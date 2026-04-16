@@ -2,9 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Chip } from "@/components/chip";
 
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -12,427 +9,200 @@ function capitalize(s: string): string {
 
 function salaryToRange(min: number | null, max: number | null): string {
   if (!min || !max) return "";
-  const ranges: Record<string, string> = {
-    "40000-60000": "$40–60k",
-    "60000-80000": "$60–80k",
-    "80000-100000": "$80–100k",
-    "100000-120000": "$100–120k",
-  };
-  const key = `${min}-${max}`;
-  return ranges[key] || (min < 40000 ? "Under $40k" : "$120k+");
+  const ranges: Record<string, string> = { "40000-60000": "$40–60k", "60000-80000": "$60–80k", "80000-100000": "$80–100k", "100000-120000": "$100–120k" };
+  return ranges[`${min}-${max}`] || (min < 40000 ? "Under $40k" : "$120k+");
 }
 
 function rangeToSalary(range: string): { min: number; max: number } | null {
-  const map: Record<string, { min: number; max: number }> = {
-    "Under $40k": { min: 0, max: 40000 },
-    "$40–60k": { min: 40000, max: 60000 },
-    "$60–80k": { min: 60000, max: 80000 },
-    "$80–100k": { min: 80000, max: 100000 },
-    "$100–120k": { min: 100000, max: 120000 },
-    "$120k+": { min: 120000, max: 200000 },
+  const m: Record<string, { min: number; max: number }> = {
+    "Under $40k": { min: 0, max: 40000 }, "$40–60k": { min: 40000, max: 60000 },
+    "$60–80k": { min: 60000, max: 80000 }, "$80–100k": { min: 80000, max: 100000 },
+    "$100–120k": { min: 100000, max: 120000 }, "$120k+": { min: 120000, max: 200000 },
   };
-  return map[range] || null;
+  return m[range] || null;
 }
 
-interface ProfileData {
-  headline: string;
-  field: string;
-  experience: string;
-  workSetup: string;
-  payRange: string;
-  city: string;
-}
+interface ProfileData { headline: string; field: string; experience: string; workSetup: string; payRange: string; city: string; }
+interface BlockedCompany { id: string; company_name: string; }
 
-interface BlockedCompany {
-  id: string;
-  company_name: string;
-}
-
-const HEADLINE_OPTIONS = [
-  "I lead teams and hit targets",
-  "I build and ship software",
-  "I keep operations running smooth",
-  "I manage the money",
-  "I take care of people",
-  "I work with my hands",
-];
-
-const FIELD_OPTIONS = [
-  "Sales & Marketing",
-  "Technology",
-  "Finance",
-  "Operations",
-  "Healthcare",
-  "Skilled Trades",
-];
-
-const EXPERIENCE_OPTIONS = [
-  "Just starting (0 yrs)",
-  "A few years (3 yrs)",
-  "Seasoned (8 yrs)",
-  "Veteran (15 yrs)",
-];
-
-const WORK_SETUP_OPTIONS = [
-  "Remote",
-  "Hybrid",
-  "On-site",
-  "Flexible",
-];
-
-const PAY_RANGE_OPTIONS = [
-  "Under $40k",
-  "$40–60k",
-  "$60–80k",
-  "$80–100k",
-  "$100–120k",
-  "$120k+",
-];
-
-const CITY_OPTIONS = [
-  "Des Moines",
-  "Cedar Rapids",
-  "Davenport",
-  "Iowa City",
-  "Waterloo",
-  "Ames",
-  "West Des Moines",
-  "Ankeny",
-];
-
+const HEADLINE_OPTIONS = ["I lead teams and hit targets", "I build and ship software", "I keep operations running smooth", "I manage the money", "I take care of people", "I work with my hands"];
+const FIELD_OPTIONS = ["Sales & Marketing", "Technology", "Finance", "Operations", "Healthcare", "Skilled Trades"];
+const EXPERIENCE_OPTIONS = ["Just starting (0 yrs)", "A few years (3 yrs)", "Seasoned (8 yrs)", "Veteran (15 yrs)"];
+const WORK_SETUP_OPTIONS = ["Remote", "Hybrid", "On-site", "Flexible"];
+const PAY_RANGE_OPTIONS = ["Under $40k", "$40–60k", "$60–80k", "$80–100k", "$100–120k", "$120k+"];
+const CITY_OPTIONS = ["Des Moines", "Cedar Rapids", "Davenport", "Iowa City", "Waterloo", "Ames", "West Des Moines", "Ankeny"];
 const AVAILABLE_COMPANIES = [
-  { id: "1", name: "Express Employment" },
-  { id: "2", name: "Rockwell Collins" },
-  { id: "3", name: "Principal Financial" },
-  { id: "4", name: "UnityPoint Health" },
-  { id: "5", name: "Hy-Vee" },
-  { id: "6", name: "John Deere" },
-  { id: "7", name: "Casey's" },
-  { id: "8", name: "Pella Corporation" },
-  { id: "9", name: "Corteva" },
-  { id: "10", name: "Wells Fargo (DSM)" },
-  { id: "11", name: "Vermeer" },
-  { id: "12", name: "Acme Corp" },
+  "Express Employment", "Rockwell Collins", "Principal Financial", "UnityPoint Health",
+  "Hy-Vee", "John Deere", "Casey's", "Pella Corporation", "Corteva", "Wells Fargo (DSM)", "Vermeer",
 ];
 
 export default function Profile() {
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [profile, setProfile] = useState<ProfileData>({
-    headline: "",
-    field: "",
-    experience: "",
-    workSetup: "",
-    payRange: "",
-    city: "",
-  });
-
-  const [blockedCompanies, setBlockedCompanies] = useState<BlockedCompany[]>([]);
-
-  // Sample fallback data
-  const fallbackProfile: ProfileData = {
-    headline: "I build and ship software",
-    field: "Technology",
-    experience: "Seasoned (8 yrs)",
-    workSetup: "Remote",
-    payRange: "$100–120k",
-    city: "Des Moines",
-  };
+  const [saved, setSaved] = useState(false);
+  const [profile, setProfile] = useState<ProfileData>({ headline: "", field: "", experience: "", workSetup: "", payRange: "", city: "" });
+  const [blocked, setBlocked] = useState<BlockedCompany[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    (async () => {
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { setLoading(false); return; }
 
-        if (!user) {
-          setProfile(fallbackProfile);
-          setLoading(false);
-          return;
-        }
-
-        // Fetch seeker card profile
-        const { data: cardData } = await supabase
-          .from("seeker_cards")
-          .select(
-            "headline, category, years_experience, arrangement, salary_min, salary_max, city"
-          )
-          .eq("profile_id", user.id)
-          .single();
-
-        if (cardData) {
+        const { data: card } = await supabase.from("seeker_cards").select("headline, category, years_experience, arrangement, salary_min, salary_max, city").eq("profile_id", user.id).single();
+        if (card) {
           setProfile({
-            headline: cardData.headline || "",
-            field: cardData.category || "",
-            experience: cardData.years_experience || "",
-            workSetup: cardData.arrangement ? capitalize(cardData.arrangement) : "",
-            payRange: salaryToRange(cardData.salary_min, cardData.salary_max),
-            city: cardData.city || "",
+            headline: card.headline || "",
+            field: card.category || "",
+            experience: card.years_experience || "",
+            workSetup: card.arrangement ? capitalize(card.arrangement) : "",
+            payRange: salaryToRange(card.salary_min, card.salary_max),
+            city: card.city || "",
           });
-        } else {
-          setProfile(fallbackProfile);
         }
 
-        // Fetch blocked companies
-        const { data: blocksData } = await supabase
-          .from("block_list")
-          .select("id, company_name")
-          .eq("seeker_id", user.id);
-
-        if (blocksData) {
-          setBlockedCompanies(blocksData);
-        }
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-        setProfile(fallbackProfile);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+        const { data: blocks } = await supabase.from("block_list").select("id, company_name").eq("seeker_id", user.id);
+        if (blocks) setBlocked(blocks);
+      } catch (e) { console.error(e); }
+      finally { setLoading(false); }
+    })();
   }, []);
 
   const handleSave = async () => {
     setSaving(true);
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setSaving(false); return; }
+    const salary = rangeToSalary(profile.payRange);
+    const { error } = await supabase.from("seeker_cards").update({
+      headline: profile.headline, category: profile.field, years_experience: profile.experience,
+      arrangement: profile.workSetup.toLowerCase() || null, salary_min: salary?.min || null, salary_max: salary?.max || null, city: profile.city,
+    }).eq("profile_id", user.id);
+    setSaving(false);
+    if (!error) { setSaved(true); setTimeout(() => setSaved(false), 2000); }
+  };
 
-      if (!user) return;
-
-      const salary = rangeToSalary(profile.payRange);
-      const { error } = await supabase
-        .from("seeker_cards")
-        .update({
-          headline: profile.headline,
-          category: profile.field,
-          years_experience: profile.experience,
-          arrangement: profile.workSetup.toLowerCase() || null,
-          salary_min: salary?.min || null,
-          salary_max: salary?.max || null,
-          city: profile.city,
-        })
-        .eq("profile_id", user.id);
-
-      if (!error) {
-        // Toast notification would go here
-      }
-    } catch (error) {
-      console.error("Error saving profile:", error);
-    } finally {
-      setSaving(false);
+  const toggleBlock = async (companyName: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const isBlocked = blocked.some((c) => c.company_name === companyName);
+    if (isBlocked) {
+      const { error } = await supabase.from("block_list").delete().eq("seeker_id", user.id).eq("company_name", companyName);
+      if (!error) setBlocked(blocked.filter((c) => c.company_name !== companyName));
+    } else {
+      const { data, error } = await supabase.from("block_list").insert({ seeker_id: user.id, company_name: companyName }).select().single();
+      if (!error && data) setBlocked([...blocked, { id: data.id, company_name: companyName }]);
     }
   };
 
-  const toggleBlockCompany = async (companyName: string, isBlocked: boolean) => {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+  if (loading) return <div className="screen-body" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}><p style={{ fontSize: 14, color: "var(--gray)" }}>Loading…</p></div>;
 
-      if (!user) return;
-
-      if (isBlocked) {
-        // Unblock
-        const { error } = await supabase
-          .from("block_list")
-          .delete()
-          .eq("seeker_id", user.id)
-          .eq("company_name", companyName);
-
-        if (!error) {
-          setBlockedCompanies(
-            blockedCompanies.filter((c) => c.company_name !== companyName)
-          );
-        }
-      } else {
-        // Block
-        const { data, error } = await supabase
-          .from("block_list")
-          .insert({
-            seeker_id: user.id,
-            company_name: companyName,
-          })
-          .select()
-          .single();
-
-        if (!error && data) {
-          setBlockedCompanies([
-            ...blockedCompanies,
-            { id: data.id, company_name: companyName },
-          ]);
-        }
-      }
-    } catch (error) {
-      console.error("Error toggling block:", error);
-    }
-  };
-
-  if (loading) {
-    return <div className="p-4 text-center">Loading...</div>;
-  }
-
-  const isBlockedByName = (companyName: string) =>
-    blockedCompanies.some((c) => c.company_name === companyName);
+  const isBlocked = (name: string) => blocked.some((c) => c.company_name === name);
 
   return (
-    <div className="flex flex-col min-h-screen bg-off-white">
-      <div className="flex-1 px-4 pt-8 pb-4">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-charcoal mb-2">
-            This is what they see
-          </h1>
-          <p className="text-sm text-gray">
-            Pick what fits — no typing required.
-          </p>
-        </div>
+    <div className="screen-body">
+      <div className="section-header">
+        <h2>This is what they see</h2>
+        <p>Pick what fits — no typing required.</p>
+      </div>
 
-        {/* Headline Section */}
-        <div className="mb-8">
-          <h2 className="text-sm font-semibold text-charcoal mb-3">
-            Pick a headline
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {HEADLINE_OPTIONS.map((option) => (
-              <Chip
-                key={option}
-                label={option}
-                selected={profile.headline === option}
-                onClick={() => setProfile({ ...profile, headline: option })}
-              />
-            ))}
-          </div>
+      {/* Headline */}
+      <div className="chip-group">
+        <div className="chip-group-label">Pick a headline</div>
+        <div className="chip-row">
+          {HEADLINE_OPTIONS.map((o) => (
+            <button key={o} className={`chip${profile.headline === o ? " selected" : ""}`} onClick={() => setProfile({ ...profile, headline: o })}>{o}</button>
+          ))}
         </div>
+      </div>
 
-        {/* Field Section */}
-        <div className="mb-8">
-          <h2 className="text-sm font-semibold text-charcoal mb-3">Field</h2>
-          <div className="flex flex-wrap gap-2">
-            {FIELD_OPTIONS.map((option) => (
-              <Chip
-                key={option}
-                label={option}
-                selected={profile.field === option}
-                onClick={() => setProfile({ ...profile, field: option })}
-              />
-            ))}
-          </div>
+      {/* Field */}
+      <div className="chip-group">
+        <div className="chip-group-label">Field</div>
+        <div className="chip-row">
+          {FIELD_OPTIONS.map((o) => (
+            <button key={o} className={`chip${profile.field === o ? " selected" : ""}`} onClick={() => setProfile({ ...profile, field: o })}>{o}</button>
+          ))}
         </div>
+      </div>
 
-        {/* Experience Section */}
-        <div className="mb-8">
-          <h2 className="text-sm font-semibold text-charcoal mb-3">
-            Experience
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {EXPERIENCE_OPTIONS.map((option) => (
-              <Chip
-                key={option}
-                label={option}
-                selected={profile.experience === option}
-                onClick={() => setProfile({ ...profile, experience: option })}
-              />
-            ))}
-          </div>
+      {/* Experience */}
+      <div className="chip-group">
+        <div className="chip-group-label">Experience</div>
+        <div className="chip-row">
+          {EXPERIENCE_OPTIONS.map((o) => (
+            <button key={o} className={`chip${profile.experience === o ? " selected" : ""}`} onClick={() => setProfile({ ...profile, experience: o })}>{o}</button>
+          ))}
         </div>
+      </div>
 
-        {/* Work Setup Section */}
-        <div className="mb-8">
-          <h2 className="text-sm font-semibold text-charcoal mb-3">
-            Work setup
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {WORK_SETUP_OPTIONS.map((option) => (
-              <Chip
-                key={option}
-                label={option}
-                selected={profile.workSetup === option}
-                onClick={() => setProfile({ ...profile, workSetup: option })}
-              />
-            ))}
-          </div>
+      {/* Work setup */}
+      <div className="chip-group">
+        <div className="chip-group-label">Work setup</div>
+        <div className="chip-row">
+          {WORK_SETUP_OPTIONS.map((o) => (
+            <button key={o} className={`chip${profile.workSetup === o ? " selected" : ""}`} onClick={() => setProfile({ ...profile, workSetup: o })}>{o}</button>
+          ))}
         </div>
+      </div>
 
-        {/* Pay Range Section */}
-        <div className="mb-8">
-          <h2 className="text-sm font-semibold text-charcoal mb-3">Pay range</h2>
-          <div className="flex flex-wrap gap-2">
-            {PAY_RANGE_OPTIONS.map((option) => (
-              <Chip
-                key={option}
-                label={option}
-                selected={profile.payRange === option}
-                onClick={() => setProfile({ ...profile, payRange: option })}
-              />
-            ))}
-          </div>
+      {/* Pay range */}
+      <div className="chip-group">
+        <div className="chip-group-label">Pay range</div>
+        <div className="chip-row">
+          {PAY_RANGE_OPTIONS.map((o) => (
+            <button key={o} className={`chip${profile.payRange === o ? " selected" : ""}`} onClick={() => setProfile({ ...profile, payRange: o })}>{o}</button>
+          ))}
         </div>
+      </div>
 
-        {/* City Section */}
-        <div className="mb-8">
-          <h2 className="text-sm font-semibold text-charcoal mb-3">City</h2>
-          <div className="flex flex-wrap gap-2">
-            {CITY_OPTIONS.map((option) => (
-              <Chip
-                key={option}
-                label={option}
-                selected={profile.city === option}
-                onClick={() => setProfile({ ...profile, city: option })}
-              />
-            ))}
-          </div>
+      {/* City */}
+      <div className="chip-group">
+        <div className="chip-group-label">City</div>
+        <div className="chip-row">
+          {CITY_OPTIONS.map((o) => (
+            <button key={o} className={`chip${profile.city === o ? " selected" : ""}`} onClick={() => setProfile({ ...profile, city: o })}>{o}</button>
+          ))}
         </div>
+      </div>
 
-        {/* Save Button */}
-        <div className="mb-8">
-          <Button
-            onClick={handleSave}
-            disabled={saving}
-            className="w-full bg-charcoal text-white hover:bg-charcoal-light py-6 h-auto font-semibold"
-          >
-            {saving ? "Saving..." : "Save"}
-          </Button>
-        </div>
+      {/* Save */}
+      <div className="cta-section">
+        <button
+          className="cta-btn cta-charcoal"
+          onClick={handleSave}
+          disabled={saving}
+          style={{ opacity: saving ? 0.5 : 1 }}
+        >
+          {saving ? "Saving…" : saved ? "Saved ✓" : "Save changes"}
+        </button>
+      </div>
 
-        {/* Block List Section */}
-        <Card className="bg-white border-border">
-          <CardHeader>
-            <CardTitle className="text-base">Hide from these companies</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {/* Available to block */}
-              <div className="space-y-2">
-                {AVAILABLE_COMPANIES.map((company) => {
-                  const blocked = isBlockedByName(company.name);
-                  return (
-                    <button
-                      key={company.id}
-                      onClick={() =>
-                        toggleBlockCompany(company.name, blocked)
-                      }
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        blocked
-                          ? "bg-red-bg text-red"
-                          : "bg-white border border-border text-charcoal hover:bg-off-white"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{company.name}</span>
-                        {blocked && <span className="text-xs">Undo</span>}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+      {/* Block List */}
+      <div className="block-section">
+        <div className="block-card">
+          <div className="block-title">Hide from these companies</div>
+
+          {/* Currently blocked */}
+          {blocked.length > 0 && (
+            <div style={{ marginBottom: 12 }}>
+              {blocked.map((c) => (
+                <span key={c.id} className="blocked-item" onClick={() => toggleBlock(c.company_name)}>
+                  {c.company_name} ✕
+                </span>
+              ))}
             </div>
-          </CardContent>
-        </Card>
+          )}
+
+          {/* Available to block */}
+          <div>
+            {AVAILABLE_COMPANIES.filter((name) => !isBlocked(name)).map((name) => (
+              <span key={name} className="company-chip" onClick={() => toggleBlock(name)}>
+                {name}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
