@@ -1,205 +1,139 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
 import { createClient } from "@/lib/supabase/client";
 import { Loader, ChevronRight } from "lucide-react";
 import type { SeekerCard } from "@/lib/types";
 
-// Sample seeker cards for fallback/demo
-const SAMPLE_SEEKERS: SeekerCard[] = [
-  {
-    id: "1",
-    profile_id: "p1",
-    headline: "Store Manager",
-    job_title: "Store Manager",
-    years_experience: "5",
-    arrangement: "on-site",
-    availability: "2 weeks",
-    salary_min: 45000,
-    salary_max: 55000,
-    city: "Des Moines",
-    state: "IA",
-    category: "Operations",
-    certifications: [],
-    skills: ["Leadership", "Inventory Management"],
-    reasons: ["Better work-life balance", "Closer to family"],
-    is_active: true,
-    // summary:"Experienced retail manager looking for a fresh opportunity",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "2",
-    profile_id: "p2",
-    headline: "Medical Assistant",
-    job_title: "Medical Assistant",
-    years_experience: "4",
-    arrangement: "on-site",
-    availability: "immediately",
-    salary_min: 32000,
-    salary_max: 38000,
-    city: "Cedar Rapids",
-    state: "IA",
-    category: "Healthcare",
-    certifications: ["CMA", "BLS"],
-    skills: ["Patient Care", "EHR Systems"],
-    reasons: ["Seeking better benefits"],
-    is_active: true,
-    // summary:"Compassionate medical assistant with clinical experience",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "3",
-    profile_id: "p3",
-    headline: "Administrative Assistant",
-    job_title: "Administrative Assistant",
-    years_experience: "6",
-    arrangement: "hybrid",
-    availability: "1 month",
-    salary_min: 38000,
-    salary_max: 45000,
-    city: "Iowa City",
-    state: "IA",
-    category: "Operations",
-    certifications: [],
-    skills: ["MS Office", "Scheduling", "Communication"],
-    reasons: ["Remote flexibility needed"],
-    is_active: true,
-    // summary:"Organized administrator seeking hybrid work arrangement",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "4",
-    profile_id: "p4",
-    headline: "Warehouse Worker",
-    job_title: "Warehouse Worker",
-    years_experience: "7",
-    arrangement: "on-site",
-    availability: "immediately",
-    salary_min: 40000,
-    salary_max: 50000,
-    city: "Davenport",
-    state: "IA",
-    category: "Skilled Trades",
-    certifications: ["Forklift"],
-    skills: ["Operations", "Safety", "Team Leadership"],
-    reasons: ["Better pay", "Career growth"],
-    is_active: true,
-    // summary:"Dedicated warehouse professional with 7+ years experience",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "5",
-    profile_id: "p5",
-    headline: "CDL Driver",
-    job_title: "CDL Driver",
-    years_experience: "8",
-    arrangement: "on-site",
-    availability: "2 weeks",
-    salary_min: 55000,
-    salary_max: 70000,
-    city: "Dubuque",
-    state: "IA",
-    category: "Skilled Trades",
-    certifications: ["CDL Class A"],
-    skills: ["Long-haul", "Route Planning"],
-    reasons: ["Home more often", "Better company culture"],
-    is_active: true,
-    // summary:"Professional CDL driver seeking stable position",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "6",
-    profile_id: "p6",
-    headline: "Electrician",
-    job_title: "Electrician",
-    years_experience: "10",
-    arrangement: "on-site",
-    availability: "1 month",
-    salary_min: 60000,
-    salary_max: 75000,
-    city: "Waterloo",
-    state: "IA",
-    category: "Skilled Trades",
-    certifications: ["Journeyman", "OSHA"],
-    skills: ["Commercial Wiring", "Code Compliance"],
-    reasons: ["New challenge", "Better benefits"],
-    is_active: true,
-    // summary:"Expert electrician ready for new projects",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
+type FilterKey = "all" | "healthcare" | "trades" | "operations" | "on-site" | "hybrid" | "remote";
 
-type FilterKey = "all" | "healthcare" | "experience" | "salary" | "onsite" | "hybrid";
+const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
+  { key: "all", label: "All" },
+  { key: "healthcare", label: "Healthcare" },
+  { key: "trades", label: "Skilled Trades" },
+  { key: "operations", label: "Operations" },
+  { key: "on-site", label: "On-site" },
+  { key: "hybrid", label: "Hybrid" },
+  { key: "remote", label: "Remote" },
+];
 
 export default function BrowsePage() {
   const [supabase] = useState(() => createClient());
-  const [seekers, setSeekers] = useState<SeekerCard[]>(SAMPLE_SEEKERS);
-  const [loading, setLoading] = useState(false);
+  const [allSeekers, setAllSeekers] = useState<SeekerCard[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Set<FilterKey>>(new Set(["all"]));
+
+  // Stats from real data
+  const [introsSent, setIntrosSent] = useState(0);
+  const [revealedCount, setRevealedCount] = useState(0);
+
   // Modal state
+  const [showIntroModal, setShowIntroModal] = useState(false);
+  const [modalSeeker, setModalSeeker] = useState<SeekerCard | null>(null);
   const [introMessage, setIntroMessage] = useState("");
   const [sendingIntro, setSendingIntro] = useState(false);
   const [introError, setIntroError] = useState("");
+  const [introSuccess, setIntroSuccess] = useState(false);
 
-  // Stats
-  const totalMatches = seekers.length;
-  const introsSent = 3; // Mock data
-  const revealed = 2; // Mock data
+  // Fetch real seekers + stats on mount
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+
+      // Fetch active seeker cards (RLS handles block list filtering)
+      const { data: cards, error } = await supabase
+        .from("seeker_cards")
+        .select("*")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
+
+      if (!error && cards) {
+        setAllSeekers(cards);
+      }
+
+      // Fetch stats for this employer
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        const { count: introsCount } = await supabase
+          .from("intros")
+          .select("*", { count: "exact", head: true })
+          .eq("employer_id", user.id);
+
+        const { count: revealsCount } = await supabase
+          .from("intros")
+          .select("*", { count: "exact", head: true })
+          .eq("employer_id", user.id)
+          .eq("status", "revealed");
+
+        setIntrosSent(introsCount || 0);
+        setRevealedCount(revealsCount || 0);
+      }
+
+      setLoading(false);
+    }
+
+    fetchData();
+  }, [supabase]);
+
+  // Apply filters
+  const filteredSeekers = allSeekers.filter((seeker) => {
+    if (filters.has("all")) return true;
+
+    let match = false;
+    if (filters.has("healthcare") && seeker.category === "Healthcare") match = true;
+    if (filters.has("trades") && seeker.category === "Skilled Trades") match = true;
+    if (filters.has("operations") && seeker.category === "Operations") match = true;
+    if (filters.has("on-site") && seeker.arrangement === "on-site") match = true;
+    if (filters.has("hybrid") && seeker.arrangement === "hybrid") match = true;
+    if (filters.has("remote") && seeker.arrangement === "remote") match = true;
+
+    return match;
+  });
 
   const getCategoryInitials = (category: string | null): string => {
-    const categoryMap: { [key: string]: string } = {
+    const categoryMap: Record<string, string> = {
       "Sales & Marketing": "SM",
-      "Healthcare": "HC",
-      "Technology": "TE",
+      Healthcare: "HC",
+      Technology: "TE",
       "Skilled Trades": "SK",
-      "Operations": "OP",
-      "Finance": "FI",
+      Operations: "OP",
+      Finance: "FI",
     };
-    return categoryMap[category || "Operations"] || "OP";
+    return categoryMap[category || ""] || "TW";
   };
 
   const toggleFilter = (filter: FilterKey) => {
-    const newFilters = new Set(filters);
+    const next = new Set(filters);
     if (filter === "all") {
-      newFilters.clear();
-      newFilters.add("all");
+      next.clear();
+      next.add("all");
     } else {
-      newFilters.delete("all");
-      if (newFilters.has(filter)) {
-        newFilters.delete(filter);
-        if (newFilters.size === 0) {
-          newFilters.add("all");
-        }
+      next.delete("all");
+      if (next.has(filter)) {
+        next.delete(filter);
+        if (next.size === 0) next.add("all");
       } else {
-        newFilters.add(filter);
+        next.add(filter);
       }
     }
-    setFilters(newFilters);
-  };
-
-  const isFilterActive = (filter: FilterKey): boolean => {
-    return filters.has(filter);
+    setFilters(next);
   };
 
   const formatSalary = (min: number | null, max: number | null): string => {
-    if (!min || !max) return "Open to offers";
-    return `$${(min / 1000).toFixed(0)}k – $${(max / 1000).toFixed(0)}k`;
+    if (!min && !max) return "Open to offers";
+    if (min && !max) return `$${(min / 1000).toFixed(0)}k+`;
+    if (!min && max) return `Up to $${(max / 1000).toFixed(0)}k`;
+    return `$${(min! / 1000).toFixed(0)}k – $${(max! / 1000).toFixed(0)}k`;
   };
-
-  const [showIntroModal, setShowIntroModal] = useState(false);
-  const [modalSeeker, setModalSeeker] = useState<SeekerCard | null>(null);
 
   const handleSayHello = (seeker: SeekerCard) => {
     setModalSeeker(seeker);
     setIntroMessage("");
     setIntroError("");
+    setIntroSuccess(false);
     setShowIntroModal(true);
   };
 
@@ -210,7 +144,9 @@ export default function BrowsePage() {
     setIntroError("");
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         setIntroError("Not authenticated");
         return;
@@ -226,38 +162,53 @@ export default function BrowsePage() {
       if (error) {
         setIntroError(error.message);
       } else {
-        setShowIntroModal(false);
-        setModalSeeker(null);
-        setIntroMessage("");
+        setIntroSuccess(true);
+        setIntrosSent((prev) => prev + 1);
+        setTimeout(() => {
+          setShowIntroModal(false);
+          setModalSeeker(null);
+          setIntroMessage("");
+          setIntroSuccess(false);
+        }, 1500);
       }
-    } catch (err) {
+    } catch {
       setIntroError("Failed to send introduction");
     } finally {
       setSendingIntro(false);
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-off-white flex items-center justify-center">
+        <Loader size={24} className="animate-spin text-charcoal" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-off-white">
       {/* Header */}
       <div className="bg-white border-b border-border px-4 py-6 sticky top-0 z-10">
         <h1 className="text-2xl font-bold text-charcoal mb-2">Browse Seekers</h1>
-        <p className="text-sm text-gray">{totalMatches} candidates in Iowa</p>
+        <p className="text-sm text-gray">
+          {filteredSeekers.length} candidate{filteredSeekers.length !== 1 ? "s" : ""} in Iowa
+        </p>
       </div>
 
       {/* Stats Row */}
       <div className="px-4 py-6 space-y-3">
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-white border border-border rounded-lg p-4">
-            <p className="text-2xl font-bold text-charcoal">{totalMatches}</p>
-            <p className="text-xs text-gray-muted">Matches</p>
+            <p className="text-2xl font-bold text-charcoal">{allSeekers.length}</p>
+            <p className="text-xs text-gray-muted">Available</p>
           </div>
           <div className="bg-white border border-border rounded-lg p-4">
             <p className="text-2xl font-bold text-charcoal">{introsSent}</p>
             <p className="text-xs text-gray-muted">Intros Sent</p>
           </div>
           <div className="bg-white border border-border rounded-lg p-4">
-            <p className="text-2xl font-bold text-charcoal">{revealed}</p>
+            <p className="text-2xl font-bold text-charcoal">{revealedCount}</p>
             <p className="text-xs text-gray-muted">Revealed</p>
           </div>
         </div>
@@ -266,12 +217,12 @@ export default function BrowsePage() {
       {/* Filter Chips */}
       <div className="px-4 py-4 border-b border-border overflow-x-auto">
         <div className="flex gap-2 min-w-min">
-          {["All", "Healthcare", "5+ yrs", "$40–50k", "On-site", "Hybrid"].map((label) => (
+          {FILTER_OPTIONS.map(({ key, label }) => (
             <button
-              key={label}
-              onClick={() => toggleFilter(label.toLowerCase() as FilterKey)}
+              key={key}
+              onClick={() => toggleFilter(key)}
               className={`px-3 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
-                isFilterActive(label.toLowerCase() as FilterKey)
+                filters.has(key)
                   ? "bg-charcoal text-white"
                   : "bg-gray-light text-charcoal hover:bg-gray"
               }`}
@@ -284,18 +235,23 @@ export default function BrowsePage() {
 
       {/* Seeker Cards */}
       <div className="px-4 py-6 space-y-4">
-        {seekers.length === 0 ? (
+        {filteredSeekers.length === 0 ? (
           <div className="bg-white border border-border rounded-lg p-8 text-center">
             <p className="text-base font-semibold text-charcoal mb-2">
-              No matches right now
+              {allSeekers.length === 0 ? "No seekers yet" : "No matches for these filters"}
             </p>
             <p className="text-sm text-gray">
-              Try loosening your filters — good people show up every day.
+              {allSeekers.length === 0
+                ? "Candidates are still signing up — check back soon."
+                : "Try loosening your filters — good people show up every day."}
             </p>
           </div>
         ) : (
-          seekers.map((seeker) => (
-            <div key={seeker.id} className="bg-white border border-border rounded-lg overflow-hidden">
+          filteredSeekers.map((seeker) => (
+            <div
+              key={seeker.id}
+              className="bg-white border border-border rounded-lg overflow-hidden"
+            >
               {/* Header with Avatar */}
               <div className="bg-charcoal text-white pb-4 px-4 py-4">
                 <div className="flex gap-3 items-start">
@@ -303,9 +259,9 @@ export default function BrowsePage() {
                     {getCategoryInitials(seeker.category)}
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-base">{seeker.job_title}</p>
+                    <p className="font-semibold text-base">{seeker.job_title || seeker.headline}</p>
                     <p className="text-sm text-gray-light">
-                      {seeker.city}, {seeker.state}
+                      {seeker.city || "Iowa"}, {seeker.state || "IA"}
                     </p>
                   </div>
                 </div>
@@ -313,24 +269,23 @@ export default function BrowsePage() {
 
               {/* Details */}
               <div className="p-4 space-y-4">
-                {/* Detail Rows */}
                 <div className="space-y-3 border-b border-border pb-4">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-muted">Experience</span>
                     <span className="font-semibold text-charcoal">
-                      {seeker.years_experience} years
+                      {seeker.years_experience || "—"} years
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-muted">Setup</span>
                     <span className="font-semibold text-charcoal capitalize">
-                      {seeker.arrangement}
+                      {seeker.arrangement || "Flexible"}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-muted">Available</span>
                     <span className="font-semibold text-charcoal capitalize">
-                      {seeker.availability}
+                      {seeker.availability || "Flexible"}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
@@ -356,11 +311,14 @@ export default function BrowsePage() {
                       {cert}
                     </span>
                   ))}
-                  {seeker.arrangement && (
-                    <span className="px-3 py-1 bg-off-white text-charcoal rounded-full text-xs font-medium">
-                      {seeker.arrangement}
+                  {seeker.skills?.slice(0, 3).map((skill) => (
+                    <span
+                      key={skill}
+                      className="px-3 py-1 bg-off-white text-charcoal rounded-full text-xs font-medium"
+                    >
+                      {skill}
                     </span>
-                  )}
+                  ))}
                 </div>
 
                 {/* CTA Button */}
@@ -375,29 +333,6 @@ export default function BrowsePage() {
           ))
         )}
       </div>
-
-      {/* Load More Button */}
-      {seekers.length > 0 && (
-        <div className="px-4 py-6">
-          <button
-            onClick={() => {
-              setLoading(true);
-              setTimeout(() => setLoading(false), 500);
-            }}
-            disabled={loading}
-            className="w-full border border-border text-charcoal py-3 px-4 rounded-lg font-medium hover:bg-off-white transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {loading ? (
-              <Loader size={16} className="animate-spin" />
-            ) : (
-              <>
-                Load more
-                <ChevronRight size={16} />
-              </>
-            )}
-          </button>
-        </div>
-      )}
 
       {/* Intro Modal */}
       {showIntroModal && (
@@ -419,62 +354,66 @@ export default function BrowsePage() {
               </button>
             </div>
 
-            {/* Summary Box */}
-            {modalSeeker && (
-              <div className="bg-off-white border border-border rounded-lg p-4 mb-4">
-                <p className="text-xs text-gray-muted mb-1">Candidate</p>
-                <p className="font-semibold text-charcoal text-sm">
-                  {modalSeeker.job_title}
-                </p>
-                <p className="text-xs text-gray mt-2">
-                  {modalSeeker.years_experience} years · {modalSeeker.city}, {modalSeeker.state}
+            {introSuccess ? (
+              <div className="py-8 text-center">
+                <p className="text-lg font-semibold text-charcoal mb-2">Intro sent!</p>
+                <p className="text-sm text-gray">
+                  They'll see your message and decide what to share.
                 </p>
               </div>
-            )}
-
-            {/* Message */}
-            <div className="space-y-2 mb-4">
-              <label className="text-xs font-semibold text-charcoal block">
-                What would you say to them?
-              </label>
-              <textarea
-                placeholder="Why this person caught your eye..."
-                value={introMessage}
-                onChange={(e) => setIntroMessage(e.target.value)}
-                className="w-full p-3 border border-border rounded-lg min-h-24 text-sm focus:outline-none focus:ring-2 focus:ring-charcoal"
-              />
-              <p className="text-xs text-gray-muted">
-                Be specific. People can tell when it's genuine.
-              </p>
-            </div>
-
-            {/* Error */}
-            {introError && (
-              <div className="bg-red-bg border border-red text-red text-xs p-3 rounded-lg mb-4">
-                {introError}
-              </div>
-            )}
-
-            {/* Footer */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowIntroModal(false)}
-                className="flex-1 border border-border text-charcoal py-3 px-4 rounded-lg font-medium hover:bg-off-white transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSendIntro}
-                disabled={sendingIntro || !introMessage.trim()}
-                className="flex-1 bg-charcoal text-white py-3 px-4 rounded-lg font-medium hover:bg-charcoal-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {sendingIntro ? (
-                  <Loader size={16} className="animate-spin" />
-                ) : (
-                  "Send"
+            ) : (
+              <>
+                {modalSeeker && (
+                  <div className="bg-off-white border border-border rounded-lg p-4 mb-4">
+                    <p className="text-xs text-gray-muted mb-1">Candidate</p>
+                    <p className="font-semibold text-charcoal text-sm">
+                      {modalSeeker.job_title || modalSeeker.headline}
+                    </p>
+                    <p className="text-xs text-gray mt-2">
+                      {modalSeeker.years_experience} years · {modalSeeker.city || "Iowa"},{" "}
+                      {modalSeeker.state || "IA"}
+                    </p>
+                  </div>
                 )}
-              </button>
-            </div>
+
+                <div className="space-y-2 mb-4">
+                  <label className="text-xs font-semibold text-charcoal block">
+                    What would you say to them?
+                  </label>
+                  <textarea
+                    placeholder="Why this person caught your eye..."
+                    value={introMessage}
+                    onChange={(e) => setIntroMessage(e.target.value)}
+                    className="w-full p-3 border border-border rounded-lg min-h-24 text-sm focus:outline-none focus:ring-2 focus:ring-charcoal"
+                  />
+                  <p className="text-xs text-gray-muted">
+                    Be specific. People can tell when it's genuine.
+                  </p>
+                </div>
+
+                {introError && (
+                  <div className="bg-red-bg border border-red text-red text-xs p-3 rounded-lg mb-4">
+                    {introError}
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowIntroModal(false)}
+                    className="flex-1 border border-border text-charcoal py-3 px-4 rounded-lg font-medium hover:bg-off-white transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSendIntro}
+                    disabled={sendingIntro || !introMessage.trim()}
+                    className="flex-1 bg-charcoal text-white py-3 px-4 rounded-lg font-medium hover:bg-charcoal-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {sendingIntro ? <Loader size={16} className="animate-spin" /> : "Send"}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
