@@ -3,11 +3,6 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { SeekerCard, Profile } from "@/lib/types";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import {
   CATEGORIES,
@@ -101,35 +96,46 @@ export default function CandidatesPage() {
 
   if (loading) {
     return (
-      <div className="screen-body flex items-center justify-center min-h-[60vh]">
-        <p className="text-sm text-gray">Loading…</p>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", paddingBottom: 80 }}>
+        <p style={{ fontSize: 14, color: "#636366" }}>Loading…</p>
       </div>
     );
   }
 
   return (
-    <div className="screen-body">
+    <div style={{ minHeight: "100vh", background: "#F8FAFC", paddingBottom: 80 }}>
       {/* Header */}
-      <div className="staffing-header">
-        <div className="express-badge">
-          <span className="express-dot" />
-          {EXPRESS_BRANDING.shortName} Staffing
+      <div style={{ background: "#003768", padding: "20px 16px", color: "#FFFFFF" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F7941D", display: "inline-block" }} />
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#F7941D", textTransform: "uppercase" }}>
+            {EXPRESS_BRANDING.shortName} Staffing
+          </span>
         </div>
-        <h1>Candidates</h1>
-        <div className="subtitle">{filtered.length} candidate{filtered.length !== 1 ? "s" : ""} in pipeline</div>
+        <h1 style={{ fontSize: 28, fontWeight: 800, margin: "12px 0 8px 0", color: "#FFFFFF" }}>Candidates</h1>
+        <div style={{ fontSize: 14, color: "#FFFFFF", opacity: 0.9 }}>
+          {filtered.length} candidate{filtered.length !== 1 ? "s" : ""} in pipeline
+        </div>
       </div>
 
       {/* Filter Chips */}
-      <div className="flex gap-2 px-4 py-4 overflow-x-auto">
+      <div style={{ display: "flex", gap: 8, padding: "16px", overflowX: "auto" }}>
         {FILTER_OPTIONS.map(({ key, label }) => (
           <button
             key={key}
             onClick={() => toggleFilter(key)}
-            className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
-              filters.has(key)
-                ? "bg-express-navy text-white border border-express-navy"
-                : "bg-white text-gray border border-border"
-            }`}
+            style={{
+              padding: "10px 16px",
+              borderRadius: 20,
+              fontSize: 14,
+              fontWeight: 600,
+              whiteSpace: "nowrap",
+              transition: "all 0.2s ease",
+              border: filters.has(key) ? "1px solid #003768" : "1px solid #E5E5EA",
+              background: filters.has(key) ? "#003768" : "#FFFFFF",
+              color: filters.has(key) ? "#FFFFFF" : "#636366",
+              cursor: "pointer"
+            }}
           >
             {label}
           </button>
@@ -138,28 +144,49 @@ export default function CandidatesPage() {
 
       {/* Candidates List */}
       {filtered.length === 0 ? (
-        <div className="text-center py-10 px-7">
-          <div className="text-4xl mb-3 opacity-40">👥</div>
-          <div className="text-base font-bold text-charcoal mb-1">No candidates yet</div>
-          <div className="text-sm text-gray leading-relaxed">Candidates show up here as they complete intake.</div>
+        <div style={{ textAlign: "center", padding: "40px 28px" }}>
+          <div style={{ fontSize: 32, marginBottom: 12, opacity: 0.4 }}>👥</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: "#1C1C1E", marginBottom: 4 }}>No candidates yet</div>
+          <div style={{ fontSize: 14, color: "#636366", lineHeight: 1.6 }}>Candidates show up here as they complete intake.</div>
         </div>
       ) : (
-        <div className="px-4 space-y-3 pb-4">
+        <div style={{ padding: "0 16px 16px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
           {filtered.map((c) => (
-            <Card key={c.id} className="overflow-hidden border-0 shadow-sm">
+            <div
+              key={c.id}
+              style={{
+                borderRadius: 16,
+                background: "#FFFFFF",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                overflow: "hidden"
+              }}
+            >
               {/* Header — Express navy */}
-              <div className="job-card-header">
-                <Avatar className="w-11 h-11 bg-express-navy-light text-white flex items-center justify-center font-bold text-base">
-                  {/* In staffing mode, show name initials if available */}
+              <div style={{ background: "#0a4a80", padding: "12px 16px", display: "flex", alignItems: "center", gap: 12 }}>
+                <div
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 8,
+                    background: "#0a4a80",
+                    color: "#FFFFFF",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: 700,
+                    fontSize: 16,
+                    border: "2px solid rgba(255,255,255,0.3)"
+                  }}
+                >
                   {c.profiles?.name
                     ? c.profiles.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
                     : getCategoryInitials(c.category)}
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="title truncate">
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ color: "#FFFFFF", fontWeight: 600, fontSize: 14, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {c.profiles?.name || c.job_title || c.headline || "Candidate"}
                   </div>
-                  <div className="sub">
+                  <div style={{ color: "rgba(255,255,255,0.8)", fontSize: 12, marginTop: 2 }}>
                     {c.job_title && c.profiles?.name ? `${c.job_title} · ` : ""}
                     {c.city || "Iowa"}, {c.state || "IA"}
                   </div>
@@ -167,164 +194,252 @@ export default function CandidatesPage() {
               </div>
 
               {/* Body */}
-              <div className="px-4 py-4 space-y-2 bg-white">
+              <div style={{ padding: "16px", background: "#FFFFFF", display: "flex", flexDirection: "column", gap: 8 }}>
                 {c.profiles?.email && (
-                  <div className="flex justify-between items-center pb-2 border-b border-off-white text-sm">
-                    <span className="text-gray">Email</span>
-                    <span className="text-charcoal font-semibold text-xs">{c.profiles.email}</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 8, borderBottom: "1px solid #F5F5F5", fontSize: 14 }}>
+                    <span style={{ color: "#636366" }}>Email</span>
+                    <span style={{ color: "#1C1C1E", fontWeight: 600, fontSize: 12 }}>{c.profiles.email}</span>
                   </div>
                 )}
                 {c.profiles?.phone && (
-                  <div className="flex justify-between items-center pb-2 border-b border-off-white text-sm">
-                    <span className="text-gray">Phone</span>
-                    <span className="text-charcoal font-semibold">{c.profiles.phone}</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 8, borderBottom: "1px solid #F5F5F5", fontSize: 14 }}>
+                    <span style={{ color: "#636366" }}>Phone</span>
+                    <span style={{ color: "#1C1C1E", fontWeight: 600 }}>{c.profiles.phone}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center pb-2 border-b border-off-white text-sm">
-                  <span className="text-gray">Experience</span>
-                  <span className="text-charcoal font-semibold">{c.years_experience || "—"}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 8, borderBottom: "1px solid #F5F5F5", fontSize: 14 }}>
+                  <span style={{ color: "#636366" }}>Experience</span>
+                  <span style={{ color: "#1C1C1E", fontWeight: 600 }}>{c.years_experience || "—"}</span>
                 </div>
-                <div className="flex justify-between items-center pb-2 border-b border-off-white text-sm">
-                  <span className="text-gray">Setup</span>
-                  <span className="text-charcoal font-semibold capitalize">{c.arrangement || "Flexible"}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 8, borderBottom: "1px solid #F5F5F5", fontSize: 14 }}>
+                  <span style={{ color: "#636366" }}>Setup</span>
+                  <span style={{ color: "#1C1C1E", fontWeight: 600, textTransform: "capitalize" }}>{c.arrangement || "Flexible"}</span>
                 </div>
-                <div className="flex justify-between items-center pb-2 border-b border-off-white text-sm">
-                  <span className="text-gray">Available</span>
-                  <span className="text-charcoal font-semibold capitalize">{c.availability || "Flexible"}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 8, borderBottom: "1px solid #F5F5F5", fontSize: 14 }}>
+                  <span style={{ color: "#636366" }}>Available</span>
+                  <span style={{ color: "#1C1C1E", fontWeight: 600, textTransform: "capitalize" }}>{c.availability || "Flexible"}</span>
                 </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray">Pay range</span>
-                  <span className="text-charcoal font-semibold">{formatSalary(c.salary_min, c.salary_max)}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 14 }}>
+                  <span style={{ color: "#636366" }}>Pay range</span>
+                  <span style={{ color: "#1C1C1E", fontWeight: 600 }}>{formatSalary(c.salary_min, c.salary_max)}</span>
                 </div>
               </div>
 
               {/* Tags */}
-              <div className="px-4 py-3 flex flex-wrap gap-2 bg-white border-t border-off-white">
-                {c.category && <Badge variant="secondary">{c.category}</Badge>}
+              <div style={{ padding: "12px 16px", background: "#FFFFFF", borderTop: "1px solid #F5F5F5", display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {c.category && (
+                  <span style={{ background: "#E8EBF5", color: "#003768", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
+                    {c.category}
+                  </span>
+                )}
                 {c.certifications?.map((cert) => (
-                  <Badge key={cert} className="bg-green-bg text-green-700">{cert}</Badge>
+                  <span key={cert} style={{ background: "#F0FFF4", color: "#22863A", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
+                    {cert}
+                  </span>
                 ))}
                 {c.skills?.slice(0, 3).map((s) => (
-                  <Badge key={s} variant="secondary">{s}</Badge>
+                  <span key={s} style={{ background: "#E8EBF5", color: "#003768", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
+                    {s}
+                  </span>
                 ))}
               </div>
 
               {/* Actions */}
-              <div className="px-4 py-4 bg-white flex gap-3">
-                <Button
+              <div style={{ padding: "16px", background: "#FFFFFF", display: "flex", gap: 12 }}>
+                <button
                   onClick={() => handleViewCandidate(c)}
-                  variant="outline"
-                  className="flex-1 border-express-navy text-express-navy font-semibold"
+                  style={{
+                    flex: 1,
+                    border: "1.5px solid #003768",
+                    color: "#003768",
+                    fontWeight: 600,
+                    padding: "12px 16px",
+                    background: "#FFFFFF",
+                    borderRadius: 10,
+                    fontSize: 14,
+                    cursor: "pointer",
+                    transition: "all 0.2s ease"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "#F8FAFC";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "#FFFFFF";
+                  }}
                 >
                   View details
-                </Button>
-                <Button
+                </button>
+                <button
                   onClick={() => handleViewCandidate(c)}
-                  className="flex-1 bg-express-navy hover:bg-express-navy-light text-white font-semibold"
+                  style={{
+                    flex: 1,
+                    background: "#003768",
+                    color: "#FFFFFF",
+                    fontWeight: 600,
+                    padding: "12px 16px",
+                    border: "none",
+                    borderRadius: 10,
+                    fontSize: 14,
+                    cursor: "pointer",
+                    transition: "background 0.2s ease"
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "#0a4a80")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "#003768")}
                 >
                   Match to job
-                </Button>
+                </button>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}
 
       {/* Candidate Detail Modal */}
-      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-        <DialogContent className="w-full max-w-[430px] rounded-t-3xl rounded-b-none max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Candidate Details</DialogTitle>
-          </DialogHeader>
+      {detailOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "flex-end",
+            zIndex: 50
+          }}
+          onClick={() => setDetailOpen(false)}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: 430,
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              background: "#FFFFFF",
+              maxHeight: "80vh",
+              overflowY: "auto"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ padding: "20px 16px", borderBottom: "1px solid #E5E5EA" }}>
+              <h2 style={{ fontSize: 16, fontWeight: 600, color: "#1C1C1E", margin: 0 }}>Candidate Details</h2>
+            </div>
 
-          {selectedCandidate && (
-            <div className="space-y-4">
-              {/* Name & contact — full visibility in staffing mode */}
-              <div className="bg-express-orange-bg p-4 rounded-2xl space-y-2">
-                <div className="font-bold text-sm text-charcoal">
-                  {candidateProfile?.name || selectedCandidate.job_title || "Candidate"}
+            {selectedCandidate && (
+              <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: 16 }}>
+                {/* Name & contact — full visibility in staffing mode */}
+                <div style={{ background: "#FFF7ED", padding: 16, borderRadius: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: "#1C1C1E" }}>
+                    {candidateProfile?.name || selectedCandidate.job_title || "Candidate"}
+                  </div>
+                  {candidateProfile?.email && (
+                    <div style={{ fontSize: 12, color: "#636366" }}>{candidateProfile.email}</div>
+                  )}
+                  {candidateProfile?.phone && (
+                    <div style={{ fontSize: 12, color: "#636366" }}>{candidateProfile.phone}</div>
+                  )}
+                  {candidateProfile?.linkedin && (
+                    <div style={{ fontSize: 12, color: "#636366" }}>{candidateProfile.linkedin}</div>
+                  )}
                 </div>
-                {candidateProfile?.email && (
-                  <div className="text-xs text-gray">{candidateProfile.email}</div>
-                )}
-                {candidateProfile?.phone && (
-                  <div className="text-xs text-gray">{candidateProfile.phone}</div>
-                )}
-                {candidateProfile?.linkedin && (
-                  <div className="text-xs text-gray">{candidateProfile.linkedin}</div>
-                )}
-              </div>
 
-              {/* Card info */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray">Title</span>
-                  <span className="font-semibold text-charcoal">{selectedCandidate.job_title || "—"}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray">Experience</span>
-                  <span className="font-semibold text-charcoal">{selectedCandidate.years_experience || "—"}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray">Location</span>
-                  <span className="font-semibold text-charcoal">{selectedCandidate.city || "Iowa"}, {selectedCandidate.state}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray">Setup</span>
-                  <span className="font-semibold text-charcoal capitalize">{selectedCandidate.arrangement || "Flexible"}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray">Available</span>
-                  <span className="font-semibold text-charcoal capitalize">{selectedCandidate.availability || "Flexible"}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray">Pay range</span>
-                  <span className="font-semibold text-charcoal">{formatSalary(selectedCandidate.salary_min, selectedCandidate.salary_max)}</span>
-                </div>
-              </div>
-
-              {/* Skills & certs */}
-              {(selectedCandidate.certifications?.length > 0 || selectedCandidate.skills?.length > 0) && (
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {selectedCandidate.certifications?.map((c) => (
-                    <Badge key={c} className="bg-green-bg text-green-700">{c}</Badge>
-                  ))}
-                  {selectedCandidate.skills?.map((s) => (
-                    <Badge key={s} variant="secondary">{s}</Badge>
-                  ))}
-                </div>
-              )}
-
-              {/* Why looking */}
-              {selectedCandidate.reasons?.length > 0 && (
-                <div>
-                  <div className="text-xs font-bold text-gray mb-2">Why they're looking</div>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedCandidate.reasons.map((r) => (
-                      <Badge key={r} className="bg-red-bg text-red">{r}</Badge>
-                    ))}
+                {/* Card info */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
+                    <span style={{ color: "#636366" }}>Title</span>
+                    <span style={{ fontWeight: 600, color: "#1C1C1E" }}>{selectedCandidate.job_title || "—"}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
+                    <span style={{ color: "#636366" }}>Experience</span>
+                    <span style={{ fontWeight: 600, color: "#1C1C1E" }}>{selectedCandidate.years_experience || "—"}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
+                    <span style={{ color: "#636366" }}>Location</span>
+                    <span style={{ fontWeight: 600, color: "#1C1C1E" }}>{selectedCandidate.city || "Iowa"}, {selectedCandidate.state}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
+                    <span style={{ color: "#636366" }}>Setup</span>
+                    <span style={{ fontWeight: 600, color: "#1C1C1E", textTransform: "capitalize" }}>{selectedCandidate.arrangement || "Flexible"}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
+                    <span style={{ color: "#636366" }}>Available</span>
+                    <span style={{ fontWeight: 600, color: "#1C1C1E", textTransform: "capitalize" }}>{selectedCandidate.availability || "Flexible"}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
+                    <span style={{ color: "#636366" }}>Pay range</span>
+                    <span style={{ fontWeight: 600, color: "#1C1C1E" }}>{formatSalary(selectedCandidate.salary_min, selectedCandidate.salary_max)}</span>
                   </div>
                 </div>
-              )}
 
-              <div className="flex gap-3 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setDetailOpen(false)}
-                  className="flex-1"
-                >
-                  Close
-                </Button>
-                <Button
-                  className="flex-[2] bg-express-navy hover:bg-express-navy-light text-white font-semibold"
-                >
-                  Match to job
-                </Button>
+                {/* Skills & certs */}
+                {(selectedCandidate.certifications?.length > 0 || selectedCandidate.skills?.length > 0) && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, paddingTop: 8 }}>
+                    {selectedCandidate.certifications?.map((c) => (
+                      <span key={c} style={{ background: "#F0FFF4", color: "#22863A", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
+                        {c}
+                      </span>
+                    ))}
+                    {selectedCandidate.skills?.map((s) => (
+                      <span key={s} style={{ background: "#E8EBF5", color: "#003768", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Why looking */}
+                {selectedCandidate.reasons?.length > 0 && (
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#636366", marginBottom: 8 }}>Why they're looking</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      {selectedCandidate.reasons.map((r) => (
+                        <span key={r} style={{ background: "#FFF5F5", color: "#E53E3E", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
+                          {r}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div style={{ display: "flex", gap: 12, paddingTop: 16 }}>
+                  <button
+                    onClick={() => setDetailOpen(false)}
+                    style={{
+                      flex: 1,
+                      border: "1.5px solid #E5E5EA",
+                      color: "#003768",
+                      fontWeight: 600,
+                      padding: "12px 16px",
+                      background: "#FFFFFF",
+                      borderRadius: 10,
+                      fontSize: 14,
+                      cursor: "pointer"
+                    }}
+                  >
+                    Close
+                  </button>
+                  <button
+                    style={{
+                      flex: 2,
+                      background: "#003768",
+                      color: "#FFFFFF",
+                      fontWeight: 600,
+                      padding: "12px 16px",
+                      border: "none",
+                      borderRadius: 10,
+                      fontSize: 14,
+                      cursor: "pointer",
+                      transition: "background 0.2s ease"
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#0a4a80")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "#003768")}
+                  >
+                    Match to job
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

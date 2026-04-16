@@ -76,55 +76,190 @@ export default function EmployerOnboarding() {
   };
 
   return (
-    <div className="screen-body">
-      <div className="step-bar">
+    <div style={{ flex: 1, overflowY: "auto", paddingBottom: "80px", background: "#F5F5F5" }}>
+      <div style={{ display: "flex", gap: "4px", padding: "16px 22px 0" }}>
         {[1, 2].map((s) => (
-          <div key={s} className={`step-segment ${s <= step ? "filled" : ""}`} />
+          <div
+            key={s}
+            style={{
+              flex: 1,
+              height: "3px",
+              background: s <= step ? "#1C1C1E" : "#E5E5EA",
+              borderRadius: "2px",
+            }}
+          />
         ))}
       </div>
-      <div className="step-label">Step {step} of 2</div>
+      <div style={{ textAlign: "center", fontSize: "11px", color: "#AEAEB2", padding: "8px 0 0", fontWeight: 500 }}>
+        Step {step} of 2
+      </div>
 
       {step === 1 && (
         <>
-          <div className="section-header">
-            <h2>Tell us about you</h2>
-            <p>Candidates see your name and company when you reach out.</p>
+          <div style={{ padding: "24px 20px 8px" }}>
+            <h2 style={{ fontSize: "24px", fontWeight: 800, color: "#1C1C1E", letterSpacing: "-0.5px", lineHeight: 1.15, margin: 0 }}>
+              Tell us about you
+            </h2>
+            <p style={{ fontSize: "14px", color: "#636366", marginTop: "4px", lineHeight: 1.4, margin: "4px 0 0" }}>
+              Candidates see your name and company when you reach out.
+            </p>
           </div>
 
-          <label className="form-label">Your name</label>
-          <input className="form-input" placeholder="First and last" value={name} onChange={(e) => setName(e.target.value)} />
-
-          <label className="form-label">Email</label>
-          <input className="form-input" type="email" placeholder="you@company.com" value={email} onChange={(e) => setEmail(e.target.value)} />
-
-          <label className="form-label">Password</label>
-          <input className="form-input" type="password" placeholder="Min 6 characters" value={password} onChange={(e) => setPassword(e.target.value)} />
-
-          <label className="form-label">Company</label>
-          <input className="form-input" placeholder="Where do you work?" value={company} onChange={(e) => setCompany(e.target.value)} />
-
-          <label className="form-label">
-            Title <span style={{ fontWeight: 400, color: "var(--gray-light)" }}>(optional)</span>
+          <label style={{ display: "block", padding: "0 22px", marginBottom: "6px", fontSize: "13px", fontWeight: 700, color: "#1C1C1E" }}>
+            Your name
           </label>
-          <input className="form-input" placeholder="HR Director, Recruiter, etc." value={title} onChange={(e) => setTitle(e.target.value)} />
+          <input
+            style={{
+              display: "block",
+              width: "calc(100% - 44px)",
+              margin: "0 22px 14px",
+              padding: "13px 16px",
+              border: "1.5px solid #E5E5EA",
+              borderRadius: "12px",
+              fontSize: "14px",
+              fontFamily: "inherit",
+              color: "#1C1C1E",
+              background: "#FFFFFF",
+              outline: "none",
+            }}
+            placeholder="First and last"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+
+          <label style={{ display: "block", padding: "0 22px", marginBottom: "6px", fontSize: "13px", fontWeight: 700, color: "#1C1C1E" }}>
+            Email
+          </label>
+          <input
+            style={{
+              display: "block",
+              width: "calc(100% - 44px)",
+              margin: "0 22px 14px",
+              padding: "13px 16px",
+              border: "1.5px solid #E5E5EA",
+              borderRadius: "12px",
+              fontSize: "14px",
+              fontFamily: "inherit",
+              color: "#1C1C1E",
+              background: "#FFFFFF",
+              outline: "none",
+            }}
+            type="email"
+            placeholder="you@company.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <label style={{ display: "block", padding: "0 22px", marginBottom: "6px", fontSize: "13px", fontWeight: 700, color: "#1C1C1E" }}>
+            Password
+          </label>
+          <input
+            style={{
+              display: "block",
+              width: "calc(100% - 44px)",
+              margin: "0 22px 14px",
+              padding: "13px 16px",
+              border: "1.5px solid #E5E5EA",
+              borderRadius: "12px",
+              fontSize: "14px",
+              fontFamily: "inherit",
+              color: "#1C1C1E",
+              background: "#FFFFFF",
+              outline: "none",
+            }}
+            type="password"
+            placeholder="Min 6 characters"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <label style={{ display: "block", padding: "0 22px", marginBottom: "6px", fontSize: "13px", fontWeight: 700, color: "#1C1C1E" }}>
+            Company
+          </label>
+          <input
+            style={{
+              display: "block",
+              width: "calc(100% - 44px)",
+              margin: "0 22px 14px",
+              padding: "13px 16px",
+              border: "1.5px solid #E5E5EA",
+              borderRadius: "12px",
+              fontSize: "14px",
+              fontFamily: "inherit",
+              color: "#1C1C1E",
+              background: "#FFFFFF",
+              outline: "none",
+            }}
+            placeholder="Where do you work?"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+          />
+
+          <label style={{ display: "block", padding: "0 22px", marginBottom: "6px", fontSize: "13px", fontWeight: 700, color: "#1C1C1E" }}>
+            Title <span style={{ fontWeight: 400, color: "#AEAEB2" }}>(optional)</span>
+          </label>
+          <input
+            style={{
+              display: "block",
+              width: "calc(100% - 44px)",
+              margin: "0 22px 14px",
+              padding: "13px 16px",
+              border: "1.5px solid #E5E5EA",
+              borderRadius: "12px",
+              fontSize: "14px",
+              fontFamily: "inherit",
+              color: "#1C1C1E",
+              background: "#FFFFFF",
+              outline: "none",
+            }}
+            placeholder="HR Director, Recruiter, etc."
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
 
           {error && (
-            <div style={{
-              padding: "10px 14px",
-              margin: "0 22px 14px",
-              borderRadius: "10px",
-              backgroundColor: "var(--red-bg)",
-              color: "var(--red)",
-              fontSize: "13px",
-            }}>
+            <div
+              style={{
+                padding: "10px 14px",
+                margin: "0 22px 14px",
+                borderRadius: "10px",
+                backgroundColor: "#FFF5F5",
+                color: "#E53E3E",
+                fontSize: "13px",
+              }}
+            >
               {error}
             </div>
           )}
 
-          <div className="cta-section">
-            <button className="cta-btn cta-charcoal" onClick={() => setStep(2)}>Continue</button>
+          <div style={{ padding: "8px 20px 20px" }}>
+            <button
+              style={{
+                display: "block",
+                width: "100%",
+                padding: "15px",
+                borderRadius: "14px",
+                fontSize: "15px",
+                fontWeight: 600,
+                textAlign: "center",
+                cursor: "pointer",
+                marginBottom: "10px",
+                border: "1.5px solid transparent",
+                fontFamily: "inherit",
+                background: "#1C1C1E",
+                color: "#FFFFFF",
+              }}
+              onClick={() => setStep(2)}
+            >
+              Continue
+            </button>
             <div style={{ textAlign: "center", padding: "6px 0" }}>
-              <Link href="/" className="footer-link">Back</Link>
+              <Link
+                href="/"
+                style={{ color: "#636366", fontWeight: 600, cursor: "pointer", textDecoration: "underline", textDecorationLine: "underline", textUnderlineOffset: "2px" }}
+              >
+                Back
+              </Link>
             </div>
           </div>
         </>
@@ -132,16 +267,37 @@ export default function EmployerOnboarding() {
 
       {step === 2 && (
         <>
-          <div className="section-header">
-            <h2>Where are you based?</h2>
-            <p>Helps candidates know who&apos;s reaching out. Optional.</p>
+          <div style={{ padding: "24px 20px 8px" }}>
+            <h2 style={{ fontSize: "24px", fontWeight: 800, color: "#1C1C1E", letterSpacing: "-0.5px", lineHeight: 1.15, margin: 0 }}>
+              Where are you based?
+            </h2>
+            <p style={{ fontSize: "14px", color: "#636366", marginTop: "4px", lineHeight: 1.4, margin: "4px 0 0" }}>
+              Helps candidates know who&apos;s reaching out. Optional.
+            </p>
           </div>
 
-          <div className="chip-group">
-            <div className="chip-group-label">City</div>
-            <div className="chip-row">
+          <div style={{ padding: "0 20px", marginBottom: "20px" }}>
+            <div style={{ fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "8px" }}>
+              City
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "7px" }}>
               {CITY_OPTIONS.map((c) => (
-                <span key={c} className={`chip ${city === c ? "selected" : ""}`} onClick={() => setCity(c)}>
+                <span
+                  key={c}
+                  style={{
+                    padding: "9px 15px",
+                    borderRadius: "22px",
+                    border: "1.5px solid " + (city === c ? "#1C1C1E" : "#E5E5EA"),
+                    background: city === c ? "#1C1C1E" : "#FFFFFF",
+                    fontSize: "13px",
+                    fontWeight: 500,
+                    color: city === c ? "#FFFFFF" : "#1C1C1E",
+                    cursor: "pointer",
+                    userSelect: "none",
+                    fontFamily: "inherit",
+                  }}
+                  onClick={() => setCity(c)}
+                >
                   {c}
                 </span>
               ))}
@@ -149,29 +305,50 @@ export default function EmployerOnboarding() {
           </div>
 
           {error && (
-            <div style={{
-              padding: "10px 14px",
-              margin: "0 22px 14px",
-              borderRadius: "10px",
-              backgroundColor: "var(--red-bg)",
-              color: "var(--red)",
-              fontSize: "13px",
-            }}>
+            <div
+              style={{
+                padding: "10px 14px",
+                margin: "0 22px 14px",
+                borderRadius: "10px",
+                backgroundColor: "#FFF5F5",
+                color: "#E53E3E",
+                fontSize: "13px",
+              }}
+            >
               {error}
             </div>
           )}
 
-          <div className="cta-section">
+          <div style={{ padding: "8px 20px 20px" }}>
             <button
-              className="cta-btn cta-charcoal"
+              style={{
+                display: "block",
+                width: "100%",
+                padding: "15px",
+                borderRadius: "14px",
+                fontSize: "15px",
+                fontWeight: 600,
+                textAlign: "center",
+                cursor: "pointer",
+                marginBottom: "10px",
+                border: "1.5px solid transparent",
+                fontFamily: "inherit",
+                background: "#1C1C1E",
+                color: "#FFFFFF",
+                opacity: loading ? 0.6 : 1,
+              }}
               onClick={handleStartBrowsing}
               disabled={loading}
-              style={{ opacity: loading ? 0.6 : 1 }}
             >
               {loading ? "Setting up..." : "Start Browsing"}
             </button>
             <div style={{ textAlign: "center", padding: "6px 0" }}>
-              <span className="footer-link" onClick={() => setStep(1)}>Back</span>
+              <span
+                style={{ color: "#636366", fontWeight: 600, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: "2px" }}
+                onClick={() => setStep(1)}
+              >
+                Back
+              </span>
             </div>
           </div>
         </>

@@ -3,10 +3,6 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar } from "@/components/ui/avatar";
 
 interface RevealedContact {
   intro_id: string;
@@ -99,8 +95,17 @@ export default function ContactsPage() {
 
   if (loading) {
     return (
-      <div className="screen-body flex items-center justify-center min-h-[60vh]">
-        <p className="text-sm text-gray">Loading…</p>
+      <div style={{
+        minHeight: "60vh",
+        backgroundColor: "#F5F5F5",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}>
+        <p style={{
+          fontSize: "14px",
+          color: "#636366"
+        }}>Loading…</p>
       </div>
     );
   }
@@ -111,108 +116,331 @@ export default function ContactsPage() {
   const hiredCount = outreach.filter((o) => o.status === "hired").length;
 
   return (
-    <div className="screen-body">
+    <div style={{
+      minHeight: "100vh",
+      paddingBottom: 80,
+      backgroundColor: "#F5F5F5"
+    }}>
       {/* Header */}
-      <div className="px-5 pt-6 pb-2">
-        <h2 className="text-2xl font-extrabold text-charcoal">
+      <div style={{
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingTop: 24,
+        paddingBottom: 8
+      }}>
+        <h2 style={{
+          fontSize: "24px",
+          fontWeight: "900",
+          color: "#1C1C1E"
+        }}>
           {userName ? `Hey, ${userName}.` : "Your Contacts"}
         </h2>
-        {companyName && <p className="text-sm text-gray mt-1">{companyName}</p>}
+        {companyName && <p style={{
+          fontSize: "14px",
+          color: "#636366",
+          marginTop: 4
+        }}>{companyName}</p>}
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-3 px-4 py-3 my-3 mx-4 bg-white rounded-3xl shadow-sm">
-        <div className="text-center py-1">
-          <div className="text-2xl font-extrabold text-charcoal">{sentCount}</div>
-          <div className="text-xs text-gray mt-1 font-medium">Sent</div>
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 12,
+        padding: 16,
+        margin: 12,
+        marginLeft: 16,
+        marginRight: 16,
+        backgroundColor: "#FFFFFF",
+        borderRadius: "24px",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
+      }}>
+        <div style={{
+          textAlign: "center",
+          paddingTop: 4,
+          paddingBottom: 4
+        }}>
+          <div style={{
+            fontSize: "24px",
+            fontWeight: "900",
+            color: "#1C1C1E"
+          }}>{sentCount}</div>
+          <div style={{
+            fontSize: "12px",
+            color: "#636366",
+            marginTop: 4,
+            fontWeight: "500"
+          }}>Sent</div>
         </div>
-        <div className="text-center py-1">
-          <div className="text-2xl font-extrabold text-charcoal">{waitingCount}</div>
-          <div className="text-xs text-gray mt-1 font-medium">Waiting</div>
+        <div style={{
+          textAlign: "center",
+          paddingTop: 4,
+          paddingBottom: 4
+        }}>
+          <div style={{
+            fontSize: "24px",
+            fontWeight: "900",
+            color: "#1C1C1E"
+          }}>{waitingCount}</div>
+          <div style={{
+            fontSize: "12px",
+            color: "#636366",
+            marginTop: 4,
+            fontWeight: "500"
+          }}>Waiting</div>
         </div>
-        <div className="text-center py-1">
-          <div className="text-2xl font-extrabold text-charcoal">{revealedCount}</div>
-          <div className="text-xs text-gray mt-1 font-medium">Opened</div>
+        <div style={{
+          textAlign: "center",
+          paddingTop: 4,
+          paddingBottom: 4
+        }}>
+          <div style={{
+            fontSize: "24px",
+            fontWeight: "900",
+            color: "#1C1C1E"
+          }}>{revealedCount}</div>
+          <div style={{
+            fontSize: "12px",
+            color: "#636366",
+            marginTop: 4,
+            fontWeight: "500"
+          }}>Opened</div>
         </div>
-        <div className="text-center py-1">
-          <div className="text-2xl font-extrabold text-charcoal">{hiredCount}</div>
-          <div className="text-xs text-gray mt-1 font-medium">Hired</div>
+        <div style={{
+          textAlign: "center",
+          paddingTop: 4,
+          paddingBottom: 4
+        }}>
+          <div style={{
+            fontSize: "24px",
+            fontWeight: "900",
+            color: "#1C1C1E"
+          }}>{hiredCount}</div>
+          <div style={{
+            fontSize: "12px",
+            color: "#636366",
+            marginTop: 4,
+            fontWeight: "500"
+          }}>Hired</div>
         </div>
       </div>
 
       {/* Revealed Contacts */}
-      <div className="text-sm font-bold text-charcoal px-5 py-3">People who shared with you ({contacts.length})</div>
+      <div style={{
+        fontSize: "14px",
+        fontWeight: "700",
+        color: "#1C1C1E",
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingTop: 12,
+        paddingBottom: 12
+      }}>People who shared with you ({contacts.length})</div>
 
       {contacts.length === 0 ? (
-        <div className="text-center py-10 px-7">
-          <div className="text-4xl mb-3 opacity-40">🤝</div>
-          <div className="text-base font-bold text-charcoal mb-1">Nobody's opened up yet</div>
-          <div className="text-sm text-gray leading-relaxed mb-4">When someone shares their info, they'll show up here.</div>
+        <div style={{
+          textAlign: "center",
+          paddingTop: 40,
+          paddingBottom: 40,
+          paddingLeft: 28,
+          paddingRight: 28
+        }}>
+          <div style={{
+            fontSize: "36px",
+            marginBottom: 12,
+            opacity: 0.4
+          }}>🤝</div>
+          <div style={{
+            fontSize: "16px",
+            fontWeight: "700",
+            color: "#1C1C1E",
+            marginBottom: 4
+          }}>Nobody's opened up yet</div>
+          <div style={{
+            fontSize: "14px",
+            color: "#636366",
+            lineHeight: "1.5",
+            marginBottom: 16
+          }}>When someone shares their info, they'll show up here.</div>
           <Link href="/browse">
-            <Button className="bg-charcoal hover:bg-charcoal-light text-white font-semibold">
+            <button style={{
+              backgroundColor: "#1C1C1E",
+              color: "#FFFFFF",
+              fontWeight: "600",
+              padding: "10px 16px",
+              borderRadius: "8px",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "14px"
+            }}>
               Browse candidates
-            </Button>
+            </button>
           </Link>
         </div>
       ) : (
-        <div className="px-4 space-y-3 pb-4">
+        <div style={{
+          paddingLeft: 16,
+          paddingRight: 16,
+          display: "flex",
+          flexDirection: "column",
+          gap: 12,
+          paddingBottom: 16
+        }}>
           {contacts.map((c) => (
-            <Card key={c.intro_id} className="p-4 flex items-center gap-3 border-0 shadow-sm">
-              <Avatar className="w-10 h-10 bg-charcoal text-white flex items-center justify-center font-bold">
+            <div key={c.intro_id} style={{
+              padding: 16,
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              backgroundColor: "#FFFFFF",
+              borderRadius: "16px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
+            }}>
+              <div style={{
+                width: 40,
+                height: 40,
+                backgroundColor: "#1C1C1E",
+                color: "#FFFFFF",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "700",
+                borderRadius: "50%",
+                flexShrink: 0
+              }}>
                 {c.name ? c.name.charAt(0).toUpperCase() : "?"}
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-bold text-charcoal">{c.name || "Anonymous"}</div>
+              </div>
+              <div style={{
+                flex: 1,
+                minWidth: 0
+              }}>
+                <div style={{
+                  fontSize: "14px",
+                  fontWeight: "700",
+                  color: "#1C1C1E"
+                }}>{c.name || "Anonymous"}</div>
                 {c.email && (
-                  <a href={`mailto:${c.email}`} className="text-xs text-gray hover:text-charcoal block mt-0.5">
+                  <a href={`mailto:${c.email}`} style={{
+                    fontSize: "12px",
+                    color: "#636366",
+                    display: "block",
+                    marginTop: 2,
+                    textDecoration: "none"
+                  }} onMouseEnter={(e) => e.currentTarget.style.color = "#1C1C1E"} onMouseLeave={(e) => e.currentTarget.style.color = "#636366"}>
                     ✉ {c.email}
                   </a>
                 )}
                 {c.phone && (
-                  <a href={`tel:${c.phone}`} className="text-xs text-gray hover:text-charcoal block">
+                  <a href={`tel:${c.phone}`} style={{
+                    fontSize: "12px",
+                    color: "#636366",
+                    display: "block",
+                    textDecoration: "none"
+                  }} onMouseEnter={(e) => e.currentTarget.style.color = "#1C1C1E"} onMouseLeave={(e) => e.currentTarget.style.color = "#636366"}>
                     ☎ {c.phone}
                   </a>
                 )}
                 {c.linkedin && (
-                  <a href={`https://${c.linkedin}`} target="_blank" rel="noopener noreferrer" className="text-xs text-gray hover:text-charcoal block">
+                  <a href={`https://${c.linkedin}`} target="_blank" rel="noopener noreferrer" style={{
+                    fontSize: "12px",
+                    color: "#636366",
+                    display: "block",
+                    textDecoration: "none"
+                  }} onMouseEnter={(e) => e.currentTarget.style.color = "#1C1C1E"} onMouseLeave={(e) => e.currentTarget.style.color = "#636366"}>
                     🔗 LinkedIn
                   </a>
                 )}
               </div>
-              {c.status === "hired" && <Badge className="bg-charcoal text-white text-xs">HIRED</Badge>}
-            </Card>
+              {c.status === "hired" && <span style={{
+                padding: "4px 10px",
+                borderRadius: "20px",
+                fontSize: "11px",
+                fontWeight: "700",
+                backgroundColor: "#1C1C1E",
+                color: "#FFFFFF",
+                whiteSpace: "nowrap"
+              }}>HIRED</span>}
+            </div>
           ))}
         </div>
       )}
 
       {/* Outreach History */}
-      <div className="text-sm font-bold text-charcoal px-5 py-3 mt-2">Your outreach ({sentCount})</div>
+      <div style={{
+        fontSize: "14px",
+        fontWeight: "700",
+        color: "#1C1C1E",
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingTop: 12,
+        paddingBottom: 12,
+        marginTop: 8
+      }}>Your outreach ({sentCount})</div>
 
       {outreach.length === 0 ? (
-        <div className="text-center py-6 px-7">
-          <div className="text-sm text-gray">No outreach yet</div>
+        <div style={{
+          textAlign: "center",
+          paddingTop: 24,
+          paddingBottom: 24,
+          paddingLeft: 28,
+          paddingRight: 28
+        }}>
+          <div style={{
+            fontSize: "14px",
+            color: "#636366"
+          }}>No outreach yet</div>
         </div>
       ) : (
-        <div className="px-4 space-y-2 pb-4">
-          {outreach.map((entry) => (
-            <div key={entry.id} className="flex justify-between items-center px-4 py-3.5 bg-white rounded-xl shadow-sm">
-              <div>
-                <div className="text-xs font-semibold text-charcoal">{entry.seeker_title}</div>
-                <div className="text-xs text-gray mt-0.5">{formatDate(entry.created_at)}</div>
+        <div style={{
+          paddingLeft: 16,
+          paddingRight: 16,
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+          paddingBottom: 16
+        }}>
+          {outreach.map((entry) => {
+            const statusStyles = entry.status === "pending"
+              ? { backgroundColor: "#FFFAF0", color: "#ED8936" }
+              : entry.status === "passed"
+              ? { backgroundColor: "#F5F5F5", color: "#AEAEB2" }
+              : { backgroundColor: "#1C1C1E", color: "#FFFFFF" };
+            return (
+              <div key={entry.id} style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                paddingLeft: 16,
+                paddingRight: 16,
+                paddingTop: 14,
+                paddingBottom: 14,
+                backgroundColor: "#FFFFFF",
+                borderRadius: "12px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
+              }}>
+                <div>
+                  <div style={{
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    color: "#1C1C1E"
+                  }}>{entry.seeker_title}</div>
+                  <div style={{
+                    fontSize: "12px",
+                    color: "#636366",
+                    marginTop: 2
+                  }}>{formatDate(entry.created_at)}</div>
+                </div>
+                <span style={{
+                  fontSize: "11px",
+                  fontWeight: "700",
+                  padding: "4px 10px",
+                  borderRadius: "20px",
+                  ...statusStyles
+                }}>
+                  {entry.status.toUpperCase()}
+                </span>
               </div>
-              <Badge
-                className={`text-xs ${
-                  entry.status === "pending"
-                    ? "bg-orange-bg text-orange"
-                    : entry.status === "passed"
-                    ? "bg-off-white text-gray-light"
-                    : "bg-charcoal text-white"
-                }`}
-              >
-                {entry.status.toUpperCase()}
-              </Badge>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

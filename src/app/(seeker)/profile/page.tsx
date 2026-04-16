@@ -2,9 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -38,6 +35,25 @@ const AVAILABLE_COMPANIES = [
   "Express Employment", "Rockwell Collins", "Principal Financial", "UnityPoint Health",
   "Hy-Vee", "John Deere", "Casey's", "Pella Corporation", "Corteva", "Wells Fargo (DSM)", "Vermeer",
 ];
+
+const chipBaseStyle = {
+  padding: "8px 16px",
+  borderRadius: 20,
+  border: "1.5px solid #E5E5EA",
+  background: "#FFFFFF",
+  fontSize: 13,
+  fontWeight: 600,
+  color: "#636366",
+  cursor: "pointer",
+  transition: "all 0.2s ease",
+} as const;
+
+const chipSelectedStyle = {
+  ...chipBaseStyle,
+  background: "#1C1C1E",
+  color: "#FFFFFF",
+  borderColor: "#1C1C1E",
+} as const;
 
 export default function Profile() {
   const supabase = createClient();
@@ -98,31 +114,31 @@ export default function Profile() {
     }
   };
 
-  if (loading) return <div className="screen-body flex items-center justify-center min-h-[60vh]"><p className="text-sm text-gray">Loading…</p></div>;
+  if (loading) return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
+      <p style={{ fontSize: 14, color: "#636366" }}>Loading…</p>
+    </div>
+  );
 
   const isBlocked = (name: string) => blocked.some((c) => c.company_name === name);
 
   return (
-    <div className="screen-body">
+    <div style={{ minHeight: "100vh", paddingBottom: 80, background: "#F5F5F5" }}>
       {/* Header */}
-      <div className="px-5 pt-6 pb-2">
-        <h2 className="text-2xl font-extrabold text-charcoal">This is what they see</h2>
-        <p className="text-sm text-gray mt-1">Pick what fits — no typing required.</p>
+      <div style={{ padding: "20px 20px 8px 20px" }}>
+        <h2 style={{ fontSize: 24, fontWeight: 800, color: "#1C1C1E", margin: 0 }}>This is what they see</h2>
+        <p style={{ fontSize: 14, color: "#636366", marginTop: 4, marginBottom: 0 }}>Pick what fits — no typing required.</p>
       </div>
 
       {/* Headline */}
-      <div className="px-5 py-4">
-        <div className="text-xs font-bold text-charcoal mb-2">Pick a headline</div>
-        <div className="flex flex-wrap gap-2">
+      <div style={{ padding: "16px 20px" }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", marginBottom: 8 }}>Pick a headline</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {HEADLINE_OPTIONS.map((o) => (
             <button
               key={o}
               onClick={() => setProfile({ ...profile, headline: o })}
-              className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
-                profile.headline === o
-                  ? "bg-charcoal text-white border border-charcoal"
-                  : "bg-white text-charcoal border border-border hover:border-gray-light"
-              }`}
+              style={profile.headline === o ? chipSelectedStyle : chipBaseStyle}
             >
               {o}
             </button>
@@ -131,18 +147,14 @@ export default function Profile() {
       </div>
 
       {/* Field */}
-      <div className="px-5 py-4">
-        <div className="text-xs font-bold text-charcoal mb-2">Field</div>
-        <div className="flex flex-wrap gap-2">
+      <div style={{ padding: "16px 20px" }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", marginBottom: 8 }}>Field</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {FIELD_OPTIONS.map((o) => (
             <button
               key={o}
               onClick={() => setProfile({ ...profile, field: o })}
-              className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
-                profile.field === o
-                  ? "bg-charcoal text-white border border-charcoal"
-                  : "bg-white text-charcoal border border-border hover:border-gray-light"
-              }`}
+              style={profile.field === o ? chipSelectedStyle : chipBaseStyle}
             >
               {o}
             </button>
@@ -151,18 +163,14 @@ export default function Profile() {
       </div>
 
       {/* Experience */}
-      <div className="px-5 py-4">
-        <div className="text-xs font-bold text-charcoal mb-2">Experience</div>
-        <div className="flex flex-wrap gap-2">
+      <div style={{ padding: "16px 20px" }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", marginBottom: 8 }}>Experience</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {EXPERIENCE_OPTIONS.map((o) => (
             <button
               key={o}
               onClick={() => setProfile({ ...profile, experience: o })}
-              className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
-                profile.experience === o
-                  ? "bg-charcoal text-white border border-charcoal"
-                  : "bg-white text-charcoal border border-border hover:border-gray-light"
-              }`}
+              style={profile.experience === o ? chipSelectedStyle : chipBaseStyle}
             >
               {o}
             </button>
@@ -171,18 +179,14 @@ export default function Profile() {
       </div>
 
       {/* Work setup */}
-      <div className="px-5 py-4">
-        <div className="text-xs font-bold text-charcoal mb-2">Work setup</div>
-        <div className="flex flex-wrap gap-2">
+      <div style={{ padding: "16px 20px" }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", marginBottom: 8 }}>Work setup</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {WORK_SETUP_OPTIONS.map((o) => (
             <button
               key={o}
               onClick={() => setProfile({ ...profile, workSetup: o })}
-              className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
-                profile.workSetup === o
-                  ? "bg-charcoal text-white border border-charcoal"
-                  : "bg-white text-charcoal border border-border hover:border-gray-light"
-              }`}
+              style={profile.workSetup === o ? chipSelectedStyle : chipBaseStyle}
             >
               {o}
             </button>
@@ -191,18 +195,14 @@ export default function Profile() {
       </div>
 
       {/* Pay range */}
-      <div className="px-5 py-4">
-        <div className="text-xs font-bold text-charcoal mb-2">Pay range</div>
-        <div className="flex flex-wrap gap-2">
+      <div style={{ padding: "16px 20px" }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", marginBottom: 8 }}>Pay range</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {PAY_RANGE_OPTIONS.map((o) => (
             <button
               key={o}
               onClick={() => setProfile({ ...profile, payRange: o })}
-              className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
-                profile.payRange === o
-                  ? "bg-charcoal text-white border border-charcoal"
-                  : "bg-white text-charcoal border border-border hover:border-gray-light"
-              }`}
+              style={profile.payRange === o ? chipSelectedStyle : chipBaseStyle}
             >
               {o}
             </button>
@@ -211,18 +211,14 @@ export default function Profile() {
       </div>
 
       {/* City */}
-      <div className="px-5 py-4">
-        <div className="text-xs font-bold text-charcoal mb-2">City</div>
-        <div className="flex flex-wrap gap-2">
+      <div style={{ padding: "16px 20px" }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", marginBottom: 8 }}>City</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {CITY_OPTIONS.map((o) => (
             <button
               key={o}
               onClick={() => setProfile({ ...profile, city: o })}
-              className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
-                profile.city === o
-                  ? "bg-charcoal text-white border border-charcoal"
-                  : "bg-white text-charcoal border border-border hover:border-gray-light"
-              }`}
+              style={profile.city === o ? chipSelectedStyle : chipBaseStyle}
             >
               {o}
             </button>
@@ -231,29 +227,61 @@ export default function Profile() {
       </div>
 
       {/* Save */}
-      <div className="px-5 py-4">
-        <Button
+      <div style={{ padding: "16px 20px" }}>
+        <button
           onClick={handleSave}
           disabled={saving}
-          className="w-full bg-charcoal hover:bg-charcoal-light text-white font-semibold"
+          style={{
+            width: "100%",
+            padding: "12px 16px",
+            background: saving ? "#2C2C2E" : "#1C1C1E",
+            color: "#FFFFFF",
+            fontWeight: 600,
+            fontSize: 14,
+            border: "none",
+            borderRadius: 8,
+            cursor: saving ? "default" : "pointer",
+            transition: "background 0.2s ease",
+            opacity: saving ? 0.7 : 1,
+          }}
         >
           {saving ? "Saving…" : saved ? "Saved ✓" : "Save changes"}
-        </Button>
+        </button>
       </div>
 
       {/* Block List */}
-      <div className="px-4 py-4">
-        <Card className="p-5 border-0 shadow-sm">
-          <div className="text-sm font-bold text-charcoal mb-3">Hide from these companies</div>
+      <div style={{ padding: "16px 16px" }}>
+        <div style={{
+          borderRadius: 16,
+          background: "#FFFFFF",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+          padding: 20,
+        }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#1C1C1E", marginBottom: 12 }}>Hide from these companies</div>
 
           {/* Currently blocked */}
           {blocked.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-3">
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
               {blocked.map((c) => (
                 <button
                   key={c.id}
                   onClick={() => toggleBlock(c.company_name)}
-                  className="inline-flex items-center gap-2 px-3 py-2 bg-red-bg text-red rounded-2xl text-xs font-semibold hover:opacity-75 transition-opacity"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "8px 12px",
+                    background: "#FFF5F5",
+                    color: "#E53E3E",
+                    borderRadius: 20,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "opacity 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
+                  onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
                 >
                   {c.company_name} ✕
                 </button>
@@ -262,18 +290,38 @@ export default function Profile() {
           )}
 
           {/* Available to block */}
-          <div className="flex flex-wrap gap-2">
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {AVAILABLE_COMPANIES.filter((name) => !isBlocked(name)).map((name) => (
               <button
                 key={name}
                 onClick={() => toggleBlock(name)}
-                className="px-3 py-2 bg-off-white text-gray-dark rounded-2xl text-xs font-medium border border-border hover:bg-red-bg hover:text-red hover:border-red transition-all"
+                style={{
+                  padding: "8px 12px",
+                  background: "#F5F5F5",
+                  color: "#3A3A3C",
+                  borderRadius: 20,
+                  fontSize: 12,
+                  fontWeight: 500,
+                  border: "1.5px solid #E5E5EA",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#FFF5F5";
+                  e.currentTarget.style.color = "#E53E3E";
+                  e.currentTarget.style.borderColor = "#E53E3E";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "#F5F5F5";
+                  e.currentTarget.style.color = "#3A3A3C";
+                  e.currentTarget.style.borderColor = "#E5E5EA";
+                }}
               >
                 {name}
               </button>
             ))}
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );

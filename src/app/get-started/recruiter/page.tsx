@@ -3,9 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { LOCATION_OPTIONS, EXPRESS_BRANDING } from "@/lib/constants";
 import Link from "next/link";
 
@@ -84,69 +81,91 @@ export default function RecruiterOnboarding() {
   };
 
   return (
-    <div className="screen-body">
+    <div style={{ flex: 1, overflowY: "auto", paddingBottom: "80px", background: "#F5F5F5" }}>
       {/* Step Bar */}
-      <div className="step-bar">
+      <div style={{ display: "flex", gap: "4px", padding: "16px 22px 0" }}>
         {[1, 2].map((s) => (
-          <div key={s} className={`step-segment ${s <= step ? "filled" : ""}`} style={s <= step ? { background: "var(--express-navy)" } : {}} />
+          <div
+            key={s}
+            style={{
+              flex: 1,
+              height: "3px",
+              background: s <= step ? "#003768" : "#E5E5EA",
+              borderRadius: "2px",
+            }}
+          />
         ))}
       </div>
-      <div className="step-label">
+      <div style={{ textAlign: "center", fontSize: "11px", color: "#AEAEB2", padding: "8px 0 0", fontWeight: 500 }}>
         Step {step} of 2 — {step === 1 ? "Organization" : "Your Account"}
       </div>
 
       {step === 1 && (
         <>
           {/* Express-branded header */}
-          <div className="staffing-header" style={{ paddingBottom: "24px" }}>
-            <div className="express-badge">
-              <span className="express-dot" />
+          <div style={{ background: "#003768", padding: "24px 20px 24px" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#F7941D", fontWeight: 700, letterSpacing: "0.5px", marginBottom: "8px", textTransform: "uppercase" }}>
+              <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#F7941D" }} />
               Internal Staffing Tool
             </div>
-            <h1 style={{ fontSize: "22px", lineHeight: "1.2" }}>Set up your office</h1>
-            <div className="subtitle" style={{ marginTop: "6px" }}>
+            <h1 style={{ fontSize: "22px", lineHeight: "1.2", color: "#FFFFFF", marginTop: "0", fontWeight: 800 }}>Set up your office</h1>
+            <div style={{ marginTop: "6px", fontSize: "14px", color: "#FFFFFF" }}>
               This creates a private staffing workspace for your team.
             </div>
           </div>
 
           <div style={{ padding: "20px 22px" }}>
             <div style={{ marginBottom: "20px" }}>
-              <Label className="text-xs font-bold text-charcoal">Office / Organization Name</Label>
-              <Input
+              <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "6px" }}>Office / Organization Name</label>
+              <input
+                type="text"
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}
                 placeholder="Express Employment Professionals"
-                className="mt-2"
+                style={{ width: "100%", padding: "13px 16px", border: "1.5px solid #E5E5EA", borderRadius: "12px", fontSize: "14px", fontFamily: "inherit", color: "#1C1C1E", background: "#FFFFFF", outline: "none", marginTop: "4px" }}
               />
             </div>
 
             <div>
-              <Label className="text-xs font-bold text-charcoal">Office Location</Label>
-              <div className="chip-row mt-2">
+              <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "6px" }}>Office Location</label>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "7px", marginTop: "4px" }}>
                 {LOCATION_OPTIONS.map((loc) => (
-                  <span
+                  <button
                     key={loc}
-                    className={`chip ${city === loc ? "selected" : ""}`}
-                    style={city === loc ? { background: "var(--express-navy)", borderColor: "var(--express-navy)" } : {}}
+                    type="button"
+                    style={{
+                      padding: "9px 15px",
+                      borderRadius: "22px",
+                      border: city === loc ? "1.5px solid #003768" : "1.5px solid #E5E5EA",
+                      background: city === loc ? "#003768" : "#FFFFFF",
+                      fontSize: "13px",
+                      fontWeight: 500,
+                      color: city === loc ? "#FFFFFF" : "#1C1C1E",
+                      cursor: "pointer",
+                      userSelect: "none",
+                      fontFamily: "inherit",
+                    }}
                     onClick={() => setCity(loc)}
                   >
                     {loc}
-                  </span>
+                  </button>
                 ))}
               </div>
             </div>
           </div>
 
-          <div className="cta-section">
+          <div style={{ padding: "8px 20px 20px" }}>
             <button
-              className="cta-btn"
-              style={{ background: "var(--express-navy)", color: "white" }}
+              type="button"
+              style={{ display: "block", width: "100%", padding: "15px", borderRadius: "14px", fontSize: "15px", fontWeight: 600, textAlign: "center", cursor: "pointer", marginBottom: "10px", border: "1.5px solid transparent", fontFamily: "inherit", background: "#003768", color: "#FFFFFF" }}
               onClick={() => setStep(2)}
             >
               Continue
             </button>
             <div style={{ textAlign: "center", padding: "6px 0" }}>
-              <Link href="/" className="footer-link">Back</Link>
+              <Link href="/" style={{ color: "#636366", fontWeight: 600, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: "2px" }}>
+                Back
+              </Link>
             </div>
           </div>
         </>
@@ -154,51 +173,53 @@ export default function RecruiterOnboarding() {
 
       {step === 2 && (
         <>
-          <div className="section-header">
-            <h2>Your Account</h2>
-            <p>You'll be the first recruiter in this workspace.</p>
+          <div style={{ padding: "24px 20px 8px" }}>
+            <h2 style={{ fontSize: "24px", fontWeight: 800, color: "#1C1C1E", letterSpacing: "-0.5px", margin: "0 0 4px 0" }}>Your Account</h2>
+            <p style={{ fontSize: "14px", color: "#636366", margin: "4px 0 0 0" }}>You'll be the first recruiter in this workspace.</p>
           </div>
 
           <div style={{ padding: "0 22px" }}>
             <div style={{ marginBottom: "14px" }}>
-              <Label className="text-xs font-bold text-charcoal">Your Name</Label>
-              <Input
+              <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "6px" }}>Your Name</label>
+              <input
+                type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Jane Smith"
-                className="mt-1"
+                style={{ width: "100%", padding: "13px 16px", border: "1.5px solid #E5E5EA", borderRadius: "12px", fontSize: "14px", fontFamily: "inherit", color: "#1C1C1E", background: "#FFFFFF", outline: "none", marginTop: "4px" }}
               />
             </div>
 
             <div style={{ marginBottom: "14px" }}>
-              <Label className="text-xs font-bold text-charcoal">Job Title (optional)</Label>
-              <Input
+              <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "6px" }}>Job Title (optional)</label>
+              <input
+                type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Senior Recruiter"
-                className="mt-1"
+                style={{ width: "100%", padding: "13px 16px", border: "1.5px solid #E5E5EA", borderRadius: "12px", fontSize: "14px", fontFamily: "inherit", color: "#1C1C1E", background: "#FFFFFF", outline: "none", marginTop: "4px" }}
               />
             </div>
 
             <div style={{ marginBottom: "14px" }}>
-              <Label className="text-xs font-bold text-charcoal">Email</Label>
-              <Input
+              <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "6px" }}>Email</label>
+              <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="jane@expresspros.com"
-                className="mt-1"
+                style={{ width: "100%", padding: "13px 16px", border: "1.5px solid #E5E5EA", borderRadius: "12px", fontSize: "14px", fontFamily: "inherit", color: "#1C1C1E", background: "#FFFFFF", outline: "none", marginTop: "4px" }}
               />
             </div>
 
             <div style={{ marginBottom: "20px" }}>
-              <Label className="text-xs font-bold text-charcoal">Password</Label>
-              <Input
+              <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "6px" }}>Password</label>
+              <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Min 6 characters"
-                className="mt-1"
+                style={{ width: "100%", padding: "13px 16px", border: "1.5px solid #E5E5EA", borderRadius: "12px", fontSize: "14px", fontFamily: "inherit", color: "#1C1C1E", background: "#FFFFFF", outline: "none", marginTop: "4px" }}
               />
             </div>
           </div>
@@ -208,8 +229,8 @@ export default function RecruiterOnboarding() {
               <div style={{
                 padding: "10px 14px",
                 borderRadius: "10px",
-                backgroundColor: "var(--red-bg)",
-                color: "var(--red)",
+                backgroundColor: "#FFF5F5",
+                color: "#E53E3E",
                 fontSize: "13px",
               }}>
                 {error}
@@ -217,17 +238,23 @@ export default function RecruiterOnboarding() {
             </div>
           )}
 
-          <div className="cta-section">
+          <div style={{ padding: "8px 20px 20px" }}>
             <button
-              className="cta-btn"
-              style={{ background: "var(--express-navy)", color: "white", opacity: loading ? 0.6 : 1 }}
+              type="button"
+              style={{ display: "block", width: "100%", padding: "15px", borderRadius: "14px", fontSize: "15px", fontWeight: 600, textAlign: "center", cursor: "pointer", marginBottom: "10px", border: "1.5px solid transparent", fontFamily: "inherit", background: "#003768", color: "#FFFFFF", opacity: loading ? 0.6 : 1 }}
               onClick={handleSignUp}
               disabled={loading}
             >
               {loading ? "Setting up workspace…" : "Create workspace"}
             </button>
             <div style={{ textAlign: "center", padding: "6px 0" }}>
-              <span className="footer-link" onClick={() => setStep(1)}>Back</span>
+              <button
+                type="button"
+                style={{ background: "none", border: "none", color: "#636366", fontWeight: 600, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: "2px", padding: "0", fontFamily: "inherit", fontSize: "inherit" }}
+                onClick={() => setStep(1)}
+              >
+                Back
+              </button>
             </div>
           </div>
         </>

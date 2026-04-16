@@ -4,13 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { JobListing } from "@/lib/types";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   EXPERIENCE_OPTIONS,
   JOB_TITLES,
@@ -131,8 +124,8 @@ export default function JobsPage() {
 
   if (loading) {
     return (
-      <div className="screen-body flex items-center justify-center min-h-[60vh]">
-        <p className="text-sm text-gray">Loading…</p>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", paddingBottom: 80 }}>
+        <p style={{ fontSize: 14, color: "#636366" }}>Loading…</p>
       </div>
     );
   }
@@ -141,75 +134,141 @@ export default function JobsPage() {
   const inactiveJobs = jobs.filter((j) => !j.is_active);
 
   return (
-    <div className="screen-body">
+    <div style={{ minHeight: "100vh", background: "#F8FAFC", paddingBottom: 80 }}>
       {/* Header */}
-      <div className="staffing-header">
-        <div className="express-badge">
-          <span className="express-dot" />
-          {EXPRESS_BRANDING.shortName} Staffing
+      <div style={{ background: "#003768", padding: "20px 16px", color: "#FFFFFF" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F7941D", display: "inline-block" }} />
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#F7941D", textTransform: "uppercase" }}>
+            {EXPRESS_BRANDING.shortName} Staffing
+          </span>
         </div>
-        <h1>Job Listings</h1>
-        <div className="subtitle">{activeJobs.length} active job{activeJobs.length !== 1 ? "s" : ""}</div>
+        <h1 style={{ fontSize: 28, fontWeight: 800, margin: "12px 0 8px 0", color: "#FFFFFF" }}>Job Listings</h1>
+        <div style={{ fontSize: 14, color: "#FFFFFF", opacity: 0.9 }}>
+          {activeJobs.length} active job{activeJobs.length !== 1 ? "s" : ""}
+        </div>
       </div>
 
       {/* New Job CTA */}
-      <div className="px-4 py-4">
-        <Button
+      <div style={{ padding: "16px" }}>
+        <button
           onClick={() => setShowCreate(true)}
-          className="w-full bg-express-navy hover:bg-express-navy-light text-white font-semibold"
+          style={{
+            width: "100%",
+            background: "#003768",
+            color: "#FFFFFF",
+            fontWeight: 600,
+            padding: "14px 16px",
+            border: "none",
+            borderRadius: 10,
+            fontSize: 14,
+            cursor: "pointer",
+            transition: "background 0.2s ease"
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#0a4a80")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "#003768")}
         >
           + Create New Job
-        </Button>
+        </button>
       </div>
 
       {/* Active Jobs */}
       {activeJobs.length > 0 && (
         <>
-          <div className="px-5 pb-2">
-            <div className="text-sm font-bold text-charcoal">Active ({activeJobs.length})</div>
+          <div style={{ padding: "20px 20px 8px 20px" }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#1C1C1E" }}>Active ({activeJobs.length})</div>
           </div>
-          <div className="px-4 space-y-3">
+          <div style={{ padding: "0 16px", display: "flex", flexDirection: "column", gap: 12 }}>
             {activeJobs.map((job) => (
-              <Card key={job.id} className="overflow-hidden border-0 shadow-sm">
-                <div className="job-card-header">
-                  <div className="flex-1 min-w-0">
-                    <div className="title truncate">{job.title}</div>
-                    <div className="sub">{job.city || "Iowa"}, {job.state} · {job.arrangement || "Flexible"}</div>
+              <div
+                key={job.id}
+                style={{
+                  borderRadius: 16,
+                  background: "#FFFFFF",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                  overflow: "hidden"
+                }}
+              >
+                <div style={{ background: "#0a4a80", padding: "12px 16px", display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ color: "#FFFFFF", fontWeight: 600, fontSize: 14, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {job.title}
+                    </div>
+                    <div style={{ color: "rgba(255,255,255,0.8)", fontSize: 12, marginTop: 2 }}>
+                      {job.city || "Iowa"}, {job.state} · {job.arrangement || "Flexible"}
+                    </div>
                   </div>
-                  <Badge className="bg-express-orange text-white text-xs">Active</Badge>
+                  <span style={{ background: "#F7941D", color: "#FFFFFF", fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 20, whiteSpace: "nowrap" }}>
+                    Active
+                  </span>
                 </div>
-                <div className="px-4 py-3 bg-white space-y-2">
+                <div style={{ padding: "12px 16px", background: "#FFFFFF", display: "flex", flexDirection: "column", gap: 8 }}>
                   {job.description && (
-                    <p className="text-xs text-gray leading-relaxed line-clamp-2">{job.description}</p>
+                    <p style={{ fontSize: 12, color: "#636366", lineHeight: 1.5, margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                      {job.description}
+                    </p>
                   )}
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray">Experience</span>
-                    <span className="text-charcoal font-semibold">{job.years_experience || "Open"}</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
+                    <span style={{ color: "#636366" }}>Experience</span>
+                    <span style={{ color: "#1C1C1E", fontWeight: 600 }}>{job.years_experience || "Open"}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray">Pay range</span>
-                    <span className="text-charcoal font-semibold">{formatSalary(job.salary_min, job.salary_max)}</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
+                    <span style={{ color: "#636366" }}>Pay range</span>
+                    <span style={{ color: "#1C1C1E", fontWeight: 600 }}>{formatSalary(job.salary_min, job.salary_max)}</span>
                   </div>
                 </div>
                 {(job.required_skills?.length > 0 || job.required_certifications?.length > 0) && (
-                  <div className="px-4 py-2 flex flex-wrap gap-2 bg-white border-t border-off-white">
+                  <div style={{ padding: "8px 16px", background: "#FFFFFF", borderTop: "1px solid #F5F5F5", display: "flex", flexWrap: "wrap", gap: 8 }}>
                     {job.required_certifications?.map((c) => (
-                      <Badge key={c} className="bg-green-bg text-green-700">{c}</Badge>
+                      <span key={c} style={{ background: "#F0FFF4", color: "#22863A", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
+                        {c}
+                      </span>
                     ))}
                     {job.required_skills?.map((s) => (
-                      <Badge key={s} variant="secondary">{s}</Badge>
+                      <span key={s} style={{ background: "#E8EBF5", color: "#003768", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
+                        {s}
+                      </span>
                     ))}
                   </div>
                 )}
-                <div className="px-4 py-3 bg-white flex gap-3">
-                  <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => toggleActive(job)}>
+                <div style={{ padding: "12px 16px", background: "#FFFFFF", display: "flex", gap: 12 }}>
+                  <button
+                    onClick={() => toggleActive(job)}
+                    style={{
+                      flex: 1,
+                      border: "1.5px solid #E5E5EA",
+                      color: "#003768",
+                      fontWeight: 600,
+                      padding: "10px 16px",
+                      background: "#FFFFFF",
+                      borderRadius: 10,
+                      fontSize: 12,
+                      cursor: "pointer"
+                    }}
+                  >
                     Pause
-                  </Button>
-                  <Button size="sm" className="flex-1 bg-express-navy hover:bg-express-navy-light text-white text-xs" onClick={() => router.push(`/staff/matches?job=${job.id}`)}>
+                  </button>
+                  <button
+                    onClick={() => router.push(`/staff/matches?job=${job.id}`)}
+                    style={{
+                      flex: 1,
+                      background: "#003768",
+                      color: "#FFFFFF",
+                      fontWeight: 600,
+                      padding: "10px 16px",
+                      border: "none",
+                      borderRadius: 10,
+                      fontSize: 12,
+                      cursor: "pointer",
+                      transition: "background 0.2s ease"
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#0a4a80")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "#003768")}
+                  >
                     View Matches
-                  </Button>
+                  </button>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         </>
@@ -218,22 +277,44 @@ export default function JobsPage() {
       {/* Inactive Jobs */}
       {inactiveJobs.length > 0 && (
         <>
-          <div className="px-5 pt-5 pb-2">
-            <div className="text-sm font-bold text-gray">Paused ({inactiveJobs.length})</div>
+          <div style={{ padding: "20px 20px 8px 20px" }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#636366" }}>Paused ({inactiveJobs.length})</div>
           </div>
-          <div className="px-4 space-y-2 pb-4">
+          <div style={{ padding: "0 16px 16px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
             {inactiveJobs.map((job) => (
-              <Card key={job.id} className="border-0 shadow-sm px-4 py-3 opacity-60">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <div className="text-sm font-semibold text-charcoal">{job.title}</div>
-                    <div className="text-xs text-gray">{job.city || "Iowa"}, {job.state}</div>
-                  </div>
-                  <Button variant="outline" size="sm" className="text-xs" onClick={() => toggleActive(job)}>
-                    Reactivate
-                  </Button>
+              <div
+                key={job.id}
+                style={{
+                  borderRadius: 16,
+                  background: "#FFFFFF",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                  padding: "12px 16px",
+                  opacity: 0.6,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center"
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "#1C1C1E" }}>{job.title}</div>
+                  <div style={{ fontSize: 12, color: "#636366" }}>{job.city || "Iowa"}, {job.state}</div>
                 </div>
-              </Card>
+                <button
+                  onClick={() => toggleActive(job)}
+                  style={{
+                    border: "1.5px solid #E5E5EA",
+                    color: "#003768",
+                    fontWeight: 600,
+                    padding: "8px 14px",
+                    background: "#FFFFFF",
+                    borderRadius: 10,
+                    fontSize: 12,
+                    cursor: "pointer"
+                  }}
+                >
+                  Reactivate
+                </button>
+              </div>
             ))}
           </div>
         </>
@@ -241,194 +322,340 @@ export default function JobsPage() {
 
       {/* Empty State */}
       {jobs.length === 0 && (
-        <div className="text-center py-10 px-7">
-          <div className="text-4xl mb-3 opacity-40">📋</div>
-          <div className="text-base font-bold text-charcoal mb-1">No jobs posted</div>
-          <div className="text-sm text-gray leading-relaxed">Create your first job listing to start matching candidates.</div>
+        <div style={{ textAlign: "center", padding: "40px 28px" }}>
+          <div style={{ fontSize: 32, marginBottom: 12, opacity: 0.4 }}>📋</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: "#1C1C1E", marginBottom: 4 }}>No jobs posted</div>
+          <div style={{ fontSize: 14, color: "#636366", lineHeight: 1.6 }}>Create your first job listing to start matching candidates.</div>
         </div>
       )}
 
       {/* Create Job Modal */}
-      <Dialog open={showCreate} onOpenChange={(open) => { setShowCreate(open); if (!open) resetForm(); }}>
-        <DialogContent className="w-full max-w-[430px] rounded-t-3xl rounded-b-none max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Create Job Listing</DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-5">
-            {/* Title */}
-            <div>
-              <Label className="text-xs font-bold text-charcoal">Job Title</Label>
-              <div className="chip-row mt-2">
-                {JOB_TITLES.map((t) => (
-                  <span
-                    key={t}
-                    className={`chip ${title === t ? "selected" : ""}`}
-                    style={title === t ? { background: "var(--express-navy)", borderColor: "var(--express-navy)" } : {}}
-                    onClick={() => setTitle(t)}
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-              <Input
-                placeholder="Or type a custom title..."
-                value={JOB_TITLES.includes(title as typeof JOB_TITLES[number]) ? "" : title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="mt-2"
-              />
+      {showCreate && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "flex-end",
+            zIndex: 50
+          }}
+          onClick={() => { setShowCreate(false); resetForm(); }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: 430,
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              background: "#FFFFFF",
+              maxHeight: "85vh",
+              overflowY: "auto"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ padding: "20px 16px", borderBottom: "1px solid #E5E5EA" }}>
+              <h2 style={{ fontSize: 16, fontWeight: 600, color: "#1C1C1E", margin: 0 }}>Create Job Listing</h2>
             </div>
 
-            {/* Description */}
-            <div>
-              <Label className="text-xs font-bold text-charcoal">Description (optional)</Label>
-              <Textarea
-                placeholder="Briefly describe the role..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="mt-1 min-h-16"
-              />
-            </div>
-
-            {/* Category */}
-            <div>
-              <Label className="text-xs font-bold text-charcoal">Category</Label>
-              <div className="chip-row mt-2">
-                {CATEGORIES.map((c) => (
-                  <span
-                    key={c}
-                    className={`chip ${category === c ? "selected" : ""}`}
-                    style={category === c ? { background: "var(--express-navy)", borderColor: "var(--express-navy)" } : {}}
-                    onClick={() => setCategory(c)}
-                  >
-                    {c}
-                  </span>
-                ))}
+            <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: 20 }}>
+              {/* Title */}
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Job Title</label>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+                  {JOB_TITLES.map((t) => (
+                    <span
+                      key={t}
+                      onClick={() => setTitle(t)}
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: 20,
+                        border: "1.5px solid #E5E5EA",
+                        background: title === t ? "#003768" : "#FFFFFF",
+                        color: title === t ? "#FFFFFF" : "#636366",
+                        fontSize: 12,
+                        fontWeight: 500,
+                        cursor: "pointer",
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+                <input
+                  type="text"
+                  placeholder="Or type a custom title..."
+                  value={JOB_TITLES.includes(title as typeof JOB_TITLES[number]) ? "" : title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  style={{
+                    width: "100%",
+                    border: "1.5px solid #E5E5EA",
+                    borderRadius: 10,
+                    padding: "14px 16px",
+                    fontSize: 14,
+                    fontFamily: "inherit",
+                    boxSizing: "border-box"
+                  }}
+                />
               </div>
-            </div>
 
-            {/* Experience */}
-            <div>
-              <Label className="text-xs font-bold text-charcoal">Experience Required</Label>
-              <div className="chip-row mt-2">
-                {EXPERIENCE_OPTIONS.map((e) => (
-                  <span
-                    key={e}
-                    className={`chip ${experience === e ? "selected" : ""}`}
-                    style={experience === e ? { background: "var(--express-navy)", borderColor: "var(--express-navy)" } : {}}
-                    onClick={() => setExperience(e)}
-                  >
-                    {e}
-                  </span>
-                ))}
+              {/* Description */}
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Description (optional)</label>
+                <textarea
+                  placeholder="Briefly describe the role..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  style={{
+                    width: "100%",
+                    border: "1.5px solid #E5E5EA",
+                    borderRadius: 10,
+                    padding: "14px 16px",
+                    fontSize: 14,
+                    fontFamily: "inherit",
+                    minHeight: 64,
+                    boxSizing: "border-box",
+                    resize: "none"
+                  }}
+                />
               </div>
-            </div>
 
-            {/* Salary */}
-            <div>
-              <Label className="text-xs font-bold text-charcoal">Salary Range</Label>
-              <div className="chip-row mt-2">
-                {SALARY_RANGE_OPTIONS.map((s) => (
-                  <span
-                    key={s}
-                    className={`chip ${salaryRange === s ? "selected" : ""}`}
-                    style={salaryRange === s ? { background: "var(--express-navy)", borderColor: "var(--express-navy)" } : {}}
-                    onClick={() => setSalaryRange(s)}
-                  >
-                    {s}
-                  </span>
-                ))}
+              {/* Category */}
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Category</label>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {CATEGORIES.map((c) => (
+                    <span
+                      key={c}
+                      onClick={() => setCategory(c)}
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: 20,
+                        border: "1.5px solid #E5E5EA",
+                        background: category === c ? "#003768" : "#FFFFFF",
+                        color: category === c ? "#FFFFFF" : "#636366",
+                        fontSize: 12,
+                        fontWeight: 500,
+                        cursor: "pointer",
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Location */}
-            <div>
-              <Label className="text-xs font-bold text-charcoal">Location</Label>
-              <div className="chip-row mt-2">
-                {LOCATION_OPTIONS.map((loc) => (
-                  <span
-                    key={loc}
-                    className={`chip ${city === loc ? "selected" : ""}`}
-                    style={city === loc ? { background: "var(--express-navy)", borderColor: "var(--express-navy)" } : {}}
-                    onClick={() => setCity(loc)}
-                  >
-                    {loc}
-                  </span>
-                ))}
+              {/* Experience */}
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Experience Required</label>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {EXPERIENCE_OPTIONS.map((e) => (
+                    <span
+                      key={e}
+                      onClick={() => setExperience(e)}
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: 20,
+                        border: "1.5px solid #E5E5EA",
+                        background: experience === e ? "#003768" : "#FFFFFF",
+                        color: experience === e ? "#FFFFFF" : "#636366",
+                        fontSize: 12,
+                        fontWeight: 500,
+                        cursor: "pointer",
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      {e}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Arrangement */}
-            <div>
-              <Label className="text-xs font-bold text-charcoal">Work Setup</Label>
-              <div className="chip-row mt-2">
-                {WORK_SETUP_OPTIONS.map((w) => (
-                  <span
-                    key={w}
-                    className={`chip ${arrangement === w ? "selected" : ""}`}
-                    style={arrangement === w ? { background: "var(--express-navy)", borderColor: "var(--express-navy)" } : {}}
-                    onClick={() => setArrangement(w)}
-                  >
-                    {w}
-                  </span>
-                ))}
+              {/* Salary */}
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Salary Range</label>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {SALARY_RANGE_OPTIONS.map((s) => (
+                    <span
+                      key={s}
+                      onClick={() => setSalaryRange(s)}
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: 20,
+                        border: "1.5px solid #E5E5EA",
+                        background: salaryRange === s ? "#003768" : "#FFFFFF",
+                        color: salaryRange === s ? "#FFFFFF" : "#636366",
+                        fontSize: 12,
+                        fontWeight: 500,
+                        cursor: "pointer",
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Required Skills */}
-            <div>
-              <Label className="text-xs font-bold text-charcoal">Required Skills (optional)</Label>
-              <div className="chip-row mt-2">
-                {SKILL_OPTIONS.map((s) => (
-                  <span
-                    key={s}
-                    className={`chip ${requiredSkills.includes(s) ? "selected" : ""}`}
-                    style={requiredSkills.includes(s) ? { background: "var(--express-navy)", borderColor: "var(--express-navy)" } : {}}
-                    onClick={() => toggleMulti(requiredSkills, setRequiredSkills, s)}
-                  >
-                    {s}
-                  </span>
-                ))}
+              {/* Location */}
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Location</label>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {LOCATION_OPTIONS.map((loc) => (
+                    <span
+                      key={loc}
+                      onClick={() => setCity(loc)}
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: 20,
+                        border: "1.5px solid #E5E5EA",
+                        background: city === loc ? "#003768" : "#FFFFFF",
+                        color: city === loc ? "#FFFFFF" : "#636366",
+                        fontSize: 12,
+                        fontWeight: 500,
+                        cursor: "pointer",
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      {loc}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Required Certs */}
-            <div>
-              <Label className="text-xs font-bold text-charcoal">Required Certifications (optional)</Label>
-              <div className="chip-row mt-2">
-                {CERTIFICATION_OPTIONS.map((c) => (
-                  <span
-                    key={c}
-                    className={`chip cert-chip ${requiredCerts.includes(c) ? "selected" : ""}`}
-                    onClick={() => toggleMulti(requiredCerts, setRequiredCerts, c)}
-                  >
-                    {c}
-                  </span>
-                ))}
+              {/* Arrangement */}
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Work Setup</label>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {WORK_SETUP_OPTIONS.map((w) => (
+                    <span
+                      key={w}
+                      onClick={() => setArrangement(w)}
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: 20,
+                        border: "1.5px solid #E5E5EA",
+                        background: arrangement === w ? "#003768" : "#FFFFFF",
+                        color: arrangement === w ? "#FFFFFF" : "#636366",
+                        fontSize: 12,
+                        fontWeight: 500,
+                        cursor: "pointer",
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      {w}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {formError && (
-              <div className="bg-red-bg border border-red text-red text-xs p-3 rounded-2xl">
-                {formError}
+              {/* Required Skills */}
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Required Skills (optional)</label>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {SKILL_OPTIONS.map((s) => (
+                    <span
+                      key={s}
+                      onClick={() => toggleMulti(requiredSkills, setRequiredSkills, s)}
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: 20,
+                        border: "1.5px solid #E5E5EA",
+                        background: requiredSkills.includes(s) ? "#003768" : "#FFFFFF",
+                        color: requiredSkills.includes(s) ? "#FFFFFF" : "#636366",
+                        fontSize: 12,
+                        fontWeight: 500,
+                        cursor: "pointer",
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
               </div>
-            )}
 
-            <div className="flex gap-3 pt-2">
-              <Button variant="outline" onClick={() => { setShowCreate(false); resetForm(); }} className="flex-1">
-                Cancel
-              </Button>
-              <Button
-                onClick={handleCreate}
-                disabled={saving || !title.trim()}
-                className="flex-[2] bg-express-navy hover:bg-express-navy-light text-white font-semibold"
-              >
-                {saving ? "Creating…" : "Create Job"}
-              </Button>
+              {/* Required Certs */}
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Required Certifications (optional)</label>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {CERTIFICATION_OPTIONS.map((c) => (
+                    <span
+                      key={c}
+                      onClick={() => toggleMulti(requiredCerts, setRequiredCerts, c)}
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: 20,
+                        border: "1.5px solid #E5E5EA",
+                        background: requiredCerts.includes(c) ? "#003768" : "#FFFFFF",
+                        color: requiredCerts.includes(c) ? "#FFFFFF" : "#636366",
+                        fontSize: 12,
+                        fontWeight: 500,
+                        cursor: "pointer",
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {formError && (
+                <div style={{ background: "#FFF5F5", border: "1px solid #E53E3E", color: "#E53E3E", fontSize: 12, padding: "12px", borderRadius: 16 }}>
+                  {formError}
+                </div>
+              )}
+
+              <div style={{ display: "flex", gap: 12, paddingTop: 8 }}>
+                <button
+                  onClick={() => { setShowCreate(false); resetForm(); }}
+                  style={{
+                    flex: 1,
+                    border: "1.5px solid #E5E5EA",
+                    color: "#003768",
+                    fontWeight: 600,
+                    padding: "12px 16px",
+                    background: "#FFFFFF",
+                    borderRadius: 10,
+                    fontSize: 14,
+                    cursor: "pointer"
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreate}
+                  disabled={saving || !title.trim()}
+                  style={{
+                    flex: 2,
+                    background: "#003768",
+                    color: "#FFFFFF",
+                    fontWeight: 600,
+                    padding: "12px 16px",
+                    border: "none",
+                    borderRadius: 10,
+                    fontSize: 14,
+                    cursor: saving || !title.trim() ? "not-allowed" : "pointer",
+                    opacity: saving || !title.trim() ? 0.6 : 1,
+                    transition: "background 0.2s ease"
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!saving && title.trim()) e.currentTarget.style.background = "#0a4a80";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!saving && title.trim()) e.currentTarget.style.background = "#003768";
+                  }}
+                >
+                  {saving ? "Creating…" : "Create Job"}
+                </button>
+              </div>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      )}
     </div>
   );
 }

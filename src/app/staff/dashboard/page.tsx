@@ -3,9 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Users, Briefcase, GitCompare, TrendingUp } from "lucide-react";
 import { EXPRESS_BRANDING } from "@/lib/constants";
 
@@ -85,132 +82,237 @@ export default function StaffingDashboard() {
 
   if (loading) {
     return (
-      <div className="screen-body flex items-center justify-center min-h-[60vh]">
-        <p className="text-sm text-gray">Loading…</p>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", paddingBottom: 80 }}>
+        <p style={{ fontSize: 14, color: "#636366" }}>Loading…</p>
       </div>
     );
   }
 
   return (
-    <div className="screen-body">
+    <div style={{ minHeight: "100vh", background: "#F8FAFC", paddingBottom: 80 }}>
       {/* Header */}
-      <div className="staffing-header">
-        <div className="express-badge">
-          <span className="express-dot" />
-          {EXPRESS_BRANDING.shortName} Staffing
+      <div style={{ background: "#003768", padding: "20px 16px", color: "#FFFFFF" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F7941D", display: "inline-block" }} />
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#F7941D", textTransform: "uppercase" }}>
+            {EXPRESS_BRANDING.shortName} Staffing
+          </span>
         </div>
-        <h1>Dashboard</h1>
-        <div className="subtitle">{EXPRESS_BRANDING.tagline}</div>
+        <h1 style={{ fontSize: 28, fontWeight: 800, margin: "12px 0 8px 0", color: "#FFFFFF" }}>Dashboard</h1>
+        <div style={{ fontSize: 14, color: "#FFFFFF", opacity: 0.9 }}>{EXPRESS_BRANDING.tagline}</div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-3 px-4 py-4">
-        <Card className="border-0 shadow-sm p-4 cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/staff/candidates")}>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-express-navy flex items-center justify-center">
-              <Users size={18} className="text-white" />
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12, padding: "16px" }}>
+        <div
+          style={{
+            borderRadius: 16,
+            background: "#FFFFFF",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+            padding: 16,
+            cursor: "pointer",
+            transition: "box-shadow 0.2s ease"
+          }}
+          onClick={() => router.push("/staff/candidates")}
+          onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)")}
+          onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)")}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: "#003768", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Users size={18} color="#FFFFFF" />
             </div>
             <div>
-              <div className="text-2xl font-extrabold text-charcoal">{stats.totalCandidates}</div>
-              <div className="text-xs text-gray font-medium">Candidates</div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: "#1C1C1E" }}>{stats.totalCandidates}</div>
+              <div style={{ fontSize: 12, color: "#636366", fontWeight: 500 }}>Candidates</div>
             </div>
           </div>
-        </Card>
+        </div>
 
-        <Card className="border-0 shadow-sm p-4 cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/staff/jobs")}>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-express-orange flex items-center justify-center">
-              <Briefcase size={18} className="text-white" />
+        <div
+          style={{
+            borderRadius: 16,
+            background: "#FFFFFF",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+            padding: 16,
+            cursor: "pointer",
+            transition: "box-shadow 0.2s ease"
+          }}
+          onClick={() => router.push("/staff/jobs")}
+          onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)")}
+          onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)")}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: "#F7941D", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Briefcase size={18} color="#FFFFFF" />
             </div>
             <div>
-              <div className="text-2xl font-extrabold text-charcoal">{stats.activeJobs}</div>
-              <div className="text-xs text-gray font-medium">Active Jobs</div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: "#1C1C1E" }}>{stats.activeJobs}</div>
+              <div style={{ fontSize: 12, color: "#636366", fontWeight: 500 }}>Active Jobs</div>
             </div>
           </div>
-        </Card>
+        </div>
 
-        <Card className="border-0 shadow-sm p-4 cursor-pointer hover:shadow-md transition-shadow" onClick={() => router.push("/staff/matches")}>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-green flex items-center justify-center">
-              <GitCompare size={18} className="text-white" />
+        <div
+          style={{
+            borderRadius: 16,
+            background: "#FFFFFF",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+            padding: 16,
+            cursor: "pointer",
+            transition: "box-shadow 0.2s ease"
+          }}
+          onClick={() => router.push("/staff/matches")}
+          onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)")}
+          onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)")}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: "#48BB78", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <GitCompare size={18} color="#FFFFFF" />
             </div>
             <div>
-              <div className="text-2xl font-extrabold text-charcoal">{stats.pendingMatches}</div>
-              <div className="text-xs text-gray font-medium">Pending</div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: "#1C1C1E" }}>{stats.pendingMatches}</div>
+              <div style={{ fontSize: 12, color: "#636366", fontWeight: 500 }}>Pending</div>
             </div>
           </div>
-        </Card>
+        </div>
 
-        <Card className="border-0 shadow-sm p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-charcoal flex items-center justify-center">
-              <TrendingUp size={18} className="text-white" />
+        <div
+          style={{
+            borderRadius: 16,
+            background: "#FFFFFF",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+            padding: 16
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: "#1C1C1E", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <TrendingUp size={18} color="#FFFFFF" />
             </div>
             <div>
-              <div className="text-2xl font-extrabold text-charcoal">{stats.hiredThisMonth}</div>
-              <div className="text-xs text-gray font-medium">Hired</div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: "#1C1C1E" }}>{stats.hiredThisMonth}</div>
+              <div style={{ fontSize: 12, color: "#636366", fontWeight: 500 }}>Hired</div>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="px-4 py-2 flex gap-3">
-        <Button
+      <div style={{ padding: "8px 16px", display: "flex", gap: 12 }}>
+        <button
           onClick={() => router.push("/staff/jobs?new=1")}
-          className="flex-1 bg-express-navy hover:bg-express-navy-light text-white font-semibold text-sm"
+          style={{
+            flex: 1,
+            background: "#003768",
+            color: "#FFFFFF",
+            fontWeight: 600,
+            fontSize: 14,
+            padding: "14px 16px",
+            border: "none",
+            borderRadius: 10,
+            cursor: "pointer",
+            transition: "background 0.2s ease"
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#0a4a80")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "#003768")}
         >
           + New Job
-        </Button>
-        <Button
+        </button>
+        <button
           onClick={() => router.push("/staff/candidates")}
-          variant="outline"
-          className="flex-1 border-express-navy text-express-navy font-semibold text-sm"
+          style={{
+            flex: 1,
+            border: "1.5px solid #003768",
+            color: "#003768",
+            fontWeight: 600,
+            fontSize: 14,
+            padding: "14px 16px",
+            background: "#FFFFFF",
+            borderRadius: 10,
+            cursor: "pointer",
+            transition: "all 0.2s ease"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "#F8FAFC";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "#FFFFFF";
+          }}
         >
           Find Candidates
-        </Button>
+        </button>
       </div>
 
       {/* Recent Candidates */}
-      <div className="px-5 pt-5 pb-2">
-        <div className="text-sm font-bold text-charcoal">Recent Candidates</div>
+      <div style={{ padding: "20px 20px 8px 20px" }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#1C1C1E" }}>Recent Candidates</div>
       </div>
       {recentCandidates.length === 0 ? (
-        <div className="text-center py-6 px-7">
-          <div className="text-sm text-gray">No candidates yet. They'll show up here once they sign up.</div>
+        <div style={{ textAlign: "center", padding: "24px 28px" }}>
+          <div style={{ fontSize: 14, color: "#636366" }}>No candidates yet. They'll show up here once they sign up.</div>
         </div>
       ) : (
-        <div className="px-4 space-y-2">
+        <div style={{ padding: "0 16px", display: "flex", flexDirection: "column", gap: 8 }}>
           {recentCandidates.map((c) => (
-            <Card key={c.id} className="border-0 shadow-sm px-4 py-3 flex items-center justify-between">
+            <div
+              key={c.id}
+              style={{
+                borderRadius: 16,
+                background: "#FFFFFF",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                padding: "12px 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between"
+              }}
+            >
               <div>
-                <div className="text-sm font-semibold text-charcoal">{c.job_title || "New Candidate"}</div>
-                <div className="text-xs text-gray">{c.city || "Iowa"}, IA</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#1C1C1E" }}>{c.job_title || "New Candidate"}</div>
+                <div style={{ fontSize: 12, color: "#636366" }}>{c.city || "Iowa"}, IA</div>
               </div>
-              <div className="text-xs text-gray-light">{timeAgo(c.created_at)}</div>
-            </Card>
+              <div style={{ fontSize: 12, color: "#AEAEB2" }}>{timeAgo(c.created_at)}</div>
+            </div>
           ))}
         </div>
       )}
 
       {/* Recent Jobs */}
-      <div className="px-5 pt-5 pb-2">
-        <div className="text-sm font-bold text-charcoal">Recent Jobs</div>
+      <div style={{ padding: "20px 20px 8px 20px" }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#1C1C1E" }}>Recent Jobs</div>
       </div>
       {recentJobs.length === 0 ? (
-        <div className="text-center py-6 px-7">
-          <div className="text-sm text-gray">No jobs posted yet. Create your first to start matching.</div>
+        <div style={{ textAlign: "center", padding: "24px 28px" }}>
+          <div style={{ fontSize: 14, color: "#636366" }}>No jobs posted yet. Create your first to start matching.</div>
         </div>
       ) : (
-        <div className="px-4 space-y-2 pb-4">
+        <div style={{ padding: "0 16px 16px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
           {recentJobs.map((j) => (
-            <Card key={j.id} className="border-0 shadow-sm px-4 py-3 flex items-center justify-between">
+            <div
+              key={j.id}
+              style={{
+                borderRadius: 16,
+                background: "#FFFFFF",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                padding: "12px 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between"
+              }}
+            >
               <div>
-                <div className="text-sm font-semibold text-charcoal">{j.title}</div>
-                <div className="text-xs text-gray">{j.city || "Iowa"}, IA</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#1C1C1E" }}>{j.title}</div>
+                <div style={{ fontSize: 12, color: "#636366" }}>{j.city || "Iowa"}, IA</div>
               </div>
-              <Badge className="bg-green-bg text-green-700 text-xs">Active</Badge>
-            </Card>
+              <span style={{
+                background: "#F0FFF4",
+                color: "#22863A",
+                fontSize: 12,
+                fontWeight: 600,
+                padding: "4px 10px",
+                borderRadius: 20
+              }}>
+                Active
+              </span>
+            </div>
           ))}
         </div>
       )}

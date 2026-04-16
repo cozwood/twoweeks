@@ -50,10 +50,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="screen-body">
-      <div className="login-card">
-        <div className="login-brand">Two Weeks</div>
-        <p className="login-tagline">
+    <div style={{ flex: 1, overflowY: "auto", paddingBottom: "80px", background: "#F5F5F5" }}>
+      <div style={{ padding: "50px 28px 30px", textAlign: "center", background: "#FFFFFF" }}>
+        <div style={{ fontSize: "42px", fontWeight: 900, color: "#1C1C1E", letterSpacing: "-1px", marginBottom: "6px" }}>
+          Two Weeks
+        </div>
+        <p style={{ fontSize: "14px", color: "#636366", marginBottom: "28px", lineHeight: 1.4 }}>
           Your next move starts here.
           <br />
           No names until you say so.
@@ -71,12 +73,12 @@ export default function LoginPage() {
                 width: "100%",
                 padding: "14px 16px",
                 borderRadius: "10px",
-                border: "1.5px solid var(--border)",
+                border: "1.5px solid #E5E5EA",
                 fontSize: "14px",
                 fontFamily: "inherit",
                 outline: "none",
-                background: "var(--white)",
-                color: "var(--charcoal)",
+                background: "#FFFFFF",
+                color: "#1C1C1E",
               }}
             />
           </div>
@@ -91,12 +93,12 @@ export default function LoginPage() {
                 width: "100%",
                 padding: "14px 16px",
                 borderRadius: "10px",
-                border: "1.5px solid var(--border)",
+                border: "1.5px solid #E5E5EA",
                 fontSize: "14px",
                 fontFamily: "inherit",
                 outline: "none",
-                background: "var(--white)",
-                color: "var(--charcoal)",
+                background: "#FFFFFF",
+                color: "#1C1C1E",
               }}
             />
           </div>
@@ -106,8 +108,8 @@ export default function LoginPage() {
               style={{
                 padding: "10px 14px",
                 borderRadius: "10px",
-                backgroundColor: "var(--red-bg)",
-                color: "var(--red)",
+                backgroundColor: "#FFF5F5",
+                color: "#E53E3E",
                 fontSize: "13px",
                 marginBottom: "14px",
               }}
@@ -119,25 +121,39 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="cta-btn cta-charcoal"
-            style={{ opacity: loading ? 0.6 : 1 }}
+            style={{
+              display: "block",
+              width: "100%",
+              padding: "15px",
+              borderRadius: "14px",
+              fontSize: "15px",
+              fontWeight: 600,
+              textAlign: "center",
+              cursor: "pointer",
+              marginBottom: "10px",
+              border: "1.5px solid transparent",
+              fontFamily: "inherit",
+              background: "#1C1C1E",
+              color: "#FFFFFF",
+              opacity: loading ? 0.6 : 1,
+            }}
           >
             {loading ? "Signing in..." : "Sign in"}
           </button>
         </form>
 
-        <div className="footer-note" style={{ marginTop: "20px" }}>
+        <div style={{ textAlign: "center", padding: "10px 28px 24px", fontSize: "12px", color: "#AEAEB2", lineHeight: 1.5, marginTop: "20px" }}>
           Don&apos;t have an account?
           <br />
-          <Link href="/get-started/seeker" className="footer-link">
+          <Link href="/get-started/seeker" style={{ color: "#636366", fontWeight: 600, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: "2px" }}>
             I deserve better
           </Link>
           {" · "}
-          <Link href="/get-started/employer" className="footer-link">
+          <Link href="/get-started/employer" style={{ color: "#636366", fontWeight: 600, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: "2px" }}>
             I&apos;m hiring
           </Link>
           <br /><br />
-          <Link href="/get-started/recruiter" className="footer-link" style={{ color: 'var(--express-navy)', fontSize: '11px' }}>
+          <Link href="/get-started/recruiter" style={{ color: "#003768", fontWeight: 600, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: "2px", fontSize: "11px" }}>
             Staffing agency? Set up your workspace →
           </Link>
         </div>

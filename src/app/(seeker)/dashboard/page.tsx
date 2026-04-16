@@ -2,11 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 function timeAgo(date: Date): string {
   const now = new Date();
@@ -84,176 +79,279 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) return <div className="screen-body flex items-center justify-center min-h-[60vh]"><p className="text-sm text-gray">Loading…</p></div>;
+  if (loading) return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh", background: "#F5F5F5" }}>
+      <p style={{ fontSize: "14px", color: "#636366" }}>Loading…</p>
+    </div>
+  );
 
   const pending = intros.filter((i) => i.status === "pending");
   const revealed = intros.filter((i) => i.status === "revealed");
   const passed = intros.filter((i) => i.status === "passed");
 
   return (
-    <div className="screen-body">
+    <div style={{ minHeight: "100vh", background: "#F5F5F5", paddingBottom: 80 }}>
       {/* Header */}
-      <div className="px-5 pt-6 pb-2">
-        <h2 className="text-2xl font-extrabold text-charcoal">Your Dashboard</h2>
-        {card && <p className="text-sm text-gray mt-1">{card.job_title} in {card.city}</p>}
+      <div style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 24, paddingBottom: 8 }}>
+        <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#1C1C1E" }}>Your Dashboard</h2>
+        {card && <p style={{ fontSize: "14px", color: "#636366", marginTop: 4 }}>{card.job_title} in {card.city}</p>}
       </div>
 
       {/* Status Banner */}
-      <Card className="mx-4 my-3 px-4 py-3 border-0 shadow-sm flex items-center gap-2.5">
+      <div style={{ margin: "12px 16px", padding: 12, borderRadius: 16, background: "#FFFFFF", boxShadow: "0 2px 8px rgba(0,0,0,0.06)", display: "flex", alignItems: "center", gap: 10 }}>
         <div
-          className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
-            card?.is_active
-              ? "bg-green shadow-[0_0_0_3px_rgba(72,187,120,0.2)]"
-              : "bg-gray-light"
-          }`}
+          style={{
+            width: 10,
+            height: 10,
+            borderRadius: "50%",
+            flexShrink: 0,
+            background: card?.is_active ? "#48BB78" : "#AEAEB2",
+            boxShadow: card?.is_active ? "0 0 0 3px rgba(72,187,120,0.2)" : "none",
+          }}
         />
-        <div className="flex-1 text-xs text-gray leading-relaxed">
+        <div style={{ flex: 1, fontSize: "12px", color: "#636366", lineHeight: 1.5 }}>
           {card?.is_active
             ? "You're live. Employers in your area can see your card."
             : "You're hidden. No one can see your card."}
         </div>
-        <Button
-          variant="outline"
-          size="sm"
+        <button
           onClick={handleToggle}
-          className="text-xs font-semibold whitespace-nowrap"
+          style={{
+            padding: "6px 12px",
+            fontSize: "12px",
+            fontWeight: 600,
+            whiteSpace: "nowrap",
+            background: "#FFFFFF",
+            border: "1px solid #E5E5EA",
+            borderRadius: 6,
+            cursor: "pointer",
+            color: "#1C1C1E",
+          }}
         >
           {card?.is_active ? "Go dark" : "Go live"}
-        </Button>
-      </Card>
+        </button>
+      </div>
 
       {/* Stats */}
-      <div className="flex gap-3 px-4 py-3 my-3 mx-4 bg-white rounded-3xl shadow-sm">
-        <div className="flex-1 text-center">
-          <div className="text-2xl font-extrabold text-charcoal">{pending.length}</div>
-          <div className="text-xs text-gray mt-1 font-medium">Interested</div>
+      <div style={{ display: "flex", gap: 12, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, margin: "12px 16px", background: "#FFFFFF", borderRadius: 48, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+        <div style={{ flex: 1, textAlign: "center" }}>
+          <div style={{ fontSize: "22px", fontWeight: 800, color: "#1C1C1E" }}>{pending.length}</div>
+          <div style={{ fontSize: "12px", color: "#636366", marginTop: 4, fontWeight: 500 }}>Interested</div>
         </div>
-        <div className="flex-1 text-center">
-          <div className="text-2xl font-extrabold text-charcoal">{revealed.length}</div>
-          <div className="text-xs text-gray mt-1 font-medium">Talking</div>
+        <div style={{ flex: 1, textAlign: "center" }}>
+          <div style={{ fontSize: "22px", fontWeight: 800, color: "#1C1C1E" }}>{revealed.length}</div>
+          <div style={{ fontSize: "12px", color: "#636366", marginTop: 4, fontWeight: 500 }}>Talking</div>
         </div>
-        <div className="flex-1 text-center">
-          <div className="text-2xl font-extrabold text-charcoal">{passed.length}</div>
-          <div className="text-xs text-gray mt-1 font-medium">Passed</div>
+        <div style={{ flex: 1, textAlign: "center" }}>
+          <div style={{ fontSize: "22px", fontWeight: 800, color: "#1C1C1E" }}>{passed.length}</div>
+          <div style={{ fontSize: "12px", color: "#636366", marginTop: 4, fontWeight: 500 }}>Passed</div>
         </div>
       </div>
 
       {/* Pending Intros */}
       {pending.length > 0 && (
-        <div className="px-4 space-y-3">
-          <div className="text-sm font-bold text-charcoal px-2 py-3">They're interested ({pending.length})</div>
-          {pending.map((intro) => (
-            <Card key={intro.id} className="p-4 border-0 shadow-sm">
-              <div className="text-xs text-gray-light mb-2">{timeAgo(new Date(intro.created_at))}</div>
-              <div className="text-sm text-gray-dark italic mb-3 leading-relaxed">"{intro.message}"</div>
-              <div className="flex gap-2.5">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePass(intro.id)}
-                  className="flex-1 text-xs font-semibold"
-                >
-                  Pass
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => handleRevealClick(intro)}
-                  className="flex-[2] bg-charcoal hover:bg-charcoal-light text-white text-xs font-semibold"
-                >
-                  Show them who I am
-                </Button>
+        <div style={{ paddingLeft: 16, paddingRight: 16 }}>
+          <div style={{ fontSize: "14px", fontWeight: 700, color: "#1C1C1E", paddingLeft: 8, paddingRight: 8, paddingTop: 12, paddingBottom: 12 }}>They're interested ({pending.length})</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {pending.map((intro) => (
+              <div key={intro.id} style={{ padding: 16, borderRadius: 16, background: "#FFFFFF", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+                <div style={{ fontSize: "12px", color: "#AEAEB2", marginBottom: 8 }}>{timeAgo(new Date(intro.created_at))}</div>
+                <div style={{ fontSize: "14px", color: "#3A3A3C", fontStyle: "italic", marginBottom: 12, lineHeight: 1.5 }}>"{intro.message}"</div>
+                <div style={{ display: "flex", gap: 10 }}>
+                  <button
+                    onClick={() => handlePass(intro.id)}
+                    style={{
+                      flex: 1,
+                      padding: "8px 12px",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      background: "#FFFFFF",
+                      border: "1px solid #E5E5EA",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                      color: "#1C1C1E",
+                    }}
+                  >
+                    Pass
+                  </button>
+                  <button
+                    onClick={() => handleRevealClick(intro)}
+                    style={{
+                      flex: 2,
+                      padding: "8px 12px",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      background: "#1C1C1E",
+                      color: "#FFFFFF",
+                      border: "none",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = "#2C2C2E"}
+                    onMouseLeave={(e) => e.currentTarget.style.background = "#1C1C1E"}
+                  >
+                    Show them who I am
+                  </button>
+                </div>
               </div>
-            </Card>
-          ))}
+            ))}
+          </div>
         </div>
       )}
 
       {/* Revealed */}
       {revealed.length > 0 && (
-        <div className="px-4 space-y-2">
-          <div className="text-sm font-bold text-charcoal px-2 py-3 mt-2">Talking ({revealed.length})</div>
-          {revealed.map((intro) => (
-            <div key={intro.id} className="flex justify-between items-center px-4 py-3.5 bg-white rounded-xl shadow-sm">
-              <span className="text-xs font-medium text-charcoal">Connected</span>
-              <Badge className="bg-charcoal text-white text-xs">REVEALED</Badge>
-            </div>
-          ))}
+        <div style={{ paddingLeft: 16, paddingRight: 16 }}>
+          <div style={{ fontSize: "14px", fontWeight: 700, color: "#1C1C1E", paddingLeft: 8, paddingRight: 8, paddingTop: 12, paddingBottom: 12, marginTop: 8 }}>Talking ({revealed.length})</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {revealed.map((intro) => (
+              <div key={intro.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingLeft: 16, paddingRight: 16, paddingTop: 14, paddingBottom: 14, background: "#FFFFFF", borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+                <span style={{ fontSize: "12px", fontWeight: 500, color: "#1C1C1E" }}>Connected</span>
+                <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>REVEALED</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
       {/* Empty */}
       {intros.length === 0 && (
-        <div className="text-center py-10 px-7">
-          <div className="text-4xl mb-3 opacity-40">💬</div>
-          <div className="text-base font-bold text-charcoal mb-1">All quiet for now</div>
-          <div className="text-sm text-gray leading-relaxed">When someone reaches out, it shows up here.</div>
+        <div style={{ textAlign: "center", paddingTop: 40, paddingBottom: 40, paddingLeft: 28, paddingRight: 28 }}>
+          <div style={{ fontSize: "36px", marginBottom: 12, opacity: 0.4 }}>💬</div>
+          <div style={{ fontSize: "16px", fontWeight: 700, color: "#1C1C1E", marginBottom: 4 }}>All quiet for now</div>
+          <div style={{ fontSize: "14px", color: "#636366", lineHeight: 1.5 }}>When someone reaches out, it shows up here.</div>
         </div>
       )}
 
       {/* Reveal Modal */}
-      <Dialog open={revealOpen} onOpenChange={setRevealOpen}>
-        <DialogContent className="w-full max-w-[430px] rounded-t-3xl rounded-b-none">
-          <DialogHeader>
-            <DialogTitle>You're in control</DialogTitle>
-          </DialogHeader>
+      {revealOpen && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 999, display: "flex", alignItems: "flex-end" }}>
+          <div
+            style={{
+              width: "100%",
+              maxWidth: 430,
+              background: "#FFFFFF",
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              borderBottomLeftRadius: 0,
+              borderBottomRightRadius: 0,
+              padding: 20,
+              animation: "slideUp 0.3s ease-out",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <style>{`
+              @keyframes slideUp {
+                from { transform: translateY(100%); }
+                to { transform: translateY(0); }
+              }
+            `}</style>
 
-          {selectedIntro && (
-            <div className="space-y-4">
-              <div className="bg-off-white p-4 rounded-2xl">
-                <div className="font-semibold text-sm text-charcoal">Their message</div>
-                <div className="text-xs text-gray mt-2 italic">"{selectedIntro.message}"</div>
-              </div>
+            <h2 style={{ fontSize: "18px", fontWeight: 600, color: "#1C1C1E", marginBottom: 20 }}>You're in control</h2>
 
-              <div className="text-xs font-bold text-charcoal">
-                Only share what you're comfortable with
-              </div>
+            {selectedIntro && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <div style={{ background: "#F5F5F5", padding: 16, borderRadius: 16 }}>
+                  <div style={{ fontWeight: 600, fontSize: "14px", color: "#1C1C1E" }}>Their message</div>
+                  <div style={{ fontSize: "12px", color: "#636366", marginTop: 8, fontStyle: "italic" }}>"{selectedIntro.message}"</div>
+                </div>
 
-              <div className="space-y-3">
-                {(["name", "email", "phone", "linkedin"] as const).map((key) => (
-                  <div key={key} className="flex items-center gap-3 cursor-pointer">
-                    <Checkbox
-                      checked={revealData[key]}
-                      onChange={() => setRevealData({ ...revealData, [key]: !revealData[key] })}
-                    />
-                    <span className="text-sm text-charcoal font-medium" onClick={() => setRevealData({ ...revealData, [key]: !revealData[key] })}>
-                      {key === "name" ? "My real name" : key === "email" ? "Email address" : key === "phone" ? "Phone number" : "LinkedIn"}
-                    </span>
+                <div style={{ fontSize: "12px", fontWeight: 700, color: "#1C1C1E" }}>
+                  Only share what you're comfortable with
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {(["name", "email", "phone", "linkedin"] as const).map((key) => (
+                    <div key={key} style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
+                      <input
+                        type="checkbox"
+                        checked={revealData[key]}
+                        onChange={() => setRevealData({ ...revealData, [key]: !revealData[key] })}
+                        style={{
+                          width: 20,
+                          height: 20,
+                          cursor: "pointer",
+                          accentColor: "#48BB78",
+                        }}
+                      />
+                      <span
+                        style={{ fontSize: "14px", color: "#1C1C1E", fontWeight: 500, cursor: "pointer", flex: 1 }}
+                        onClick={() => setRevealData({ ...revealData, [key]: !revealData[key] })}
+                      >
+                        {key === "name" ? "My real name" : key === "email" ? "Email address" : key === "phone" ? "Phone number" : "LinkedIn"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ paddingTop: 8 }}>
+                  <div style={{ fontSize: "12px", color: "#636366", fontWeight: 600, marginBottom: 8 }}>They'll see:</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {revealData.name && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>My real name</span>}
+                    {revealData.email && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>Email address</span>}
+                    {revealData.phone && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>Phone number</span>}
+                    {revealData.linkedin && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>LinkedIn</span>}
+                    {!Object.values(revealData).some((v) => v) && (
+                      <span style={{ fontSize: "12px", color: "#636366" }}>Nothing selected</span>
+                    )}
                   </div>
-                ))}
-              </div>
+                </div>
 
-              <div className="pt-2">
-                <div className="text-xs text-gray font-semibold mb-2">They'll see:</div>
-                <div className="flex flex-wrap gap-2">
-                  {revealData.name && <Badge className="bg-charcoal text-white text-xs">My real name</Badge>}
-                  {revealData.email && <Badge className="bg-charcoal text-white text-xs">Email address</Badge>}
-                  {revealData.phone && <Badge className="bg-charcoal text-white text-xs">Phone number</Badge>}
-                  {revealData.linkedin && <Badge className="bg-charcoal text-white text-xs">LinkedIn</Badge>}
-                  {!Object.values(revealData).some((v) => v) && (
-                    <span className="text-xs text-gray">Nothing selected</span>
-                  )}
+                <div style={{ display: "flex", gap: 12, paddingTop: 16 }}>
+                  <button
+                    onClick={() => setRevealOpen(false)}
+                    style={{
+                      flex: 1,
+                      padding: "10px 12px",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      background: "#FFFFFF",
+                      border: "1px solid #E5E5EA",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                      color: "#1C1C1E",
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleReveal}
+                    style={{
+                      flex: 2,
+                      padding: "10px 12px",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      background: "#1C1C1E",
+                      color: "#FFFFFF",
+                      border: "none",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = "#2C2C2E"}
+                    onMouseLeave={(e) => e.currentTarget.style.background = "#1C1C1E"}
+                  >
+                    Let them in
+                  </button>
                 </div>
               </div>
+            )}
 
-              <div className="flex gap-3 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setRevealOpen(false)}
-                  className="flex-1 text-sm"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleReveal}
-                  className="flex-[2] bg-charcoal hover:bg-charcoal-light text-white text-sm"
-                >
-                  Let them in
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: "rgba(0,0,0,0.5)",
+                zIndex: -1,
+                cursor: "pointer",
+              }}
+              onClick={() => setRevealOpen(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
