@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -95,114 +98,182 @@ export default function Profile() {
     }
   };
 
-  if (loading) return <div className="screen-body" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}><p style={{ fontSize: 14, color: "var(--gray)" }}>Loading…</p></div>;
+  if (loading) return <div className="screen-body flex items-center justify-center min-h-[60vh]"><p className="text-sm text-gray">Loading…</p></div>;
 
   const isBlocked = (name: string) => blocked.some((c) => c.company_name === name);
 
   return (
     <div className="screen-body">
-      <div className="section-header">
-        <h2>This is what they see</h2>
-        <p>Pick what fits — no typing required.</p>
+      {/* Header */}
+      <div className="px-5 pt-6 pb-2">
+        <h2 className="text-2xl font-extrabold text-charcoal">This is what they see</h2>
+        <p className="text-sm text-gray mt-1">Pick what fits — no typing required.</p>
       </div>
 
       {/* Headline */}
-      <div className="chip-group">
-        <div className="chip-group-label">Pick a headline</div>
-        <div className="chip-row">
+      <div className="px-5 py-4">
+        <div className="text-xs font-bold text-charcoal mb-2">Pick a headline</div>
+        <div className="flex flex-wrap gap-2">
           {HEADLINE_OPTIONS.map((o) => (
-            <button key={o} className={`chip${profile.headline === o ? " selected" : ""}`} onClick={() => setProfile({ ...profile, headline: o })}>{o}</button>
+            <button
+              key={o}
+              onClick={() => setProfile({ ...profile, headline: o })}
+              className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
+                profile.headline === o
+                  ? "bg-charcoal text-white border border-charcoal"
+                  : "bg-white text-charcoal border border-border hover:border-gray-light"
+              }`}
+            >
+              {o}
+            </button>
           ))}
         </div>
       </div>
 
       {/* Field */}
-      <div className="chip-group">
-        <div className="chip-group-label">Field</div>
-        <div className="chip-row">
+      <div className="px-5 py-4">
+        <div className="text-xs font-bold text-charcoal mb-2">Field</div>
+        <div className="flex flex-wrap gap-2">
           {FIELD_OPTIONS.map((o) => (
-            <button key={o} className={`chip${profile.field === o ? " selected" : ""}`} onClick={() => setProfile({ ...profile, field: o })}>{o}</button>
+            <button
+              key={o}
+              onClick={() => setProfile({ ...profile, field: o })}
+              className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
+                profile.field === o
+                  ? "bg-charcoal text-white border border-charcoal"
+                  : "bg-white text-charcoal border border-border hover:border-gray-light"
+              }`}
+            >
+              {o}
+            </button>
           ))}
         </div>
       </div>
 
       {/* Experience */}
-      <div className="chip-group">
-        <div className="chip-group-label">Experience</div>
-        <div className="chip-row">
+      <div className="px-5 py-4">
+        <div className="text-xs font-bold text-charcoal mb-2">Experience</div>
+        <div className="flex flex-wrap gap-2">
           {EXPERIENCE_OPTIONS.map((o) => (
-            <button key={o} className={`chip${profile.experience === o ? " selected" : ""}`} onClick={() => setProfile({ ...profile, experience: o })}>{o}</button>
+            <button
+              key={o}
+              onClick={() => setProfile({ ...profile, experience: o })}
+              className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
+                profile.experience === o
+                  ? "bg-charcoal text-white border border-charcoal"
+                  : "bg-white text-charcoal border border-border hover:border-gray-light"
+              }`}
+            >
+              {o}
+            </button>
           ))}
         </div>
       </div>
 
       {/* Work setup */}
-      <div className="chip-group">
-        <div className="chip-group-label">Work setup</div>
-        <div className="chip-row">
+      <div className="px-5 py-4">
+        <div className="text-xs font-bold text-charcoal mb-2">Work setup</div>
+        <div className="flex flex-wrap gap-2">
           {WORK_SETUP_OPTIONS.map((o) => (
-            <button key={o} className={`chip${profile.workSetup === o ? " selected" : ""}`} onClick={() => setProfile({ ...profile, workSetup: o })}>{o}</button>
+            <button
+              key={o}
+              onClick={() => setProfile({ ...profile, workSetup: o })}
+              className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
+                profile.workSetup === o
+                  ? "bg-charcoal text-white border border-charcoal"
+                  : "bg-white text-charcoal border border-border hover:border-gray-light"
+              }`}
+            >
+              {o}
+            </button>
           ))}
         </div>
       </div>
 
       {/* Pay range */}
-      <div className="chip-group">
-        <div className="chip-group-label">Pay range</div>
-        <div className="chip-row">
+      <div className="px-5 py-4">
+        <div className="text-xs font-bold text-charcoal mb-2">Pay range</div>
+        <div className="flex flex-wrap gap-2">
           {PAY_RANGE_OPTIONS.map((o) => (
-            <button key={o} className={`chip${profile.payRange === o ? " selected" : ""}`} onClick={() => setProfile({ ...profile, payRange: o })}>{o}</button>
+            <button
+              key={o}
+              onClick={() => setProfile({ ...profile, payRange: o })}
+              className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
+                profile.payRange === o
+                  ? "bg-charcoal text-white border border-charcoal"
+                  : "bg-white text-charcoal border border-border hover:border-gray-light"
+              }`}
+            >
+              {o}
+            </button>
           ))}
         </div>
       </div>
 
       {/* City */}
-      <div className="chip-group">
-        <div className="chip-group-label">City</div>
-        <div className="chip-row">
+      <div className="px-5 py-4">
+        <div className="text-xs font-bold text-charcoal mb-2">City</div>
+        <div className="flex flex-wrap gap-2">
           {CITY_OPTIONS.map((o) => (
-            <button key={o} className={`chip${profile.city === o ? " selected" : ""}`} onClick={() => setProfile({ ...profile, city: o })}>{o}</button>
+            <button
+              key={o}
+              onClick={() => setProfile({ ...profile, city: o })}
+              className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
+                profile.city === o
+                  ? "bg-charcoal text-white border border-charcoal"
+                  : "bg-white text-charcoal border border-border hover:border-gray-light"
+              }`}
+            >
+              {o}
+            </button>
           ))}
         </div>
       </div>
 
       {/* Save */}
-      <div className="cta-section">
-        <button
-          className="cta-btn cta-charcoal"
+      <div className="px-5 py-4">
+        <Button
           onClick={handleSave}
           disabled={saving}
-          style={{ opacity: saving ? 0.5 : 1 }}
+          className="w-full bg-charcoal hover:bg-charcoal-light text-white font-semibold"
         >
           {saving ? "Saving…" : saved ? "Saved ✓" : "Save changes"}
-        </button>
+        </Button>
       </div>
 
       {/* Block List */}
-      <div className="block-section">
-        <div className="block-card">
-          <div className="block-title">Hide from these companies</div>
+      <div className="px-4 py-4">
+        <Card className="p-5 border-0 shadow-sm">
+          <div className="text-sm font-bold text-charcoal mb-3">Hide from these companies</div>
 
           {/* Currently blocked */}
           {blocked.length > 0 && (
-            <div style={{ marginBottom: 12 }}>
+            <div className="flex flex-wrap gap-2 mb-3">
               {blocked.map((c) => (
-                <span key={c.id} className="blocked-item" onClick={() => toggleBlock(c.company_name)}>
+                <button
+                  key={c.id}
+                  onClick={() => toggleBlock(c.company_name)}
+                  className="inline-flex items-center gap-2 px-3 py-2 bg-red-bg text-red rounded-2xl text-xs font-semibold hover:opacity-75 transition-opacity"
+                >
                   {c.company_name} ✕
-                </span>
+                </button>
               ))}
             </div>
           )}
 
           {/* Available to block */}
-          <div>
+          <div className="flex flex-wrap gap-2">
             {AVAILABLE_COMPANIES.filter((name) => !isBlocked(name)).map((name) => (
-              <span key={name} className="company-chip" onClick={() => toggleBlock(name)}>
+              <button
+                key={name}
+                onClick={() => toggleBlock(name)}
+                className="px-3 py-2 bg-off-white text-gray-dark rounded-2xl text-xs font-medium border border-border hover:bg-red-bg hover:text-red hover:border-red transition-all"
+              >
                 {name}
-              </span>
+              </button>
             ))}
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

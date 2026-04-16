@@ -3,6 +3,10 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar } from "@/components/ui/avatar";
 
 interface RevealedContact {
   intro_id: string;
@@ -95,8 +99,8 @@ export default function ContactsPage() {
 
   if (loading) {
     return (
-      <div className="screen-body" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
-        <p style={{ fontSize: 14, color: "var(--gray)" }}>Loading…</p>
+      <div className="screen-body flex items-center justify-center min-h-[60vh]">
+        <p className="text-sm text-gray">Loading…</p>
       </div>
     );
   }
@@ -109,93 +113,107 @@ export default function ContactsPage() {
   return (
     <div className="screen-body">
       {/* Header */}
-      <div className="section-header">
-        <h2>{userName ? `Hey, ${userName}.` : "Your Contacts"}</h2>
-        {companyName && <p>{companyName}</p>}
+      <div className="px-5 pt-6 pb-2">
+        <h2 className="text-2xl font-extrabold text-charcoal">
+          {userName ? `Hey, ${userName}.` : "Your Contacts"}
+        </h2>
+        {companyName && <p className="text-sm text-gray mt-1">{companyName}</p>}
       </div>
 
       {/* Stats */}
-      <div className="stats-row" style={{ flexWrap: "wrap" }}>
-        <div className="stat-card">
-          <div className="stat-num">{sentCount}</div>
-          <div className="stat-label">Sent</div>
+      <div className="grid grid-cols-2 gap-3 px-4 py-3 my-3 mx-4 bg-white rounded-3xl shadow-sm">
+        <div className="text-center py-1">
+          <div className="text-2xl font-extrabold text-charcoal">{sentCount}</div>
+          <div className="text-xs text-gray mt-1 font-medium">Sent</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-num">{waitingCount}</div>
-          <div className="stat-label">Waiting</div>
+        <div className="text-center py-1">
+          <div className="text-2xl font-extrabold text-charcoal">{waitingCount}</div>
+          <div className="text-xs text-gray mt-1 font-medium">Waiting</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-num">{revealedCount}</div>
-          <div className="stat-label">Opened</div>
+        <div className="text-center py-1">
+          <div className="text-2xl font-extrabold text-charcoal">{revealedCount}</div>
+          <div className="text-xs text-gray mt-1 font-medium">Opened</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-num">{hiredCount}</div>
-          <div className="stat-label">Hired</div>
+        <div className="text-center py-1">
+          <div className="text-2xl font-extrabold text-charcoal">{hiredCount}</div>
+          <div className="text-xs text-gray mt-1 font-medium">Hired</div>
         </div>
       </div>
 
       {/* Revealed Contacts */}
-      <div className="section-label">People who shared with you ({contacts.length})</div>
+      <div className="text-sm font-bold text-charcoal px-5 py-3">People who shared with you ({contacts.length})</div>
 
       {contacts.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-icon">🤝</div>
-          <div className="empty-title">Nobody's opened up yet</div>
-          <div className="empty-desc">When someone shares their info, they'll show up here.</div>
-          <Link href="/browse" style={{ display: "inline-block", marginTop: 16 }}>
-            <button className="card-action-btn" style={{ width: "auto", padding: "10px 24px" }}>Browse candidates</button>
+        <div className="text-center py-10 px-7">
+          <div className="text-4xl mb-3 opacity-40">🤝</div>
+          <div className="text-base font-bold text-charcoal mb-1">Nobody's opened up yet</div>
+          <div className="text-sm text-gray leading-relaxed mb-4">When someone shares their info, they'll show up here.</div>
+          <Link href="/browse">
+            <Button className="bg-charcoal hover:bg-charcoal-light text-white font-semibold">
+              Browse candidates
+            </Button>
           </Link>
         </div>
       ) : (
-        contacts.map((c) => (
-          <div key={c.intro_id} className="contact-card">
-            <div className="avatar small">{c.name ? c.name.charAt(0) : "?"}</div>
-            <div className="contact-info">
-              <div className="contact-name">{c.name || "Anonymous"}</div>
-              {c.email && (
-                <a href={`mailto:${c.email}`} className="contact-detail" style={{ display: "block", textDecoration: "none", color: "var(--gray)" }}>
-                  ✉ {c.email}
-                </a>
-              )}
-              {c.phone && (
-                <a href={`tel:${c.phone}`} className="contact-detail" style={{ display: "block", textDecoration: "none", color: "var(--gray)" }}>
-                  ☎ {c.phone}
-                </a>
-              )}
-              {c.linkedin && (
-                <a href={`https://${c.linkedin}`} target="_blank" rel="noopener noreferrer" className="contact-detail" style={{ display: "block", textDecoration: "none", color: "var(--gray)" }}>
-                  🔗 LinkedIn
-                </a>
-              )}
-            </div>
-            {c.status === "hired" && <span className="badge badge-revealed">HIRED</span>}
-          </div>
-        ))
+        <div className="px-4 space-y-3 pb-4">
+          {contacts.map((c) => (
+            <Card key={c.intro_id} className="p-4 flex items-center gap-3 border-0 shadow-sm">
+              <Avatar className="w-10 h-10 bg-charcoal text-white flex items-center justify-center font-bold">
+                {c.name ? c.name.charAt(0).toUpperCase() : "?"}
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-bold text-charcoal">{c.name || "Anonymous"}</div>
+                {c.email && (
+                  <a href={`mailto:${c.email}`} className="text-xs text-gray hover:text-charcoal block mt-0.5">
+                    ✉ {c.email}
+                  </a>
+                )}
+                {c.phone && (
+                  <a href={`tel:${c.phone}`} className="text-xs text-gray hover:text-charcoal block">
+                    ☎ {c.phone}
+                  </a>
+                )}
+                {c.linkedin && (
+                  <a href={`https://${c.linkedin}`} target="_blank" rel="noopener noreferrer" className="text-xs text-gray hover:text-charcoal block">
+                    🔗 LinkedIn
+                  </a>
+                )}
+              </div>
+              {c.status === "hired" && <Badge className="bg-charcoal text-white text-xs">HIRED</Badge>}
+            </Card>
+          ))}
+        </div>
       )}
 
       {/* Outreach History */}
-      <div className="section-label" style={{ marginTop: 16 }}>Your outreach ({sentCount})</div>
+      <div className="text-sm font-bold text-charcoal px-5 py-3 mt-2">Your outreach ({sentCount})</div>
 
       {outreach.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-desc">No outreach yet</div>
+        <div className="text-center py-6 px-7">
+          <div className="text-sm text-gray">No outreach yet</div>
         </div>
       ) : (
-        outreach.map((entry) => (
-          <div key={entry.id} className="outreach-row">
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--charcoal)" }}>{entry.seeker_title}</div>
-              <div className="outreach-date">{formatDate(entry.created_at)}</div>
+        <div className="px-4 space-y-2 pb-4">
+          {outreach.map((entry) => (
+            <div key={entry.id} className="flex justify-between items-center px-4 py-3.5 bg-white rounded-xl shadow-sm">
+              <div>
+                <div className="text-xs font-semibold text-charcoal">{entry.seeker_title}</div>
+                <div className="text-xs text-gray mt-0.5">{formatDate(entry.created_at)}</div>
+              </div>
+              <Badge
+                className={`text-xs ${
+                  entry.status === "pending"
+                    ? "bg-orange-bg text-orange"
+                    : entry.status === "passed"
+                    ? "bg-off-white text-gray-light"
+                    : "bg-charcoal text-white"
+                }`}
+              >
+                {entry.status.toUpperCase()}
+              </Badge>
             </div>
-            <span className={`badge ${
-              entry.status === "pending" ? "badge-pending" :
-              entry.status === "passed" ? "badge-passed" :
-              "badge-revealed"
-            }`}>
-              {entry.status.toUpperCase()}
-            </span>
-          </div>
-        ))
+          ))}
+        </div>
       )}
     </div>
   );

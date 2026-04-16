@@ -3,6 +3,12 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { SeekerCard } from "@/lib/types";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 type FilterKey = "all" | "healthcare" | "trades" | "operations" | "on-site" | "hybrid" | "remote";
 
@@ -117,8 +123,8 @@ export default function BrowsePage() {
 
   if (loading) {
     return (
-      <div className="screen-body" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
-        <p style={{ fontSize: 14, color: "var(--gray)" }}>Loading…</p>
+      <div className="screen-body flex items-center justify-center min-h-[60vh]">
+        <p className="text-sm text-gray">Loading…</p>
       </div>
     );
   }
@@ -126,31 +132,39 @@ export default function BrowsePage() {
   return (
     <div className="screen-body">
       {/* Header */}
-      <div className="section-header">
-        <h2>Browse Seekers</h2>
-        <p>{filteredSeekers.length} candidate{filteredSeekers.length !== 1 ? "s" : ""} in Iowa</p>
+      <div className="px-5 pt-6 pb-2">
+        <h2 className="text-2xl font-extrabold text-charcoal">Browse Seekers</h2>
+        <p className="text-sm text-gray mt-1">{filteredSeekers.length} candidate{filteredSeekers.length !== 1 ? "s" : ""} in Iowa</p>
       </div>
 
       {/* Stats */}
-      <div className="stats-row">
-        <div className="stat-card">
-          <div className="stat-num">{allSeekers.length}</div>
-          <div className="stat-label">Available</div>
+      <div className="flex gap-3 px-4 py-3 my-3 mx-4 bg-white rounded-3xl shadow-sm">
+        <div className="flex-1 text-center">
+          <div className="text-2xl font-extrabold text-charcoal">{allSeekers.length}</div>
+          <div className="text-xs text-gray mt-1 font-medium">Available</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-num">{introsSent}</div>
-          <div className="stat-label">Intros Sent</div>
+        <div className="flex-1 text-center">
+          <div className="text-2xl font-extrabold text-charcoal">{introsSent}</div>
+          <div className="text-xs text-gray mt-1 font-medium">Intros Sent</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-num">{revealedCount}</div>
-          <div className="stat-label">Revealed</div>
+        <div className="flex-1 text-center">
+          <div className="text-2xl font-extrabold text-charcoal">{revealedCount}</div>
+          <div className="text-xs text-gray mt-1 font-medium">Revealed</div>
         </div>
       </div>
 
       {/* Filter Chips */}
-      <div className="filter-bar">
+      <div className="flex gap-2 px-4 py-4 overflow-x-auto">
         {FILTER_OPTIONS.map(({ key, label }) => (
-          <button key={key} className={`filter-chip${filters.has(key) ? " active" : ""}`} onClick={() => toggleFilter(key)}>
+          <button
+            key={key}
+            onClick={() => toggleFilter(key)}
+            className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
+              filters.has(key)
+                ? "bg-charcoal text-white border border-charcoal"
+                : "bg-white text-gray border border-border"
+            }`}
+          >
             {label}
           </button>
         ))}
@@ -158,102 +172,130 @@ export default function BrowsePage() {
 
       {/* Seeker Cards */}
       {filteredSeekers.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-icon">👀</div>
-          <div className="empty-title">{allSeekers.length === 0 ? "No seekers yet" : "No matches for these filters"}</div>
-          <div className="empty-desc">{allSeekers.length === 0 ? "Candidates are still signing up — check back soon." : "Try loosening your filters — good people show up every day."}</div>
+        <div className="text-center py-10 px-7">
+          <div className="text-4xl mb-3 opacity-40">👀</div>
+          <div className="text-base font-bold text-charcoal mb-1">
+            {allSeekers.length === 0 ? "No seekers yet" : "No matches for these filters"}
+          </div>
+          <div className="text-sm text-gray leading-relaxed">
+            {allSeekers.length === 0 ? "Candidates are still signing up — check back soon." : "Try loosening your filters — good people show up every day."}
+          </div>
         </div>
       ) : (
-        filteredSeekers.map((seeker) => (
-          <div key={seeker.id} className="card">
-            <div className="card-dark-header">
-              <div className="avatar">{getCategoryInitials(seeker.category)}</div>
-              <div>
-                <div className="card-title">{seeker.job_title || seeker.headline}</div>
-                <div className="card-sub">{seeker.city || "Iowa"}, {seeker.state || "IA"}</div>
+        <div className="px-4 space-y-3 pb-4">
+          {filteredSeekers.map((seeker) => (
+            <Card key={seeker.id} className="overflow-hidden border-0 shadow-sm">
+              {/* Dark Header */}
+              <div className="bg-charcoal px-4 py-4 flex items-center gap-3">
+                <Avatar className="w-11 h-11 bg-gray-dark text-white flex items-center justify-center font-bold text-base">
+                  {getCategoryInitials(seeker.category)}
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="text-white font-semibold text-base truncate">{seeker.job_title || seeker.headline}</div>
+                  <div className="text-gray-light text-xs mt-0.5">{seeker.city || "Iowa"}, {seeker.state || "IA"}</div>
+                </div>
               </div>
-            </div>
-            <div className="card-body">
-              <div className="detail-row">
-                <span className="detail-label">Experience</span>
-                <span className="detail-value">{seeker.years_experience || "—"} years</span>
+
+              {/* Body */}
+              <div className="px-4 py-4 space-y-2 bg-white">
+                <div className="flex justify-between items-center pb-2 border-b border-off-white text-sm">
+                  <span className="text-gray">Experience</span>
+                  <span className="text-charcoal font-semibold">{seeker.years_experience || "—"} years</span>
+                </div>
+                <div className="flex justify-between items-center pb-2 border-b border-off-white text-sm">
+                  <span className="text-gray">Setup</span>
+                  <span className="text-charcoal font-semibold capitalize">{seeker.arrangement || "Flexible"}</span>
+                </div>
+                <div className="flex justify-between items-center pb-2 border-b border-off-white text-sm">
+                  <span className="text-gray">Available</span>
+                  <span className="text-charcoal font-semibold capitalize">{seeker.availability || "Flexible"}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray">Pay range</span>
+                  <span className="text-charcoal font-semibold">{formatSalary(seeker.salary_min, seeker.salary_max)}</span>
+                </div>
               </div>
-              <div className="detail-row">
-                <span className="detail-label">Setup</span>
-                <span className="detail-value" style={{ textTransform: "capitalize" }}>{seeker.arrangement || "Flexible"}</span>
+
+              {/* Tags */}
+              <div className="px-4 py-3 flex flex-wrap gap-2 bg-white border-t border-off-white">
+                {seeker.category && <Badge variant="secondary">{seeker.category}</Badge>}
+                {seeker.certifications?.map((c) => (
+                  <Badge key={c} className="bg-green-bg text-green-700">{c}</Badge>
+                ))}
+                {seeker.skills?.slice(0, 3).map((s) => (
+                  <Badge key={s} variant="secondary">{s}</Badge>
+                ))}
               </div>
-              <div className="detail-row">
-                <span className="detail-label">Available</span>
-                <span className="detail-value" style={{ textTransform: "capitalize" }}>{seeker.availability || "Flexible"}</span>
+
+              {/* Action Button */}
+              <div className="px-4 py-4 bg-white">
+                <Button
+                  onClick={() => handleSayHello(seeker)}
+                  className="w-full bg-charcoal hover:bg-charcoal-light text-white font-semibold"
+                >
+                  Say hello
+                </Button>
               </div>
-              <div className="detail-row">
-                <span className="detail-label">Pay range</span>
-                <span className="detail-value">{formatSalary(seeker.salary_min, seeker.salary_max)}</span>
-              </div>
-            </div>
-            <div className="tag-row">
-              {seeker.category && <span className="tag">{seeker.category}</span>}
-              {seeker.certifications?.map((c) => <span key={c} className="tag green">{c}</span>)}
-              {seeker.skills?.slice(0, 3).map((s) => <span key={s} className="tag">{s}</span>)}
-            </div>
-            <div className="card-action">
-              <button className="card-action-btn" onClick={() => handleSayHello(seeker)}>Say hello</button>
-            </div>
-          </div>
-        ))
+            </Card>
+          ))}
+        </div>
       )}
 
       {/* Intro Modal */}
-      <div className={`modal-overlay${showIntroModal ? " show" : ""}`} onClick={() => setShowIntroModal(false)}>
-        <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
-          <div className="modal-header">
-            <div className="modal-title">Introduce yourself</div>
-            <button className="modal-close" onClick={() => setShowIntroModal(false)}>×</button>
-          </div>
+      <Dialog open={showIntroModal} onOpenChange={setShowIntroModal}>
+        <DialogContent className="w-full max-w-[430px] rounded-t-3xl rounded-b-none">
+          <DialogHeader>
+            <DialogTitle>Introduce yourself</DialogTitle>
+          </DialogHeader>
 
           {introSuccess ? (
-            <div className="success-state">
-              <div className="success-icon">✓</div>
-              <div className="success-title">Intro sent!</div>
-              <div className="success-desc">They'll see your message and decide what to share.</div>
+            <div className="text-center py-10">
+              <div className="text-5xl mb-3">✓</div>
+              <div className="text-xl font-bold text-charcoal mb-2">Intro sent!</div>
+              <div className="text-sm text-gray">They'll see your message and decide what to share.</div>
             </div>
           ) : (
-            <>
+            <div className="space-y-4">
               {modalSeeker && (
-                <div className="modal-summary">
-                  <strong>{modalSeeker.job_title || modalSeeker.headline}</strong>
-                  <span>{modalSeeker.years_experience} years · {modalSeeker.city || "Iowa"}, {modalSeeker.state || "IA"}</span>
+                <div className="bg-off-white p-4 rounded-2xl">
+                  <div className="font-semibold text-sm text-charcoal">{modalSeeker.job_title || modalSeeker.headline}</div>
+                  <div className="text-xs text-gray mt-1">{modalSeeker.years_experience} years · {modalSeeker.city || "Iowa"}, {modalSeeker.state || "IA"}</div>
                 </div>
               )}
-              <textarea
-                className="modal-textarea"
+              <Textarea
                 placeholder="Why this person caught your eye..."
                 value={introMessage}
                 onChange={(e) => setIntroMessage(e.target.value)}
+                className="min-h-24"
               />
-              <div className="modal-hint">Be specific. People can tell when it's genuine.</div>
+              <p className="text-xs text-gray-light">Be specific. People can tell when it's genuine.</p>
 
               {introError && (
-                <div style={{ background: "var(--red-bg)", border: "1px solid var(--red)", color: "var(--red)", fontSize: 12, padding: "10px 14px", borderRadius: 10, marginBottom: 14 }}>
+                <div className="bg-red-bg border border-red text-red text-xs p-3 rounded-2xl">
                   {introError}
                 </div>
               )}
 
-              <div className="modal-actions">
-                <button className="btn-cancel" onClick={() => setShowIntroModal(false)}>Cancel</button>
-                <button
-                  className="btn-send"
+              <div className="flex gap-3 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowIntroModal(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
                   onClick={handleSendIntro}
                   disabled={sendingIntro || !introMessage.trim()}
-                  style={{ opacity: sendingIntro || !introMessage.trim() ? 0.5 : 1 }}
+                  className="flex-[2] bg-charcoal hover:bg-charcoal-light text-white"
                 >
                   {sendingIntro ? "Sending…" : "Send"}
-                </button>
+                </Button>
               </div>
-            </>
+            </div>
           )}
-        </div>
-      </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

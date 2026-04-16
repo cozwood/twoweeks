@@ -2,6 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 function timeAgo(date: Date): string {
   const now = new Date();
@@ -79,7 +84,7 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) return <div className="screen-body" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}><p style={{ fontSize: 14, color: "var(--gray)" }}>Loading…</p></div>;
+  if (loading) return <div className="screen-body flex items-center justify-center min-h-[60vh]"><p className="text-sm text-gray">Loading…</p></div>;
 
   const pending = intros.filter((i) => i.status === "pending");
   const revealed = intros.filter((i) => i.status === "revealed");
@@ -88,140 +93,167 @@ export default function Dashboard() {
   return (
     <div className="screen-body">
       {/* Header */}
-      <div className="section-header">
-        <h2>Your Dashboard</h2>
-        {card && <p>{card.job_title} in {card.city}</p>}
+      <div className="px-5 pt-6 pb-2">
+        <h2 className="text-2xl font-extrabold text-charcoal">Your Dashboard</h2>
+        {card && <p className="text-sm text-gray mt-1">{card.job_title} in {card.city}</p>}
       </div>
 
       {/* Status Banner */}
-      <div className="status-banner">
-        <div className={`status-dot ${card?.is_active ? "live" : "dark"}`} />
-        <div className="status-text">
+      <Card className="mx-4 my-3 px-4 py-3 border-0 shadow-sm flex items-center gap-2.5">
+        <div
+          className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+            card?.is_active
+              ? "bg-green shadow-[0_0_0_3px_rgba(72,187,120,0.2)]"
+              : "bg-gray-light"
+          }`}
+        />
+        <div className="flex-1 text-xs text-gray leading-relaxed">
           {card?.is_active
             ? "You're live. Employers in your area can see your card."
             : "You're hidden. No one can see your card."}
         </div>
-        <button className="status-btn" onClick={handleToggle}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleToggle}
+          className="text-xs font-semibold whitespace-nowrap"
+        >
           {card?.is_active ? "Go dark" : "Go live"}
-        </button>
-      </div>
+        </Button>
+      </Card>
 
       {/* Stats */}
-      <div className="stats-row">
-        <div className="stat-card">
-          <div className="stat-num">{pending.length}</div>
-          <div className="stat-label">Interested</div>
+      <div className="flex gap-3 px-4 py-3 my-3 mx-4 bg-white rounded-3xl shadow-sm">
+        <div className="flex-1 text-center">
+          <div className="text-2xl font-extrabold text-charcoal">{pending.length}</div>
+          <div className="text-xs text-gray mt-1 font-medium">Interested</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-num">{revealed.length}</div>
-          <div className="stat-label">Talking</div>
+        <div className="flex-1 text-center">
+          <div className="text-2xl font-extrabold text-charcoal">{revealed.length}</div>
+          <div className="text-xs text-gray mt-1 font-medium">Talking</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-num">{passed.length}</div>
-          <div className="stat-label">Passed</div>
+        <div className="flex-1 text-center">
+          <div className="text-2xl font-extrabold text-charcoal">{passed.length}</div>
+          <div className="text-xs text-gray mt-1 font-medium">Passed</div>
         </div>
       </div>
 
       {/* Pending Intros */}
       {pending.length > 0 && (
-        <>
-          <div className="section-label">They're interested ({pending.length})</div>
+        <div className="px-4 space-y-3">
+          <div className="text-sm font-bold text-charcoal px-2 py-3">They're interested ({pending.length})</div>
           {pending.map((intro) => (
-            <div key={intro.id} className="intro-card">
-              <div className="intro-date">{timeAgo(new Date(intro.created_at))}</div>
-              <div className="intro-msg">"{intro.message}"</div>
-              <div className="intro-actions">
-                <button className="btn-pass" onClick={() => handlePass(intro.id)}>Pass</button>
-                <button className="btn-reveal" onClick={() => handleRevealClick(intro)}>Show them who I am</button>
+            <Card key={intro.id} className="p-4 border-0 shadow-sm">
+              <div className="text-xs text-gray-light mb-2">{timeAgo(new Date(intro.created_at))}</div>
+              <div className="text-sm text-gray-dark italic mb-3 leading-relaxed">"{intro.message}"</div>
+              <div className="flex gap-2.5">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePass(intro.id)}
+                  className="flex-1 text-xs font-semibold"
+                >
+                  Pass
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => handleRevealClick(intro)}
+                  className="flex-[2] bg-charcoal hover:bg-charcoal-light text-white text-xs font-semibold"
+                >
+                  Show them who I am
+                </Button>
               </div>
-            </div>
+            </Card>
           ))}
-        </>
+        </div>
       )}
 
       {/* Revealed */}
       {revealed.length > 0 && (
-        <>
-          <div className="section-label" style={{ marginTop: 8 }}>Talking ({revealed.length})</div>
+        <div className="px-4 space-y-2">
+          <div className="text-sm font-bold text-charcoal px-2 py-3 mt-2">Talking ({revealed.length})</div>
           {revealed.map((intro) => (
-            <div key={intro.id} className="outreach-row">
-              <span style={{ fontSize: 13, fontWeight: 500, color: "var(--charcoal)" }}>Connected</span>
-              <span className="badge badge-revealed">REVEALED</span>
+            <div key={intro.id} className="flex justify-between items-center px-4 py-3.5 bg-white rounded-xl shadow-sm">
+              <span className="text-xs font-medium text-charcoal">Connected</span>
+              <Badge className="bg-charcoal text-white text-xs">REVEALED</Badge>
             </div>
           ))}
-        </>
+        </div>
       )}
 
       {/* Empty */}
       {intros.length === 0 && (
-        <div className="empty-state">
-          <div className="empty-icon">💬</div>
-          <div className="empty-title">All quiet for now</div>
-          <div className="empty-desc">When someone reaches out, it shows up here.</div>
+        <div className="text-center py-10 px-7">
+          <div className="text-4xl mb-3 opacity-40">💬</div>
+          <div className="text-base font-bold text-charcoal mb-1">All quiet for now</div>
+          <div className="text-sm text-gray leading-relaxed">When someone reaches out, it shows up here.</div>
         </div>
       )}
 
       {/* Reveal Modal */}
-      <div className={`modal-overlay${revealOpen ? " show" : ""}`} onClick={() => setRevealOpen(false)}>
-        <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
-          <div className="modal-header">
-            <div className="modal-title">You're in control</div>
-            <button className="modal-close" onClick={() => setRevealOpen(false)}>×</button>
-          </div>
+      <Dialog open={revealOpen} onOpenChange={setRevealOpen}>
+        <DialogContent className="w-full max-w-[430px] rounded-t-3xl rounded-b-none">
+          <DialogHeader>
+            <DialogTitle>You're in control</DialogTitle>
+          </DialogHeader>
 
           {selectedIntro && (
-            <>
-              <div className="modal-summary">
-                <strong>Their message</strong>
-                <span style={{ fontStyle: "italic" }}>"{selectedIntro.message}"</span>
+            <div className="space-y-4">
+              <div className="bg-off-white p-4 rounded-2xl">
+                <div className="font-semibold text-sm text-charcoal">Their message</div>
+                <div className="text-xs text-gray mt-2 italic">"{selectedIntro.message}"</div>
               </div>
 
-              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--charcoal)", marginBottom: 10 }}>
+              <div className="text-xs font-bold text-charcoal">
                 Only share what you're comfortable with
               </div>
 
-              <div className="checkbox-list">
+              <div className="space-y-3">
                 {(["name", "email", "phone", "linkedin"] as const).map((key) => (
-                  <div
-                    key={key}
-                    className={`checkbox-item${revealData[key] ? " checked" : ""}`}
-                    onClick={() => setRevealData({ ...revealData, [key]: !revealData[key] })}
-                  >
-                    <div className="checkbox-box">
-                      {revealData[key] && (
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                      )}
-                    </div>
-                    <span className="checkbox-label">
+                  <div key={key} className="flex items-center gap-3 cursor-pointer">
+                    <Checkbox
+                      checked={revealData[key]}
+                      onCheckedChange={() => setRevealData({ ...revealData, [key]: !revealData[key] })}
+                    />
+                    <span className="text-sm text-charcoal font-medium" onClick={() => setRevealData({ ...revealData, [key]: !revealData[key] })}>
                       {key === "name" ? "My real name" : key === "email" ? "Email address" : key === "phone" ? "Phone number" : "LinkedIn"}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <div className="preview-section">
-                <div className="preview-label">They'll see:</div>
-                <div className="preview-badges">
-                  {revealData.name && <span className="preview-badge">My real name</span>}
-                  {revealData.email && <span className="preview-badge">Email address</span>}
-                  {revealData.phone && <span className="preview-badge">Phone number</span>}
-                  {revealData.linkedin && <span className="preview-badge">LinkedIn</span>}
+              <div className="pt-2">
+                <div className="text-xs text-gray font-semibold mb-2">They'll see:</div>
+                <div className="flex flex-wrap gap-2">
+                  {revealData.name && <Badge className="bg-charcoal text-white text-xs">My real name</Badge>}
+                  {revealData.email && <Badge className="bg-charcoal text-white text-xs">Email address</Badge>}
+                  {revealData.phone && <Badge className="bg-charcoal text-white text-xs">Phone number</Badge>}
+                  {revealData.linkedin && <Badge className="bg-charcoal text-white text-xs">LinkedIn</Badge>}
                   {!Object.values(revealData).some((v) => v) && (
-                    <span style={{ fontSize: 12, color: "var(--gray)" }}>Nothing selected</span>
+                    <span className="text-xs text-gray">Nothing selected</span>
                   )}
                 </div>
               </div>
 
-              <div className="modal-actions">
-                <button className="btn-cancel" onClick={() => setRevealOpen(false)}>Cancel</button>
-                <button className="btn-send" onClick={handleReveal}>Let them in</button>
+              <div className="flex gap-3 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setRevealOpen(false)}
+                  className="flex-1 text-sm"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleReveal}
+                  className="flex-[2] bg-charcoal hover:bg-charcoal-light text-white text-sm"
+                >
+                  Let them in
+                </Button>
               </div>
-            </>
+            </div>
           )}
-        </div>
-      </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
