@@ -37,7 +37,9 @@ export default function LoginPage() {
         .eq("id", data.user.id)
         .single();
 
-      if (profile?.role === "employer") {
+      if (profile?.role === "recruiter") {
+        router.push("/staff/dashboard");
+      } else if (profile?.role === "employer") {
         router.push("/browse");
       } else {
         router.push("/dashboard");
@@ -133,6 +135,10 @@ export default function LoginPage() {
           {" · "}
           <Link href="/get-started/employer" className="footer-link">
             I&apos;m hiring
+          </Link>
+          <br /><br />
+          <Link href="/get-started/recruiter" className="footer-link" style={{ color: 'var(--express-navy)', fontSize: '11px' }}>
+            Staffing agency? Set up your workspace →
           </Link>
         </div>
       </div>
