@@ -1,12 +1,11 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { House, User, LogOut, Search, Users } from "lucide-react";
+import { House, User, LogOut, Search, Users, Briefcase, GitCompare } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
 
 interface BottomNavProps {
-  role: "seeker" | "employer";
+  role: "seeker" | "employer" | "recruiter";
 }
 
 export function BottomNav({ role }: BottomNavProps) {
@@ -31,7 +30,19 @@ export function BottomNav({ role }: BottomNavProps) {
     { label: "Sign out", icon: LogOut, href: null, action: handleSignOut },
   ];
 
-  const items = role === "seeker" ? seekerItems : employerItems;
+  const recruiterItems = [
+    { label: "Home", icon: House, href: "/staff/dashboard" },
+    { label: "Candidates", icon: Users, href: "/staff/candidates" },
+    { label: "Jobs", icon: Briefcase, href: "/staff/jobs" },
+    { label: "Matches", icon: GitCompare, href: "/staff/matches" },
+    { label: "Sign out", icon: LogOut, href: null, action: handleSignOut },
+  ];
+
+  const items = role === "recruiter" ? recruiterItems : role === "seeker" ? seekerItems : employerItems;
+
+  // Express navy for recruiter mode
+  const activeColor = role === "recruiter" ? "text-express-navy" : "text-charcoal";
+  const activeFontClass = role === "recruiter" ? "text-express-navy font-semibold" : "text-charcoal font-semibold";
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 mx-auto max-w-[430px] h-16 bg-white border-t border-border flex items-center justify-around z-50">
@@ -54,13 +65,13 @@ export function BottomNav({ role }: BottomNavProps) {
             <Icon
               size={22}
               className={`transition-colors ${
-                isActive ? "text-charcoal stroke-2" : "text-gray-light stroke-1.5"
+                isActive ? `${activeColor} stroke-2` : "text-gray-light stroke-1.5"
               }`}
               strokeWidth={1.5}
             />
             <span
               className={`text-[10px] leading-none font-medium transition-colors ${
-                isActive ? "text-charcoal font-semibold" : "text-gray-light"
+                isActive ? activeFontClass : "text-gray-light"
               }`}
             >
               {item.label}

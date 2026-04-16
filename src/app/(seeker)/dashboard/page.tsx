@@ -213,7 +213,7 @@ export default function Dashboard() {
                   <div key={key} className="flex items-center gap-3 cursor-pointer">
                     <Checkbox
                       checked={revealData[key]}
-                      onCheckedChange={() => setRevealData({ ...revealData, [key]: !revealData[key] })}
+                      onChange={() => setRevealData({ ...revealData, [key]: !revealData[key] })}
                     />
                     <span className="text-sm text-charcoal font-medium" onClick={() => setRevealData({ ...revealData, [key]: !revealData[key] })}>
                       {key === "name" ? "My real name" : key === "email" ? "Email address" : key === "phone" ? "Phone number" : "LinkedIn"}

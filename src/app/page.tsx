@@ -55,6 +55,10 @@ export default function HomePage() {
         Employers pay 4–8% when they hire.<br/>
         No subscriptions. No nonsense.<br/><br/>
         <Link href="/login" className="footer-link">Already have an account? Sign in</Link>
+        <br/><br/>
+        <Link href="/get-started/recruiter" className="footer-link" style={{ color: 'var(--express-navy)', fontSize: '11px' }}>
+          Staffing agency? Set up your workspace →
+        </Link>
       </div>
     </div>
   );

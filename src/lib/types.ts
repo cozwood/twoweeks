@@ -1,6 +1,6 @@
 export interface Profile {
   id: string
-  role: 'seeker' | 'employer'
+  role: 'seeker' | 'employer' | 'recruiter'
   email: string
   name: string | null
   phone: string | null
@@ -9,6 +9,7 @@ export interface Profile {
   title: string | null
   city: string | null
   state: string
+  organization_id: string | null
   created_at: string
   updated_at: string
 }
@@ -30,6 +31,7 @@ export interface SeekerCard {
   skills: string[]
   reasons: string[]
   is_active: boolean
+  organization_id: string | null
   created_at: string
   updated_at: string
 }
@@ -47,6 +49,8 @@ export interface Intro {
   seeker_id: string
   message: string | null
   status: 'pending' | 'revealed' | 'passed' | 'revoked' | 'hired'
+  job_id: string | null
+  organization_id: string | null
   created_at: string
   updated_at: string
 }
@@ -59,4 +63,60 @@ export interface Reveal {
   show_phone: boolean
   show_linkedin: boolean
   revealed_at: string
+}
+
+// ── New types for multi-mode support ──
+
+export interface Organization {
+  id: string
+  name: string
+  slug: string
+  mode: 'marketplace' | 'staffing'
+  owner_id: string
+  config: OrganizationConfig
+  created_at: string
+  updated_at: string
+}
+
+export interface OrganizationConfig {
+  show_company_names?: boolean
+  show_seeker_names?: boolean
+  allow_self_serve?: boolean
+  require_recruiter_approval?: boolean
+  branding?: {
+    primary_color?: string
+    logo_url?: string
+  }
+}
+
+export interface JobListing {
+  id: string
+  organization_id: string
+  created_by: string
+  title: string
+  description: string | null
+  category: string | null
+  years_experience: string | null
+  salary_min: number | null
+  salary_max: number | null
+  arrangement: 'on-site' | 'hybrid' | 'remote' | 'flexible' | null
+  availability: string | null
+  city: string | null
+  state: string
+  required_skills: string[]
+  required_certifications: string[]
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface JobMatch {
+  id: string
+  job_id: string
+  seeker_id: string
+  recruiter_id: string | null
+  status: 'pending' | 'reviewed' | 'interested' | 'declined' | 'hired'
+  notes: string | null
+  created_at: string
+  updated_at: string
 }

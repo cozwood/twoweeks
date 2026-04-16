@@ -47,7 +47,13 @@ export async function updateSession(request: NextRequest) {
       .single()
 
     const url = request.nextUrl.clone()
-    url.pathname = profile?.role === 'employer' ? '/browse' : '/dashboard'
+    if (profile?.role === 'recruiter') {
+      url.pathname = '/staff/dashboard'
+    } else if (profile?.role === 'employer') {
+      url.pathname = '/browse'
+    } else {
+      url.pathname = '/dashboard'
+    }
     return NextResponse.redirect(url)
   }
 
