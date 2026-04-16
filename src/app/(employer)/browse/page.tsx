@@ -39,13 +39,8 @@ export default function BrowsePage() {
   const [introsSent, setIntrosSent] = useState(0);
   const [revealedCount, setRevealedCount] = useState(0);
 
-  // Modal state
-  const [showIntroModal, setShowIntroModal] = useState(false);
-  const [modalSeeker, setModalSeeker] = useState<SeekerCard | null>(null);
-  const [introMessage, setIntroMessage] = useState("");
-  const [sendingIntro, setSendingIntro] = useState(false);
-  const [introError, setIntroError] = useState("");
-  const [introSuccess, setIntroSuccess] = useState(false);
+  const [sendingId, setSendingId] = useState<string | null>(null);
+  const [sentIds, setSentIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     async function fetchData() {
@@ -92,30 +87,18 @@ export default function BrowsePage() {
     setFilters(next);
   };
 
-  const handleSayHello = (seeker: SeekerCard) => {
-    setModalSeeker(seeker);
-    setIntroMessage("");
-    setIntroError("");
-    setIntroSuccess(false);
-    setShowIntroModal(true);
-  };
-
-  const handleSendIntro = async () => {
-    if (!modalSeeker || !introMessage.trim()) return;
-    setSendingIntro(true);
-    setIntroError("");
+  const handleInterested = async (seeker: SeekerCard) => {
+    setSendingId(seeker.profile_id);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { setIntroError("Not authenticated"); return; }
-      const { error } = await supabase.from("intros").insert({ employer_id: user.id, seeker_id: modalSeeker.profile_id, message: introMessage, status: "pending" });
-      if (error) { setIntroError(error.message); }
-      else {
-        setIntroSuccess(true);
+      if (!user) return;
+      const { error } = await supabase.from("intros").insert({ employer_id: user.id, seeker_id: seeker.profile_id, status: "pending" });
+      if (!error) {
+        setSentIds((prev) => new Set(prev).add(seeker.profile_id));
         setIntrosSent((p) => p + 1);
-        setTimeout(() => { setShowIntroModal(false); setModalSeeker(null); setIntroMessage(""); setIntroSuccess(false); }, 1500);
       }
-    } catch { setIntroError("Failed to send introduction"); }
-    finally { setSendingIntro(false); }
+    } catch { /* silent */ }
+    finally { setSendingId(null); }
   };
 
   if (loading) {
@@ -260,120 +243,34 @@ export default function BrowsePage() {
 
               {/* Action Button */}
               <div style={{ padding: "8px 18px 16px" }}>
-                <button
-                  onClick={() => handleSayHello(seeker)}
-                  style={{
-                    width: "100%", padding: 14, borderRadius: 12, border: "none",
-                    background: "#1C1C1E", color: "#fff", fontSize: 14, fontWeight: 600,
-                    cursor: "pointer", fontFamily: "inherit", transition: "all 0.12s",
-                  }}
-                >
-                  Say hello
-                </button>
+                {sentIds.has(seeker.profile_id) ? (
+                  <div style={{
+                    width: "100%", padding: 14, borderRadius: 12,
+                    background: "#F0FFF4", color: "#2F855A", fontSize: 14, fontWeight: 600,
+                    textAlign: "center",
+                  }}>
+                    Interest sent ✓
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleInterested(seeker)}
+                    disabled={sendingId === seeker.profile_id}
+                    style={{
+                      width: "100%", padding: 14, borderRadius: 12, border: "none",
+                      background: "#1C1C1E", color: "#fff", fontSize: 14, fontWeight: 600,
+                      cursor: "pointer", fontFamily: "inherit", transition: "all 0.12s",
+                      opacity: sendingId === seeker.profile_id ? 0.5 : 1,
+                    }}
+                  >
+                    {sendingId === seeker.profile_id ? "Sending…" : "I'm interested"}
+                  </button>
+                )}
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Intro Modal */}
-      {showIntroModal && (
-        <div
-          style={{
-            position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)",
-            display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 20,
-          }}
-          onClick={(e) => { if (e.target === e.currentTarget) setShowIntroModal(false); }}
-        >
-          <div style={{
-            width: "100%", maxWidth: 430, background: "#fff",
-            borderRadius: "24px 24px 0 0", padding: "24px 22px 30px",
-            animation: "slideUp 0.2s ease-out",
-          }}>
-            {introSuccess ? (
-              <div style={{ textAlign: "center", padding: "40px 24px" }}>
-                <div style={{ fontSize: 48, marginBottom: 12 }}>✓</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: "#1C1C1E", marginBottom: 6 }}>Intro sent!</div>
-                <div style={{ fontSize: 14, color: "#636366" }}>They'll see your message and decide what to share.</div>
-              </div>
-            ) : (
-              <>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-                  <h3 style={{ fontSize: 20, fontWeight: 800, color: "#1C1C1E" }}>Introduce yourself</h3>
-                  <button
-                    onClick={() => setShowIntroModal(false)}
-                    style={{
-                      width: 30, height: 30, borderRadius: "50%", border: "none",
-                      background: "#F5F5F5", fontSize: 16, cursor: "pointer",
-                      display: "flex", alignItems: "center", justifyContent: "center", color: "#636366",
-                    }}
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                {modalSeeker && (
-                  <div style={{ background: "#F5F5F5", padding: "14px 16px", borderRadius: 14, marginBottom: 16 }}>
-                    <div style={{ fontWeight: 600, fontSize: 14, color: "#1C1C1E" }}>{modalSeeker.job_title || modalSeeker.headline}</div>
-                    <div style={{ fontSize: 12, color: "#636366", marginTop: 3 }}>{modalSeeker.years_experience} · {modalSeeker.city || "Iowa"}, {modalSeeker.state || "IA"}</div>
-                  </div>
-                )}
-
-                <textarea
-                  placeholder="Why this person caught your eye..."
-                  value={introMessage}
-                  onChange={(e) => setIntroMessage(e.target.value)}
-                  style={{
-                    width: "100%", minHeight: 100, padding: "14px 16px",
-                    border: "1.5px solid #E5E5EA", borderRadius: 12,
-                    fontSize: 14, fontFamily: "inherit", color: "#1C1C1E",
-                    resize: "none", outline: "none", marginBottom: 6,
-                    boxSizing: "border-box",
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = "#1C1C1E")}
-                  onBlur={(e) => (e.target.style.borderColor = "#E5E5EA")}
-                />
-                <p style={{ fontSize: 12, color: "#AEAEB2", marginBottom: 18 }}>Be specific. People can tell when it's genuine.</p>
-
-                {introError && (
-                  <div style={{
-                    padding: "10px 14px", borderRadius: 12, marginBottom: 14,
-                    background: "#FFF5F5", border: "1px solid #E53E3E", color: "#E53E3E", fontSize: 13,
-                  }}>
-                    {introError}
-                  </div>
-                )}
-
-                <div style={{ display: "flex", gap: 10 }}>
-                  <button
-                    onClick={() => setShowIntroModal(false)}
-                    style={{
-                      flex: 1, padding: 13, borderRadius: 12,
-                      border: "1.5px solid #E5E5EA", background: "#fff",
-                      fontSize: 14, fontWeight: 600, color: "#636366",
-                      cursor: "pointer", fontFamily: "inherit",
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSendIntro}
-                    disabled={sendingIntro || !introMessage.trim()}
-                    style={{
-                      flex: 2, padding: 13, borderRadius: 12,
-                      border: "none", background: "#1C1C1E", color: "#fff",
-                      fontSize: 14, fontWeight: 600, cursor: "pointer",
-                      fontFamily: "inherit", opacity: (sendingIntro || !introMessage.trim()) ? 0.5 : 1,
-                    }}
-                  >
-                    {sendingIntro ? "Sending…" : "Send"}
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -18,7 +18,7 @@ function timeAgo(date: Date): string {
 }
 
 interface Card { id: string; job_title: string; city: string; is_active: boolean; }
-interface Intro { id: string; employer_id: string; message: string; status: "pending" | "revealed" | "passed"; created_at: string; }
+interface Intro { id: string; employer_id: string; message: string | null; status: "pending" | "revealed" | "passed"; created_at: string; employer_company?: string; }
 
 export default function Dashboard() {
   const supabase = createClient();
@@ -47,7 +47,13 @@ export default function Dashboard() {
           .select("id, employer_id, message, status, created_at")
           .eq("seeker_id", user.id)
           .order("created_at", { ascending: false });
-        if (introsData) setIntros(introsData);
+        if (introsData) {
+          const enriched = await Promise.all(introsData.map(async (intro) => {
+            const { data: emp } = await supabase.from("profiles").select("company").eq("id", intro.employer_id).single();
+            return { ...intro, employer_company: emp?.company || "A company" };
+          }));
+          setIntros(enriched);
+        }
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     })();
@@ -155,8 +161,9 @@ export default function Dashboard() {
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {pending.map((intro) => (
               <div key={intro.id} style={{ padding: 16, borderRadius: 16, background: "#FFFFFF", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-                <div style={{ fontSize: "12px", color: "#AEAEB2", marginBottom: 8 }}>{timeAgo(new Date(intro.created_at))}</div>
-                <div style={{ fontSize: "14px", color: "#3A3A3C", fontStyle: "italic", marginBottom: 12, lineHeight: 1.5 }}>"{intro.message}"</div>
+                <div style={{ fontSize: "12px", color: "#AEAEB2", marginBottom: 6 }}>{timeAgo(new Date(intro.created_at))}</div>
+                <div style={{ fontSize: "15px", fontWeight: 700, color: "#1C1C1E", marginBottom: 4 }}>{intro.employer_company}</div>
+                <div style={{ fontSize: "13px", color: "#636366", marginBottom: 12 }}>is interested in your profile</div>
                 <div style={{ display: "flex", gap: 10 }}>
                   <button
                     onClick={() => handlePass(intro.id)}
@@ -252,8 +259,8 @@ export default function Dashboard() {
             {selectedIntro && (
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                 <div style={{ background: "#F5F5F5", padding: 16, borderRadius: 16 }}>
-                  <div style={{ fontWeight: 600, fontSize: "14px", color: "#1C1C1E" }}>Their message</div>
-                  <div style={{ fontSize: "12px", color: "#636366", marginTop: 8, fontStyle: "italic" }}>"{selectedIntro.message}"</div>
+                  <div style={{ fontWeight: 600, fontSize: "14px", color: "#1C1C1E" }}>{selectedIntro.employer_company}</div>
+                  <div style={{ fontSize: "12px", color: "#636366", marginTop: 4 }}>wants to connect with you</div>
                 </div>
 
                 <div style={{ fontSize: "12px", fontWeight: 700, color: "#1C1C1E" }}>
