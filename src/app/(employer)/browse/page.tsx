@@ -3,24 +3,33 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { SeekerCard } from "@/lib/types";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
+import {
+  CATEGORIES,
+  formatSalary,
+  getCategoryInitials,
+} from "@/lib/constants";
 
-type FilterKey = "all" | "healthcare" | "trades" | "operations" | "on-site" | "hybrid" | "remote";
+type FilterKey = "all" | "healthcare" | "trades" | "operations" | "sales" | "technology" | "on-site" | "hybrid" | "remote";
 
 const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
   { key: "all", label: "All" },
   { key: "healthcare", label: "Healthcare" },
   { key: "trades", label: "Skilled Trades" },
   { key: "operations", label: "Operations" },
+  { key: "sales", label: "Sales" },
+  { key: "technology", label: "Tech" },
   { key: "on-site", label: "On-site" },
   { key: "hybrid", label: "Hybrid" },
   { key: "remote", label: "Remote" },
 ];
+
+const CATEGORY_MAP: Record<string, string> = {
+  healthcare: "Healthcare",
+  trades: "Skilled Trades",
+  operations: "Operations",
+  sales: "Sales & Marketing",
+  technology: "Technology",
+};
 
 export default function BrowsePage() {
   const [supabase] = useState(() => createClient());
@@ -63,12 +72,12 @@ export default function BrowsePage() {
 
   const filteredSeekers = allSeekers.filter((s) => {
     if (filters.has("all")) return true;
-    if (filters.has("healthcare") && s.category === "Healthcare") return true;
-    if (filters.has("trades") && s.category === "Skilled Trades") return true;
-    if (filters.has("operations") && s.category === "Operations") return true;
-    if (filters.has("on-site") && s.arrangement === "on-site") return true;
-    if (filters.has("hybrid") && s.arrangement === "hybrid") return true;
-    if (filters.has("remote") && s.arrangement === "remote") return true;
+    for (const f of filters) {
+      if (CATEGORY_MAP[f] && s.category === CATEGORY_MAP[f]) return true;
+      if (f === "on-site" && s.arrangement === "on-site") return true;
+      if (f === "hybrid" && s.arrangement === "hybrid") return true;
+      if (f === "remote" && s.arrangement === "remote") return true;
+    }
     return false;
   });
 
@@ -81,18 +90,6 @@ export default function BrowsePage() {
       if (next.size === 0) next.add("all");
     }
     setFilters(next);
-  };
-
-  const getCategoryInitials = (cat: string | null): string => {
-    const m: Record<string, string> = { "Sales & Marketing": "SM", Healthcare: "HC", Technology: "TE", "Skilled Trades": "SK", Operations: "OP", Finance: "FI" };
-    return m[cat || ""] || "TW";
-  };
-
-  const formatSalary = (min: number | null, max: number | null): string => {
-    if (!min && !max) return "Open to offers";
-    if (min && !max) return `$${(min / 1000).toFixed(0)}k+`;
-    if (!min && max) return `Up to $${(max / 1000).toFixed(0)}k`;
-    return `$${(min! / 1000).toFixed(0)}k – $${(max! / 1000).toFixed(0)}k`;
   };
 
   const handleSayHello = (seeker: SeekerCard) => {
@@ -123,47 +120,57 @@ export default function BrowsePage() {
 
   if (loading) {
     return (
-      <div className="screen-body flex items-center justify-center min-h-[60vh]">
-        <p className="text-sm text-gray">Loading…</p>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh", background: "#F5F5F5" }}>
+        <p style={{ fontSize: 14, color: "#636366" }}>Loading…</p>
       </div>
     );
   }
 
   return (
-    <div className="screen-body">
+    <div style={{ background: "#F5F5F5", minHeight: "100vh", paddingBottom: 80 }}>
       {/* Header */}
-      <div className="px-5 pt-6 pb-2">
-        <h2 className="text-2xl font-extrabold text-charcoal">Browse Seekers</h2>
-        <p className="text-sm text-gray mt-1">{filteredSeekers.length} candidate{filteredSeekers.length !== 1 ? "s" : ""} in Iowa</p>
+      <div style={{ padding: "24px 20px 8px", background: "#fff" }}>
+        <h2 style={{ fontSize: 26, fontWeight: 800, color: "#1C1C1E", letterSpacing: -0.5 }}>Browse Seekers</h2>
+        <p style={{ fontSize: 13, color: "#636366", marginTop: 2 }}>{filteredSeekers.length} candidate{filteredSeekers.length !== 1 ? "s" : ""} in Iowa</p>
       </div>
 
       {/* Stats */}
-      <div className="flex gap-3 px-4 py-3 my-3 mx-4 bg-white rounded-3xl shadow-sm">
-        <div className="flex-1 text-center">
-          <div className="text-2xl font-extrabold text-charcoal">{allSeekers.length}</div>
-          <div className="text-xs text-gray mt-1 font-medium">Available</div>
-        </div>
-        <div className="flex-1 text-center">
-          <div className="text-2xl font-extrabold text-charcoal">{introsSent}</div>
-          <div className="text-xs text-gray mt-1 font-medium">Intros Sent</div>
-        </div>
-        <div className="flex-1 text-center">
-          <div className="text-2xl font-extrabold text-charcoal">{revealedCount}</div>
-          <div className="text-xs text-gray mt-1 font-medium">Revealed</div>
-        </div>
+      <div style={{ display: "flex", gap: 12, padding: "12px 16px", margin: "0 0 4px" }}>
+        {[
+          { num: allSeekers.length, label: "Available" },
+          { num: introsSent, label: "Intros Sent" },
+          { num: revealedCount, label: "Revealed" },
+        ].map((s) => (
+          <div key={s.label} style={{
+            flex: 1, textAlign: "center", background: "#fff",
+            borderRadius: 16, padding: "14px 8px",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+          }}>
+            <div style={{ fontSize: 24, fontWeight: 800, color: "#1C1C1E" }}>{s.num}</div>
+            <div style={{ fontSize: 11, color: "#636366", marginTop: 4, fontWeight: 500 }}>{s.label}</div>
+          </div>
+        ))}
       </div>
 
       {/* Filter Chips */}
-      <div className="flex gap-2 px-4 py-4 overflow-x-auto">
+      <div style={{ display: "flex", gap: 8, padding: "12px 16px", overflowX: "auto" }}>
         {FILTER_OPTIONS.map(({ key, label }) => (
           <button
             key={key}
             onClick={() => toggleFilter(key)}
-            className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
-              filters.has(key)
-                ? "bg-charcoal text-white border border-charcoal"
-                : "bg-white text-gray border border-border"
-            }`}
+            style={{
+              padding: "8px 16px",
+              borderRadius: 20,
+              fontSize: 13,
+              fontWeight: 600,
+              whiteSpace: "nowrap",
+              border: filters.has(key) ? "1.5px solid #1C1C1E" : "1.5px solid #E5E5EA",
+              background: filters.has(key) ? "#1C1C1E" : "#fff",
+              color: filters.has(key) ? "#fff" : "#636366",
+              cursor: "pointer",
+              fontFamily: "inherit",
+              transition: "all 0.12s",
+            }}
           >
             {label}
           </button>
@@ -172,130 +179,201 @@ export default function BrowsePage() {
 
       {/* Seeker Cards */}
       {filteredSeekers.length === 0 ? (
-        <div className="text-center py-10 px-7">
-          <div className="text-4xl mb-3 opacity-40">👀</div>
-          <div className="text-base font-bold text-charcoal mb-1">
+        <div style={{ textAlign: "center", padding: "40px 28px" }}>
+          <div style={{ fontSize: 36, marginBottom: 12, opacity: 0.4 }}>👀</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: "#1C1C1E", marginBottom: 6 }}>
             {allSeekers.length === 0 ? "No seekers yet" : "No matches for these filters"}
           </div>
-          <div className="text-sm text-gray leading-relaxed">
+          <div style={{ fontSize: 13, color: "#636366", lineHeight: 1.45 }}>
             {allSeekers.length === 0 ? "Candidates are still signing up — check back soon." : "Try loosening your filters — good people show up every day."}
           </div>
         </div>
       ) : (
-        <div className="px-4 space-y-3 pb-4">
+        <div style={{ padding: "8px 16px", display: "flex", flexDirection: "column", gap: 14 }}>
           {filteredSeekers.map((seeker) => (
-            <Card key={seeker.id} className="overflow-hidden border-0 shadow-sm">
+            <div key={seeker.id} style={{
+              background: "#fff", borderRadius: 16, overflow: "hidden",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+            }}>
               {/* Dark Header */}
-              <div className="bg-charcoal px-4 py-4 flex items-center gap-3">
-                <Avatar className="w-11 h-11 bg-gray-dark text-white flex items-center justify-center font-bold text-base">
+              <div style={{
+                background: "#1C1C1E", padding: "16px 18px",
+                display: "flex", alignItems: "center", gap: 12,
+              }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: 12,
+                  background: "#3A3A3C", display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 16, fontWeight: 700, color: "#fff", flexShrink: 0,
+                }}>
                   {getCategoryInitials(seeker.category)}
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="text-white font-semibold text-base truncate">{seeker.job_title || seeker.headline}</div>
-                  <div className="text-gray-light text-xs mt-0.5">{seeker.city || "Iowa"}, {seeker.state || "IA"}</div>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 16, fontWeight: 600, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {seeker.job_title || seeker.headline}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#AEAEB2", marginTop: 1 }}>
+                    {seeker.city || "Iowa"}, {seeker.state || "IA"}
+                  </div>
                 </div>
               </div>
 
               {/* Body */}
-              <div className="px-4 py-4 space-y-2 bg-white">
-                <div className="flex justify-between items-center pb-2 border-b border-off-white text-sm">
-                  <span className="text-gray">Experience</span>
-                  <span className="text-charcoal font-semibold">{seeker.years_experience || "—"} years</span>
-                </div>
-                <div className="flex justify-between items-center pb-2 border-b border-off-white text-sm">
-                  <span className="text-gray">Setup</span>
-                  <span className="text-charcoal font-semibold capitalize">{seeker.arrangement || "Flexible"}</span>
-                </div>
-                <div className="flex justify-between items-center pb-2 border-b border-off-white text-sm">
-                  <span className="text-gray">Available</span>
-                  <span className="text-charcoal font-semibold capitalize">{seeker.availability || "Flexible"}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray">Pay range</span>
-                  <span className="text-charcoal font-semibold">{formatSalary(seeker.salary_min, seeker.salary_max)}</span>
-                </div>
+              <div style={{ padding: "14px 18px" }}>
+                {[
+                  { label: "Experience", value: seeker.years_experience ? `${seeker.years_experience}` : "—" },
+                  { label: "Setup", value: seeker.arrangement ? seeker.arrangement.charAt(0).toUpperCase() + seeker.arrangement.slice(1) : "Flexible" },
+                  { label: "Available", value: seeker.availability ? seeker.availability.charAt(0).toUpperCase() + seeker.availability.slice(1) : "Flexible" },
+                  { label: "Pay range", value: formatSalary(seeker.salary_min, seeker.salary_max) },
+                ].map((row, i, arr) => (
+                  <div key={row.label} style={{
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                    padding: "9px 0",
+                    borderBottom: i < arr.length - 1 ? "1px solid #F5F5F5" : "none",
+                    fontSize: 13,
+                  }}>
+                    <span style={{ color: "#636366" }}>{row.label}</span>
+                    <span style={{ color: "#1C1C1E", fontWeight: 600 }}>{row.value}</span>
+                  </div>
+                ))}
               </div>
 
               {/* Tags */}
-              <div className="px-4 py-3 flex flex-wrap gap-2 bg-white border-t border-off-white">
-                {seeker.category && <Badge variant="secondary">{seeker.category}</Badge>}
-                {seeker.certifications?.map((c) => (
-                  <Badge key={c} className="bg-green-bg text-green-700">{c}</Badge>
-                ))}
-                {seeker.skills?.slice(0, 3).map((s) => (
-                  <Badge key={s} variant="secondary">{s}</Badge>
-                ))}
-              </div>
+              {(seeker.category || (seeker.certifications?.length > 0) || (seeker.skills?.length > 0)) && (
+                <div style={{ padding: "8px 18px 12px", display: "flex", flexWrap: "wrap", gap: 6, borderTop: "1px solid #F5F5F5" }}>
+                  {seeker.category && (
+                    <span style={{ padding: "4px 10px", borderRadius: 6, background: "#F5F5F5", color: "#1C1C1E", fontSize: 11, fontWeight: 600 }}>
+                      {seeker.category}
+                    </span>
+                  )}
+                  {seeker.certifications?.map((c) => (
+                    <span key={c} style={{ padding: "4px 10px", borderRadius: 6, background: "#F0FFF4", color: "#2F855A", fontSize: 11, fontWeight: 600 }}>
+                      {c}
+                    </span>
+                  ))}
+                  {seeker.skills?.slice(0, 3).map((s) => (
+                    <span key={s} style={{ padding: "4px 10px", borderRadius: 6, background: "#F5F5F5", color: "#3A3A3C", fontSize: 11, fontWeight: 600 }}>
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               {/* Action Button */}
-              <div className="px-4 py-4 bg-white">
-                <Button
+              <div style={{ padding: "8px 18px 16px" }}>
+                <button
                   onClick={() => handleSayHello(seeker)}
-                  className="w-full bg-charcoal hover:bg-charcoal-light text-white font-semibold"
+                  style={{
+                    width: "100%", padding: 14, borderRadius: 12, border: "none",
+                    background: "#1C1C1E", color: "#fff", fontSize: 14, fontWeight: 600,
+                    cursor: "pointer", fontFamily: "inherit", transition: "all 0.12s",
+                  }}
                 >
                   Say hello
-                </Button>
+                </button>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}
 
       {/* Intro Modal */}
-      <Dialog open={showIntroModal} onOpenChange={setShowIntroModal}>
-        <DialogContent className="w-full max-w-[430px] rounded-t-3xl rounded-b-none">
-          <DialogHeader>
-            <DialogTitle>Introduce yourself</DialogTitle>
-          </DialogHeader>
-
-          {introSuccess ? (
-            <div className="text-center py-10">
-              <div className="text-5xl mb-3">✓</div>
-              <div className="text-xl font-bold text-charcoal mb-2">Intro sent!</div>
-              <div className="text-sm text-gray">They'll see your message and decide what to share.</div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {modalSeeker && (
-                <div className="bg-off-white p-4 rounded-2xl">
-                  <div className="font-semibold text-sm text-charcoal">{modalSeeker.job_title || modalSeeker.headline}</div>
-                  <div className="text-xs text-gray mt-1">{modalSeeker.years_experience} years · {modalSeeker.city || "Iowa"}, {modalSeeker.state || "IA"}</div>
-                </div>
-              )}
-              <Textarea
-                placeholder="Why this person caught your eye..."
-                value={introMessage}
-                onChange={(e) => setIntroMessage(e.target.value)}
-                className="min-h-24"
-              />
-              <p className="text-xs text-gray-light">Be specific. People can tell when it's genuine.</p>
-
-              {introError && (
-                <div className="bg-red-bg border border-red text-red text-xs p-3 rounded-2xl">
-                  {introError}
-                </div>
-              )}
-
-              <div className="flex gap-3 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowIntroModal(false)}
-                  className="flex-1"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleSendIntro}
-                  disabled={sendingIntro || !introMessage.trim()}
-                  className="flex-[2] bg-charcoal hover:bg-charcoal-light text-white"
-                >
-                  {sendingIntro ? "Sending…" : "Send"}
-                </Button>
+      {showIntroModal && (
+        <div
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)",
+            display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 20,
+          }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowIntroModal(false); }}
+        >
+          <div style={{
+            width: "100%", maxWidth: 430, background: "#fff",
+            borderRadius: "24px 24px 0 0", padding: "24px 22px 30px",
+            animation: "slideUp 0.2s ease-out",
+          }}>
+            {introSuccess ? (
+              <div style={{ textAlign: "center", padding: "40px 24px" }}>
+                <div style={{ fontSize: 48, marginBottom: 12 }}>✓</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: "#1C1C1E", marginBottom: 6 }}>Intro sent!</div>
+                <div style={{ fontSize: 14, color: "#636366" }}>They'll see your message and decide what to share.</div>
               </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+            ) : (
+              <>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+                  <h3 style={{ fontSize: 20, fontWeight: 800, color: "#1C1C1E" }}>Introduce yourself</h3>
+                  <button
+                    onClick={() => setShowIntroModal(false)}
+                    style={{
+                      width: 30, height: 30, borderRadius: "50%", border: "none",
+                      background: "#F5F5F5", fontSize: 16, cursor: "pointer",
+                      display: "flex", alignItems: "center", justifyContent: "center", color: "#636366",
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {modalSeeker && (
+                  <div style={{ background: "#F5F5F5", padding: "14px 16px", borderRadius: 14, marginBottom: 16 }}>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: "#1C1C1E" }}>{modalSeeker.job_title || modalSeeker.headline}</div>
+                    <div style={{ fontSize: 12, color: "#636366", marginTop: 3 }}>{modalSeeker.years_experience} · {modalSeeker.city || "Iowa"}, {modalSeeker.state || "IA"}</div>
+                  </div>
+                )}
+
+                <textarea
+                  placeholder="Why this person caught your eye..."
+                  value={introMessage}
+                  onChange={(e) => setIntroMessage(e.target.value)}
+                  style={{
+                    width: "100%", minHeight: 100, padding: "14px 16px",
+                    border: "1.5px solid #E5E5EA", borderRadius: 12,
+                    fontSize: 14, fontFamily: "inherit", color: "#1C1C1E",
+                    resize: "none", outline: "none", marginBottom: 6,
+                    boxSizing: "border-box",
+                  }}
+                  onFocus={(e) => (e.target.style.borderColor = "#1C1C1E")}
+                  onBlur={(e) => (e.target.style.borderColor = "#E5E5EA")}
+                />
+                <p style={{ fontSize: 12, color: "#AEAEB2", marginBottom: 18 }}>Be specific. People can tell when it's genuine.</p>
+
+                {introError && (
+                  <div style={{
+                    padding: "10px 14px", borderRadius: 12, marginBottom: 14,
+                    background: "#FFF5F5", border: "1px solid #E53E3E", color: "#E53E3E", fontSize: 13,
+                  }}>
+                    {introError}
+                  </div>
+                )}
+
+                <div style={{ display: "flex", gap: 10 }}>
+                  <button
+                    onClick={() => setShowIntroModal(false)}
+                    style={{
+                      flex: 1, padding: 13, borderRadius: 12,
+                      border: "1.5px solid #E5E5EA", background: "#fff",
+                      fontSize: 14, fontWeight: 600, color: "#636366",
+                      cursor: "pointer", fontFamily: "inherit",
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSendIntro}
+                    disabled={sendingIntro || !introMessage.trim()}
+                    style={{
+                      flex: 2, padding: 13, borderRadius: 12,
+                      border: "none", background: "#1C1C1E", color: "#fff",
+                      fontSize: 14, fontWeight: 600, cursor: "pointer",
+                      fontFamily: "inherit", opacity: (sendingIntro || !introMessage.trim()) ? 0.5 : 1,
+                    }}
+                  >
+                    {sendingIntro ? "Sending…" : "Send"}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
