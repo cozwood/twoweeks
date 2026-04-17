@@ -9,21 +9,36 @@ import {
   getCategoryInitials,
 } from "@/lib/constants";
 
-type FilterKey = "all" | "cna" | "5plus" | "40-50k" | "on-site";
+const CATEGORY_FILTERS: Record<string, { key: string; label: string }> = {
+  "Healthcare": { key: "healthcare", label: "Healthcare" },
+  "Skilled Trades": { key: "trades", label: "Trades" },
+  "Operations": { key: "operations", label: "Operations" },
+  "Sales & Marketing": { key: "sales", label: "Sales" },
+  "Technology": { key: "tech", label: "Tech" },
+  "Finance": { key: "finance", label: "Finance" },
+};
 
-const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "cna", label: "CNA" },
-  { key: "5plus", label: "5+ yrs" },
-  { key: "40-50k", label: "$40–50k" },
+const UTILITY_FILTERS = [
   { key: "on-site", label: "On-site" },
+  { key: "ready-now", label: "Ready now" },
 ];
+
+function formatExperience(val: string | null): string {
+  if (!val) return "—";
+  const num = parseInt(val);
+  if (isNaN(num)) return val;
+  if (num < 2) return "0–2 years";
+  if (num < 5) return "2–5 years";
+  if (num < 10) return "5–10 years";
+  if (num < 15) return "10–15 years";
+  return "15+ years";
+}
 
 export default function BrowsePage() {
   const [supabase] = useState(() => createClient());
   const [allSeekers, setAllSeekers] = useState<SeekerCard[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<Set<FilterKey>>(new Set(["all"]));
+  const [filters, setFilters] = useState<Set<string>>(new Set(["all"]));
   const [introsSent, setIntrosSent] = useState(0);
   const [revealedCount, setRevealedCount] = useState(0);
 
@@ -53,18 +68,28 @@ export default function BrowsePage() {
     fetchData();
   }, [supabase]);
 
+  // Build filter chips from categories that actually have seekers
+  const filterOptions = (() => {
+    const cats = new Set(allSeekers.map((s) => s.category).filter(Boolean));
+    const catFilters = Array.from(cats)
+      .map((c) => CATEGORY_FILTERS[c!])
+      .filter(Boolean);
+    return [{ key: "all", label: "All" }, ...catFilters, ...UTILITY_FILTERS];
+  })();
+
   const filteredSeekers = allSeekers.filter((s) => {
     if (filters.has("all")) return true;
     for (const f of filters) {
-      if (f === "cna" && s.certifications?.some((c) => c.toUpperCase().includes("CNA"))) return true;
-      if (f === "5plus" && s.years_experience && parseInt(String(s.years_experience)) >= 5) return true;
-      if (f === "40-50k" && s.salary_min && s.salary_min >= 40000 && s.salary_min <= 50000) return true;
+      // Match category filters by finding the original category name
+      const catEntry = Object.entries(CATEGORY_FILTERS).find(([, v]) => v.key === f);
+      if (catEntry && s.category === catEntry[0]) return true;
       if (f === "on-site" && s.arrangement === "on-site") return true;
+      if (f === "ready-now" && (s.availability === "immediately" || s.availability === "2 weeks")) return true;
     }
     return false;
   });
 
-  const toggleFilter = (f: FilterKey) => {
+  const toggleFilter = (f: string) => {
     const next = new Set(filters);
     if (f === "all") { next.clear(); next.add("all"); }
     else {
@@ -125,7 +150,7 @@ export default function BrowsePage() {
 
       {/* Filter Chips */}
       <div style={{ display: "flex", gap: 8, padding: "12px 16px", overflowX: "auto" }}>
-        {FILTER_OPTIONS.map(({ key, label }) => (
+        {filterOptions.map(({ key, label }) => (
           <button
             key={key}
             onClick={() => toggleFilter(key)}
@@ -191,7 +216,7 @@ export default function BrowsePage() {
               {/* Body */}
               <div style={{ padding: "14px 18px" }}>
                 {[
-                  { label: "Experience", value: seeker.years_experience ? `${seeker.years_experience} years` : "—" },
+                  { label: "Experience", value: formatExperience(seeker.years_experience) },
                   { label: "Setup", value: seeker.arrangement ? seeker.arrangement.charAt(0).toUpperCase() + seeker.arrangement.slice(1) : "Flexible" },
                   { label: "Available", value: seeker.availability ? seeker.availability.charAt(0).toUpperCase() + seeker.availability.slice(1) : "Flexible" },
                   { label: "Pay range", value: formatSalary(seeker.salary_min, seeker.salary_max) },
@@ -250,7 +275,7 @@ export default function BrowsePage() {
                       opacity: sendingId === seeker.profile_id ? 0.5 : 1,
                     }}
                   >
-                    {sendingId === seeker.profile_id ? "Sending…" : "Say hello"}
+                    {sendingId === seeker.profile_id ? "Sending…" : "I'm interested"}
                   </button>
                 )}
               </div>
