@@ -35,10 +35,6 @@ const FIELD_OPTIONS = ["Sales & Marketing", "Technology", "Finance", "Operations
 // EXPERIENCE_OPTIONS and WORK_SETUP_OPTIONS imported from constants
 const PAY_RANGE_OPTIONS = ["Under $40k", "$40–60k", "$60–80k", "$80–100k", "$100–120k", "$120k+"];
 const CITY_OPTIONS = ["Des Moines", "Cedar Rapids", "Davenport", "Iowa City", "Waterloo", "Ames", "West Des Moines", "Ankeny"];
-const AVAILABLE_COMPANIES = [
-  "Express Employment", "Rockwell Collins", "Principal Financial", "UnityPoint Health",
-  "Hy-Vee", "John Deere", "Casey's", "Pella Corporation", "Corteva", "Wells Fargo (DSM)", "Vermeer",
-];
 
 const chipBaseStyle = {
   padding: "8px 16px",
@@ -66,6 +62,7 @@ export default function Profile() {
   const [saved, setSaved] = useState(false);
   const [profile, setProfile] = useState<ProfileData>({ headline: "", field: "", experience: "", workSetup: "", payRange: "", city: "" });
   const [blocked, setBlocked] = useState<BlockedCompany[]>([]);
+  const [blockInput, setBlockInput] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -263,9 +260,57 @@ export default function Profile() {
         }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: "#1C1C1E", marginBottom: 12 }}>Hide from these companies</div>
 
+          {/* Add company input */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+            <input
+              type="text"
+              placeholder="Type a company name"
+              value={blockInput}
+              onChange={(e) => setBlockInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && blockInput.trim()) {
+                  toggleBlock(blockInput.trim());
+                  setBlockInput("");
+                }
+              }}
+              style={{
+                flex: 1,
+                padding: "10px 14px",
+                border: "1.5px solid #E5E5EA",
+                borderRadius: 10,
+                fontSize: 14,
+                fontFamily: "inherit",
+                color: "#1C1C1E",
+                background: "#FFFFFF",
+                outline: "none",
+              }}
+            />
+            <button
+              onClick={() => {
+                if (blockInput.trim()) {
+                  toggleBlock(blockInput.trim());
+                  setBlockInput("");
+                }
+              }}
+              style={{
+                padding: "10px 16px",
+                background: "#1C1C1E",
+                color: "#FFFFFF",
+                border: "none",
+                borderRadius: 10,
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Block
+            </button>
+          </div>
+
           {/* Currently blocked */}
           {blocked.length > 0 && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {blocked.map((c) => (
                 <button
                   key={c.id}
@@ -282,10 +327,7 @@ export default function Profile() {
                     fontWeight: 600,
                     border: "none",
                     cursor: "pointer",
-                    transition: "opacity 0.2s ease",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
-                  onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
                 >
                   {c.company_name} ✕
                 </button>
@@ -293,38 +335,9 @@ export default function Profile() {
             </div>
           )}
 
-          {/* Available to block */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {AVAILABLE_COMPANIES.filter((name) => !isBlocked(name)).map((name) => (
-              <button
-                key={name}
-                onClick={() => toggleBlock(name)}
-                style={{
-                  padding: "8px 12px",
-                  background: "#F5F5F5",
-                  color: "#3A3A3C",
-                  borderRadius: 20,
-                  fontSize: 12,
-                  fontWeight: 500,
-                  border: "1.5px solid #E5E5EA",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#FFF5F5";
-                  e.currentTarget.style.color = "#E53E3E";
-                  e.currentTarget.style.borderColor = "#E53E3E";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "#F5F5F5";
-                  e.currentTarget.style.color = "#3A3A3C";
-                  e.currentTarget.style.borderColor = "#E5E5EA";
-                }}
-              >
-                {name}
-              </button>
-            ))}
-          </div>
+          {blocked.length === 0 && (
+            <div style={{ fontSize: 12, color: "#AEAEB2" }}>No companies blocked yet</div>
+          )}
         </div>
       </div>
     </div>
