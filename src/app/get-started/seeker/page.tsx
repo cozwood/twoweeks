@@ -9,7 +9,7 @@ type Step = 1 | 2 | 3;
 
 import {
   EXPERIENCE_OPTIONS,
-  JOB_TITLES,
+  JOB_SEGMENTS,
   CERTIFICATION_OPTIONS,
   SKILL_OPTIONS,
   SALARY_RANGE_OPTIONS,
@@ -17,6 +17,7 @@ import {
   WORK_SETUP_OPTIONS,
   CAN_START_OPTIONS,
   WHY_LOOKING_OPTIONS,
+  getCategoryFromTitle,
 } from "@/lib/constants";
 
 function parseSalaryRange(range: string | null): { min: number; max: number } | null {
@@ -52,6 +53,7 @@ export default function SeekerOnboarding() {
 
   // Card fields
   const [experience, setExperience] = useState<string | null>(null);
+  const [segment, setSegment] = useState<string | null>(null);
   const [jobTitle, setJobTitle] = useState<string | null>(null);
   const [certifications, setCertifications] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
@@ -104,7 +106,7 @@ export default function SeekerOnboarding() {
       profile_id: user.id,
       job_title: jobTitle,
       headline: jobTitle,
-      category: getCategoryFromTitle(jobTitle),
+      category: segment || getCategoryFromTitle(jobTitle),
       years_experience: experience,
       arrangement: arrangementValue(workSetup),
       availability: availabilityValue(canStart),
@@ -164,13 +166,33 @@ export default function SeekerOnboarding() {
           </div>
 
           <div style={{ padding: "0 20px", marginBottom: "20px" }}>
-            <div style={{ fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "8px" }}>Job Title</div>
+            <div style={{ fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "8px" }}>What field are you in?</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "7px" }}>
-              {JOB_TITLES.map((t) => (
-                <span key={t} style={{ padding: "9px 15px", borderRadius: "22px", border: jobTitle === t ? "1.5px solid #1C1C1E" : "1.5px solid #E5E5EA", background: jobTitle === t ? "#1C1C1E" : "#FFFFFF", fontSize: "13px", fontWeight: 500, color: jobTitle === t ? "#FFFFFF" : "#1C1C1E", cursor: "pointer", userSelect: "none", fontFamily: "inherit" }} onClick={() => setJobTitle(t)}>{t}</span>
+              {Object.keys(JOB_SEGMENTS).map((seg) => (
+                <span key={seg} style={{ padding: "9px 15px", borderRadius: "22px", border: segment === seg ? "1.5px solid #1C1C1E" : "1.5px solid #E5E5EA", background: segment === seg ? "#1C1C1E" : "#FFFFFF", fontSize: "13px", fontWeight: 500, color: segment === seg ? "#FFFFFF" : "#1C1C1E", cursor: "pointer", userSelect: "none", fontFamily: "inherit" }} onClick={() => { setSegment(seg); setJobTitle(null); }}>{seg}</span>
               ))}
             </div>
           </div>
+
+          {segment && (
+            <div style={{ padding: "0 20px", marginBottom: "20px" }}>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "8px" }}>What&apos;s your role?</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "7px" }}>
+                {JOB_SEGMENTS[segment].map((t) => (
+                  <span key={t} style={{ padding: "9px 15px", borderRadius: "22px", border: jobTitle === t ? "1.5px solid #1C1C1E" : "1.5px solid #E5E5EA", background: jobTitle === t ? "#1C1C1E" : "#FFFFFF", fontSize: "13px", fontWeight: 500, color: jobTitle === t ? "#FFFFFF" : "#1C1C1E", cursor: "pointer", userSelect: "none", fontFamily: "inherit" }} onClick={() => setJobTitle(t)}>{t}</span>
+                ))}
+                <span style={{ padding: "9px 15px", borderRadius: "22px", border: jobTitle && !JOB_SEGMENTS[segment].includes(jobTitle) ? "1.5px solid #1C1C1E" : "1.5px solid #E5E5EA", background: jobTitle && !JOB_SEGMENTS[segment].includes(jobTitle) ? "#1C1C1E" : "#FFFFFF", fontSize: "13px", fontWeight: 500, color: jobTitle && !JOB_SEGMENTS[segment].includes(jobTitle) ? "#FFFFFF" : "#1C1C1E", cursor: "pointer", userSelect: "none", fontFamily: "inherit" }} onClick={() => setJobTitle("Other")}>Other</span>
+              </div>
+              {jobTitle === "Other" && (
+                <input
+                  type="text"
+                  placeholder="Type your job title"
+                  onChange={(e) => { if (e.target.value) setJobTitle(e.target.value); }}
+                  style={{ marginTop: "8px", width: "100%", padding: "12px 14px", borderRadius: "10px", border: "1.5px solid #E5E5EA", fontSize: "14px", fontFamily: "inherit", outline: "none", background: "#FFFFFF", color: "#1C1C1E", boxSizing: "border-box" }}
+                />
+              )}
+            </div>
+          )}
 
           <div style={{ padding: "0 20px", marginBottom: "20px" }}>
             <div style={{ fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "8px" }}>Certifications <span style={{ fontWeight: 400, color: "#AEAEB2" }}>(optional)</span></div>
@@ -394,24 +416,3 @@ export default function SeekerOnboarding() {
   );
 }
 
-function getCategoryFromTitle(title: string | null): string {
-  if (!title) return "Operations";
-  const map: Record<string, string> = {
-    "Cashier": "Sales & Marketing",
-    "Server": "Sales & Marketing",
-    "Cook": "Operations",
-    "CNA": "Healthcare",
-    "Warehouse Worker": "Skilled Trades",
-    "Forklift Operator": "Skilled Trades",
-    "Machine Operator": "Skilled Trades",
-    "Welder": "Skilled Trades",
-    "Electrician": "Skilled Trades",
-    "HVAC Tech": "Skilled Trades",
-    "Admin Assistant": "Operations",
-    "Bookkeeper": "Finance",
-    "CDL Driver": "Skilled Trades",
-    "Retail Associate": "Sales & Marketing",
-    "Maintenance Tech": "Skilled Trades",
-  };
-  return map[title] || "Operations";
-}

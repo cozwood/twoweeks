@@ -6,6 +6,7 @@ import {
   EXPERIENCE_OPTIONS,
   WORK_SETUP_OPTIONS,
   LOCATION_OPTIONS,
+  JOB_SEGMENTS,
 } from "@/lib/constants";
 
 function capitalize(s: string): string {
@@ -27,11 +28,11 @@ function rangeToSalary(range: string): { min: number; max: number } | null {
   return m[range] || null;
 }
 
-interface ProfileData { headline: string; field: string; experience: string; workSetup: string; payRange: string; city: string; }
+interface ProfileData { headline: string; field: string; jobTitle: string; experience: string; workSetup: string; payRange: string; city: string; }
 interface BlockedCompany { id: string; company_name: string; }
 
 const HEADLINE_OPTIONS = ["I lead teams and hit targets", "I build and ship software", "I keep operations running smooth", "I manage the money", "I take care of people", "I work with my hands"];
-const FIELD_OPTIONS = ["Sales & Marketing", "Technology", "Finance", "Operations", "Healthcare", "Skilled Trades"];
+const SEGMENT_NAMES = Object.keys(JOB_SEGMENTS);
 // EXPERIENCE_OPTIONS and WORK_SETUP_OPTIONS imported from constants
 const PAY_RANGE_OPTIONS = ["Under $40k", "$40–60k", "$60–80k", "$80–100k", "$100–120k", "$120k+"];
 const CITY_OPTIONS = ["Des Moines", "Cedar Rapids", "Davenport", "Iowa City", "Waterloo", "Ames", "West Des Moines", "Ankeny"];
@@ -60,7 +61,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [profile, setProfile] = useState<ProfileData>({ headline: "", field: "", experience: "", workSetup: "", payRange: "", city: "" });
+  const [profile, setProfile] = useState<ProfileData>({ headline: "", field: "", jobTitle: "", experience: "", workSetup: "", payRange: "", city: "" });
   const [blocked, setBlocked] = useState<BlockedCompany[]>([]);
   const [blockInput, setBlockInput] = useState("");
 
@@ -70,11 +71,12 @@ export default function Profile() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { setLoading(false); return; }
 
-        const { data: card } = await supabase.from("seeker_cards").select("headline, category, years_experience, arrangement, salary_min, salary_max, city").eq("profile_id", user.id).single();
+        const { data: card } = await supabase.from("seeker_cards").select("headline, category, job_title, years_experience, arrangement, salary_min, salary_max, city").eq("profile_id", user.id).single();
         if (card) {
           setProfile({
             headline: card.headline || "",
             field: card.category || "",
+            jobTitle: card.job_title || "",
             experience: card.years_experience || "",
             workSetup: card.arrangement ? capitalize(card.arrangement) : "",
             payRange: salaryToRange(card.salary_min, card.salary_max),
@@ -95,7 +97,8 @@ export default function Profile() {
     if (!user) { setSaving(false); return; }
     const salary = rangeToSalary(profile.payRange);
     const { error } = await supabase.from("seeker_cards").update({
-      headline: profile.headline, category: profile.field, years_experience: profile.experience,
+      headline: profile.headline, category: profile.field, job_title: profile.jobTitle,
+      years_experience: profile.experience,
       arrangement: profile.workSetup.toLowerCase() || null, salary_min: salary?.min || null, salary_max: salary?.max || null, city: profile.city,
     }).eq("profile_id", user.id);
     setSaving(false);
@@ -147,14 +150,14 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Field */}
+      {/* Field / Segment */}
       <div style={{ padding: "16px 20px" }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", marginBottom: 8 }}>Field</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", marginBottom: 8 }}>What field are you in?</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {FIELD_OPTIONS.map((o) => (
+          {SEGMENT_NAMES.map((o) => (
             <button
               key={o}
-              onClick={() => setProfile({ ...profile, field: o })}
+              onClick={() => setProfile({ ...profile, field: o, jobTitle: "" })}
               style={profile.field === o ? chipSelectedStyle : chipBaseStyle}
             >
               {o}
@@ -162,6 +165,38 @@ export default function Profile() {
           ))}
         </div>
       </div>
+
+      {/* Role within segment */}
+      {profile.field && JOB_SEGMENTS[profile.field] && (
+        <div style={{ padding: "0 20px 16px" }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", marginBottom: 8 }}>What&apos;s your role?</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {JOB_SEGMENTS[profile.field].map((t) => (
+              <button
+                key={t}
+                onClick={() => setProfile({ ...profile, jobTitle: t })}
+                style={profile.jobTitle === t ? chipSelectedStyle : chipBaseStyle}
+              >
+                {t}
+              </button>
+            ))}
+            <button
+              onClick={() => setProfile({ ...profile, jobTitle: "Other" })}
+              style={profile.jobTitle && !JOB_SEGMENTS[profile.field]?.includes(profile.jobTitle) && profile.jobTitle !== "" ? chipSelectedStyle : chipBaseStyle}
+            >
+              Other
+            </button>
+          </div>
+          {profile.jobTitle === "Other" && (
+            <input
+              type="text"
+              placeholder="Type your job title"
+              onChange={(e) => { if (e.target.value) setProfile({ ...profile, jobTitle: e.target.value }); }}
+              style={{ marginTop: 8, width: "100%", padding: "10px 14px", borderRadius: 10, border: "1.5px solid #E5E5EA", fontSize: 14, fontFamily: "inherit", outline: "none", background: "#FFFFFF", color: "#1C1C1E", boxSizing: "border-box" }}
+            />
+          )}
+        </div>
+      )}
 
       {/* Experience */}
       <div style={{ padding: "16px 20px" }}>

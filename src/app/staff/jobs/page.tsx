@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { JobListing } from "@/lib/types";
 import {
   EXPERIENCE_OPTIONS,
-  JOB_TITLES,
+  JOB_SEGMENTS,
   CATEGORIES,
   CERTIFICATION_OPTIONS,
   SKILL_OPTIONS,
@@ -359,34 +359,62 @@ export default function JobsPage() {
             </div>
 
             <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: 20 }}>
-              {/* Title */}
+              {/* Category (pick segment first) */}
               <div>
-                <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Job Title</label>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-                  {JOB_TITLES.map((t) => (
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Category</label>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {CATEGORIES.map((c) => (
                     <span
-                      key={t}
-                      onClick={() => setTitle(t)}
+                      key={c}
+                      onClick={() => { setCategory(c); setTitle(""); }}
                       style={{
                         padding: "8px 14px",
                         borderRadius: 20,
                         border: "1.5px solid #E5E5EA",
-                        background: title === t ? "#003768" : "#FFFFFF",
-                        color: title === t ? "#FFFFFF" : "#636366",
+                        background: category === c ? "#003768" : "#FFFFFF",
+                        color: category === c ? "#FFFFFF" : "#636366",
                         fontSize: 12,
                         fontWeight: 500,
                         cursor: "pointer",
                         transition: "all 0.2s ease"
                       }}
                     >
-                      {t}
+                      {c}
                     </span>
                   ))}
                 </div>
+              </div>
+
+              {/* Title (from selected category) */}
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Job Title</label>
+                {category && JOB_SEGMENTS[category] && (
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+                    {JOB_SEGMENTS[category].map((t) => (
+                      <span
+                        key={t}
+                        onClick={() => setTitle(t)}
+                        style={{
+                          padding: "8px 14px",
+                          borderRadius: 20,
+                          border: "1.5px solid #E5E5EA",
+                          background: title === t ? "#003768" : "#FFFFFF",
+                          color: title === t ? "#FFFFFF" : "#636366",
+                          fontSize: 12,
+                          fontWeight: 500,
+                          cursor: "pointer",
+                          transition: "all 0.2s ease"
+                        }}
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <input
                   type="text"
                   placeholder="Or type a custom title..."
-                  value={JOB_TITLES.includes(title as typeof JOB_TITLES[number]) ? "" : title}
+                  value={category && JOB_SEGMENTS[category]?.includes(title) ? "" : title}
                   onChange={(e) => setTitle(e.target.value)}
                   style={{
                     width: "100%",
@@ -419,32 +447,6 @@ export default function JobsPage() {
                     resize: "none"
                   }}
                 />
-              </div>
-
-              {/* Category */}
-              <div>
-                <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Category</label>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {CATEGORIES.map((c) => (
-                    <span
-                      key={c}
-                      onClick={() => setCategory(c)}
-                      style={{
-                        padding: "8px 14px",
-                        borderRadius: 20,
-                        border: "1.5px solid #E5E5EA",
-                        background: category === c ? "#003768" : "#FFFFFF",
-                        color: category === c ? "#FFFFFF" : "#636366",
-                        fontSize: 12,
-                        fontWeight: 500,
-                        cursor: "pointer",
-                        transition: "all 0.2s ease"
-                      }}
-                    >
-                      {c}
-                    </span>
-                  ))}
-                </div>
               </div>
 
               {/* Experience */}

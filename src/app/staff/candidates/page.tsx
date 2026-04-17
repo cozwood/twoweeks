@@ -12,25 +12,33 @@ import {
   EXPRESS_BRANDING,
 } from "@/lib/constants";
 
-type FilterKey = "all" | "healthcare" | "trades" | "operations" | "sales" | "technology" | "finance";
+type FilterKey = string;
 
 const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
   { key: "all", label: "All" },
+  { key: "manufacturing", label: "Manufacturing" },
+  { key: "trades", label: "Trades" },
+  { key: "office", label: "Office" },
+  { key: "service", label: "Service & Sales" },
   { key: "healthcare", label: "Healthcare" },
-  { key: "trades", label: "Skilled Trades" },
-  { key: "operations", label: "Operations" },
-  { key: "sales", label: "Sales" },
-  { key: "technology", label: "Tech" },
+  { key: "transport", label: "Transport" },
+  { key: "it", label: "IT" },
   { key: "finance", label: "Finance" },
+  { key: "hr", label: "HR" },
+  { key: "engineering", label: "Engineering" },
 ];
 
 const CATEGORY_MAP: Record<string, string> = {
-  healthcare: "Healthcare",
+  manufacturing: "Manufacturing & Production",
   trades: "Skilled Trades",
-  operations: "Operations",
-  sales: "Sales & Marketing",
-  technology: "Technology",
-  finance: "Finance",
+  office: "Office & Admin",
+  service: "Customer Service & Sales",
+  healthcare: "Healthcare Support",
+  transport: "Transportation & Logistics",
+  it: "IT & Technical",
+  finance: "Accounting & Finance",
+  hr: "Human Resources",
+  engineering: "Engineering & Design",
 };
 
 interface CandidateWithProfile extends SeekerCard {

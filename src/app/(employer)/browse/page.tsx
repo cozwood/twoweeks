@@ -4,18 +4,21 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { SeekerCard } from "@/lib/types";
 import {
-  CATEGORIES,
   formatSalary,
   getCategoryInitials,
 } from "@/lib/constants";
 
 const CATEGORY_FILTERS: Record<string, { key: string; label: string }> = {
-  "Healthcare": { key: "healthcare", label: "Healthcare" },
+  "Manufacturing & Production": { key: "manufacturing", label: "Manufacturing" },
   "Skilled Trades": { key: "trades", label: "Trades" },
-  "Operations": { key: "operations", label: "Operations" },
-  "Sales & Marketing": { key: "sales", label: "Sales" },
-  "Technology": { key: "tech", label: "Tech" },
-  "Finance": { key: "finance", label: "Finance" },
+  "Office & Admin": { key: "office", label: "Office" },
+  "Customer Service & Sales": { key: "service", label: "Service & Sales" },
+  "Healthcare Support": { key: "healthcare", label: "Healthcare" },
+  "Transportation & Logistics": { key: "transport", label: "Transport" },
+  "IT & Technical": { key: "it", label: "IT" },
+  "Accounting & Finance": { key: "finance", label: "Finance" },
+  "Human Resources": { key: "hr", label: "HR" },
+  "Engineering & Design": { key: "engineering", label: "Engineering" },
 };
 
 const UTILITY_FILTERS = [

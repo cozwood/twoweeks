@@ -5,21 +5,56 @@
 
 export const EXPERIENCE_OPTIONS = ["0–2 yrs", "2–5 yrs", "5–10 yrs", "10–15 yrs", "15+ yrs"] as const;
 
-export const CATEGORIES = [
-  "Healthcare",
-  "Skilled Trades",
-  "Operations",
-  "Sales & Marketing",
-  "Technology",
-  "Finance",
-] as const;
+// ── Job Segments ──
+// Segment → specific titles. Seeker picks a segment first, then a title.
+export const JOB_SEGMENTS: Record<string, string[]> = {
+  "Manufacturing & Production": [
+    "Machine Operator", "Assembler", "Quality Inspector", "Production Lead",
+    "Warehouse Worker", "Logistics Coordinator", "Packaging Operator",
+  ],
+  "Skilled Trades": [
+    "Welder", "Electrician", "HVAC Tech", "Plumber", "Maintenance Mechanic",
+    "Millwright", "CNC Operator", "Painter/Coater",
+  ],
+  "Office & Admin": [
+    "Administrative Assistant", "Data Entry Clerk", "Receptionist",
+    "Office Manager", "Bookkeeper", "Executive Assistant",
+  ],
+  "Customer Service & Sales": [
+    "Call Center Rep", "Retail Associate", "Inside Sales Rep",
+    "Account Representative", "Support Specialist", "Cashier", "Server",
+  ],
+  "Healthcare Support": [
+    "CNA", "Medical Assistant", "Phlebotomist", "Dental Assistant",
+    "Pharmacy Tech", "Home Health Aide", "Patient Care Tech",
+  ],
+  "Transportation & Logistics": [
+    "CDL Driver", "Forklift Operator", "Dispatcher", "Delivery Driver",
+    "Route Planner", "Dock Worker",
+  ],
+  "IT & Technical": [
+    "Help Desk Tech", "Junior Developer", "Network Technician",
+    "Database Admin", "QA Tester", "Systems Admin",
+  ],
+  "Accounting & Finance": [
+    "AP/AR Clerk", "Payroll Specialist", "Staff Accountant",
+    "Financial Analyst", "Collections Specialist", "Billing Coordinator",
+  ],
+  "Human Resources": [
+    "HR Coordinator", "Recruiter", "Benefits Admin",
+    "Training Specialist", "HR Generalist",
+  ],
+  "Engineering & Design": [
+    "Drafter", "CAD Technician", "Process Engineer", "Quality Engineer",
+    "Project Coordinator", "Industrial Designer",
+  ],
+} as const;
 
-export const JOB_TITLES = [
-  "Cashier", "Server", "Cook", "CNA", "Warehouse Worker",
-  "Forklift Operator", "Machine Operator", "Welder", "Electrician",
-  "HVAC Tech", "Admin Assistant", "Bookkeeper", "CDL Driver",
-  "Retail Associate", "Maintenance Tech",
-] as const;
+// Flat list of all segment names (used as categories)
+export const CATEGORIES = Object.keys(JOB_SEGMENTS) as string[];
+
+// Flat list of all job titles across segments
+export const JOB_TITLES = Object.values(JOB_SEGMENTS).flat() as string[];
 
 export const CERTIFICATION_OPTIONS = [
   "CNA", "CDL", "OSHA 10", "Forklift", "ServSafe",
@@ -76,35 +111,25 @@ export function formatSalary(min: number | null, max: number | null): string {
 }
 
 export function getCategoryFromTitle(title: string | null): string {
-  if (!title) return "Operations";
-  const map: Record<string, string> = {
-    "Cashier": "Sales & Marketing",
-    "Server": "Sales & Marketing",
-    "Cook": "Operations",
-    "CNA": "Healthcare",
-    "Warehouse Worker": "Skilled Trades",
-    "Forklift Operator": "Skilled Trades",
-    "Machine Operator": "Skilled Trades",
-    "Welder": "Skilled Trades",
-    "Electrician": "Skilled Trades",
-    "HVAC Tech": "Skilled Trades",
-    "Admin Assistant": "Operations",
-    "Bookkeeper": "Finance",
-    "CDL Driver": "Skilled Trades",
-    "Retail Associate": "Sales & Marketing",
-    "Maintenance Tech": "Skilled Trades",
-  };
-  return map[title] || "Operations";
+  if (!title) return "Manufacturing & Production";
+  for (const [segment, titles] of Object.entries(JOB_SEGMENTS)) {
+    if ((titles as readonly string[]).includes(title)) return segment;
+  }
+  return "Manufacturing & Production";
 }
 
 export function getCategoryInitials(cat: string | null): string {
   const m: Record<string, string> = {
-    "Sales & Marketing": "SM",
-    Healthcare: "HC",
-    Technology: "TE",
-    "Skilled Trades": "SK",
-    Operations: "OP",
-    Finance: "FI",
+    "Manufacturing & Production": "MF",
+    "Skilled Trades": "ST",
+    "Office & Admin": "OA",
+    "Customer Service & Sales": "CS",
+    "Healthcare Support": "HC",
+    "Transportation & Logistics": "TL",
+    "IT & Technical": "IT",
+    "Accounting & Finance": "AF",
+    "Human Resources": "HR",
+    "Engineering & Design": "ED",
   };
   return m[cat || ""] || "TW";
 }
