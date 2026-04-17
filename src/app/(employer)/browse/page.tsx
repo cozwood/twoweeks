@@ -9,27 +9,15 @@ import {
   getCategoryInitials,
 } from "@/lib/constants";
 
-type FilterKey = "all" | "healthcare" | "trades" | "operations" | "sales" | "technology" | "on-site" | "hybrid" | "remote";
+type FilterKey = "all" | "cna" | "5plus" | "40-50k" | "on-site";
 
 const FILTER_OPTIONS: { key: FilterKey; label: string }[] = [
   { key: "all", label: "All" },
-  { key: "healthcare", label: "Healthcare" },
-  { key: "trades", label: "Skilled Trades" },
-  { key: "operations", label: "Operations" },
-  { key: "sales", label: "Sales" },
-  { key: "technology", label: "Tech" },
+  { key: "cna", label: "CNA" },
+  { key: "5plus", label: "5+ yrs" },
+  { key: "40-50k", label: "$40–50k" },
   { key: "on-site", label: "On-site" },
-  { key: "hybrid", label: "Hybrid" },
-  { key: "remote", label: "Remote" },
 ];
-
-const CATEGORY_MAP: Record<string, string> = {
-  healthcare: "Healthcare",
-  trades: "Skilled Trades",
-  operations: "Operations",
-  sales: "Sales & Marketing",
-  technology: "Technology",
-};
 
 export default function BrowsePage() {
   const [supabase] = useState(() => createClient());
@@ -68,10 +56,10 @@ export default function BrowsePage() {
   const filteredSeekers = allSeekers.filter((s) => {
     if (filters.has("all")) return true;
     for (const f of filters) {
-      if (CATEGORY_MAP[f] && s.category === CATEGORY_MAP[f]) return true;
+      if (f === "cna" && s.certifications?.some((c) => c.toUpperCase().includes("CNA"))) return true;
+      if (f === "5plus" && s.years_experience && parseInt(String(s.years_experience)) >= 5) return true;
+      if (f === "40-50k" && s.salary_min && s.salary_min >= 40000 && s.salary_min <= 50000) return true;
       if (f === "on-site" && s.arrangement === "on-site") return true;
-      if (f === "hybrid" && s.arrangement === "hybrid") return true;
-      if (f === "remote" && s.arrangement === "remote") return true;
     }
     return false;
   });
@@ -120,7 +108,7 @@ export default function BrowsePage() {
       {/* Stats */}
       <div style={{ display: "flex", gap: 12, padding: "12px 16px", margin: "0 0 4px" }}>
         {[
-          { num: allSeekers.length, label: "Available" },
+          { num: allSeekers.length, label: "Matches" },
           { num: introsSent, label: "Intros Sent" },
           { num: revealedCount, label: "Revealed" },
         ].map((s) => (
@@ -192,7 +180,7 @@ export default function BrowsePage() {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 16, fontWeight: 600, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {seeker.job_title || seeker.headline}
+                    {seeker.headline || seeker.job_title}
                   </div>
                   <div style={{ fontSize: 12, color: "#AEAEB2", marginTop: 1 }}>
                     {seeker.city || "Iowa"}, {seeker.state || "IA"}
@@ -203,7 +191,7 @@ export default function BrowsePage() {
               {/* Body */}
               <div style={{ padding: "14px 18px" }}>
                 {[
-                  { label: "Experience", value: seeker.years_experience ? `${seeker.years_experience}` : "—" },
+                  { label: "Experience", value: seeker.years_experience ? `${seeker.years_experience} years` : "—" },
                   { label: "Setup", value: seeker.arrangement ? seeker.arrangement.charAt(0).toUpperCase() + seeker.arrangement.slice(1) : "Flexible" },
                   { label: "Available", value: seeker.availability ? seeker.availability.charAt(0).toUpperCase() + seeker.availability.slice(1) : "Flexible" },
                   { label: "Pay range", value: formatSalary(seeker.salary_min, seeker.salary_max) },
@@ -262,7 +250,7 @@ export default function BrowsePage() {
                       opacity: sendingId === seeker.profile_id ? 0.5 : 1,
                     }}
                   >
-                    {sendingId === seeker.profile_id ? "Sending…" : "I'm interested"}
+                    {sendingId === seeker.profile_id ? "Sending…" : "Say hello"}
                   </button>
                 )}
               </div>

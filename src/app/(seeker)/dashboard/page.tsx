@@ -3,18 +3,11 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-function timeAgo(date: Date): string {
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  const mins = Math.floor(diff / 60000);
-  const hrs = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
-  if (mins < 60) return `${mins}m ago`;
-  if (hrs < 24) return `${hrs}h ago`;
-  if (days < 7) return `${days}d ago`;
-  const weeks = Math.floor(days / 7);
-  if (weeks < 4) return `${weeks}w ago`;
-  return `${Math.floor(days / 30)}mo ago`;
+function formatDate(date: Date): string {
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  const yyyy = date.getFullYear();
+  return `${mm}/${dd}/${yyyy}`;
 }
 
 interface Card { id: string; job_title: string; city: string; is_active: boolean; }
@@ -161,9 +154,10 @@ export default function Dashboard() {
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {pending.map((intro) => (
               <div key={intro.id} style={{ padding: 16, borderRadius: 16, background: "#FFFFFF", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-                <div style={{ fontSize: "12px", color: "#AEAEB2", marginBottom: 6 }}>{timeAgo(new Date(intro.created_at))}</div>
-                <div style={{ fontSize: "15px", fontWeight: 700, color: "#1C1C1E", marginBottom: 4 }}>{intro.employer_company}</div>
-                <div style={{ fontSize: "13px", color: "#636366", marginBottom: 12 }}>is interested in your profile</div>
+                <div style={{ fontSize: "12px", color: "#AEAEB2", marginBottom: 8 }}>{formatDate(new Date(intro.created_at))}</div>
+                <div style={{ fontSize: "14px", color: "#1C1C1E", fontStyle: "italic", lineHeight: 1.5, marginBottom: 14 }}>
+                  &ldquo;{intro.message || `We're interested in your profile. Would love to chat!`}&rdquo;
+                </div>
                 <div style={{ display: "flex", gap: 10 }}>
                   <button
                     onClick={() => handlePass(intro.id)}
@@ -212,9 +206,16 @@ export default function Dashboard() {
           <div style={{ fontSize: "14px", fontWeight: 700, color: "#1C1C1E", paddingLeft: 8, paddingRight: 8, paddingTop: 12, paddingBottom: 12, marginTop: 8 }}>Talking ({revealed.length})</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {revealed.map((intro) => (
-              <div key={intro.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingLeft: 16, paddingRight: 16, paddingTop: 14, paddingBottom: 14, background: "#FFFFFF", borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-                <span style={{ fontSize: "12px", fontWeight: 500, color: "#1C1C1E" }}>Connected</span>
-                <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>REVEALED</span>
+              <div key={intro.id} style={{ padding: 16, background: "#FFFFFF", borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: intro.message ? 8 : 0 }}>
+                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#1C1C1E" }}>Connected</span>
+                  <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>REVEALED</span>
+                </div>
+                {intro.message && (
+                  <div style={{ fontSize: "13px", color: "#636366", fontStyle: "italic", lineHeight: 1.5 }}>
+                    &ldquo;{intro.message}&rdquo;
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -254,13 +255,23 @@ export default function Dashboard() {
               }
             `}</style>
 
-            <h2 style={{ fontSize: "18px", fontWeight: 600, color: "#1C1C1E", marginBottom: 20 }}>You're in control</h2>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h2 style={{ fontSize: "18px", fontWeight: 600, color: "#1C1C1E" }}>You&apos;re in control</h2>
+              <button
+                onClick={() => setRevealOpen(false)}
+                style={{ width: 32, height: 32, borderRadius: "50%", border: "none", background: "#F5F5F5", cursor: "pointer", fontSize: 16, color: "#636366", display: "flex", alignItems: "center", justifyContent: "center" }}
+              >
+                &times;
+              </button>
+            </div>
 
             {selectedIntro && (
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                 <div style={{ background: "#F5F5F5", padding: 16, borderRadius: 16 }}>
-                  <div style={{ fontWeight: 600, fontSize: "14px", color: "#1C1C1E" }}>{selectedIntro.employer_company}</div>
-                  <div style={{ fontSize: "12px", color: "#636366", marginTop: 4 }}>wants to connect with you</div>
+                  <div style={{ fontSize: "12px", color: "#AEAEB2", marginBottom: 4 }}>They wrote:</div>
+                  <div style={{ fontSize: "14px", color: "#1C1C1E", fontStyle: "italic", lineHeight: 1.5 }}>
+                    &ldquo;{selectedIntro.message || `We're interested in your profile. Would love to chat!`}&rdquo;
+                  </div>
                 </div>
 
                 <div style={{ fontSize: "12px", fontWeight: 700, color: "#1C1C1E" }}>
@@ -278,7 +289,7 @@ export default function Dashboard() {
                           width: 20,
                           height: 20,
                           cursor: "pointer",
-                          accentColor: "#48BB78",
+                          accentColor: "#1C1C1E",
                         }}
                       />
                       <span
@@ -294,9 +305,9 @@ export default function Dashboard() {
                 <div style={{ paddingTop: 8 }}>
                   <div style={{ fontSize: "12px", color: "#636366", fontWeight: 600, marginBottom: 8 }}>They'll see:</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                    {revealData.name && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>My real name</span>}
-                    {revealData.email && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>Email address</span>}
-                    {revealData.phone && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>Phone number</span>}
+                    {revealData.name && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>Name</span>}
+                    {revealData.email && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>Email</span>}
+                    {revealData.phone && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>Phone</span>}
                     {revealData.linkedin && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>LinkedIn</span>}
                     {!Object.values(revealData).some((v) => v) && (
                       <span style={{ fontSize: "12px", color: "#636366" }}>Nothing selected</span>
