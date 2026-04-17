@@ -9,11 +9,9 @@ interface RevealedContact {
   name: string | null;
   email: string | null;
   phone: string | null;
-  linkedin: string | null;
   show_name: boolean;
   show_email: boolean;
   show_phone: boolean;
-  show_linkedin: boolean;
   status: string;
 }
 
@@ -64,19 +62,17 @@ export default function ContactsPage() {
         const revealedIntros = introsData.filter((i) => i.status === "revealed" || i.status === "hired");
         const revealedContacts: RevealedContact[] = [];
         for (const intro of revealedIntros) {
-          const { data: reveal } = await supabase.from("reveals").select("show_name, show_email, show_phone, show_linkedin").eq("intro_id", intro.id).single();
-          const { data: prof } = await supabase.from("profiles").select("name, email, phone, linkedin").eq("id", intro.seeker_id).single();
+          const { data: reveal } = await supabase.from("reveals").select("show_name, show_email, show_phone").eq("intro_id", intro.id).single();
+          const { data: prof } = await supabase.from("profiles").select("name, email, phone").eq("id", intro.seeker_id).single();
           if (reveal && prof) {
             revealedContacts.push({
               intro_id: intro.id,
               name: reveal.show_name ? prof.name : null,
               email: reveal.show_email ? prof.email : null,
               phone: reveal.show_phone ? prof.phone : null,
-              linkedin: reveal.show_linkedin ? prof.linkedin : null,
               show_name: reveal.show_name,
               show_email: reveal.show_email,
               show_phone: reveal.show_phone,
-              show_linkedin: reveal.show_linkedin,
               status: intro.status,
             });
           }
@@ -337,16 +333,6 @@ export default function ContactsPage() {
                     textDecoration: "none"
                   }} onMouseEnter={(e) => e.currentTarget.style.color = "#1C1C1E"} onMouseLeave={(e) => e.currentTarget.style.color = "#636366"}>
                     ☎ {c.phone}
-                  </a>
-                )}
-                {c.linkedin && (
-                  <a href={`https://${c.linkedin}`} target="_blank" rel="noopener noreferrer" style={{
-                    fontSize: "12px",
-                    color: "#636366",
-                    display: "block",
-                    textDecoration: "none"
-                  }} onMouseEnter={(e) => e.currentTarget.style.color = "#1C1C1E"} onMouseLeave={(e) => e.currentTarget.style.color = "#636366"}>
-                    🔗 LinkedIn
                   </a>
                 )}
               </div>

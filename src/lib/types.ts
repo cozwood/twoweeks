@@ -61,7 +61,7 @@ export interface Reveal {
   show_name: boolean
   show_email: boolean
   show_phone: boolean
-  show_linkedin: boolean
+  show_linkedin: boolean  // kept for DB compat, always false for new reveals
   revealed_at: string
 }
 

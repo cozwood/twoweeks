@@ -20,7 +20,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [revealOpen, setRevealOpen] = useState(false);
   const [selectedIntro, setSelectedIntro] = useState<Intro | null>(null);
-  const [revealData, setRevealData] = useState({ name: false, email: false, phone: false, linkedin: false });
+  const [revealData, setRevealData] = useState({ firstName: false, lastName: false, email: false, phone: false });
 
   useEffect(() => {
     (async () => {
@@ -65,13 +65,13 @@ export default function Dashboard() {
 
   const handleRevealClick = (intro: Intro) => {
     setSelectedIntro(intro);
-    setRevealData({ name: false, email: false, phone: false, linkedin: false });
+    setRevealData({ firstName: false, lastName: false, email: false, phone: false });
     setRevealOpen(true);
   };
 
   const handleReveal = async () => {
     if (!selectedIntro) return;
-    const { error: re } = await supabase.from("reveals").insert({ intro_id: selectedIntro.id, show_name: revealData.name, show_email: revealData.email, show_phone: revealData.phone, show_linkedin: revealData.linkedin });
+    const { error: re } = await supabase.from("reveals").insert({ intro_id: selectedIntro.id, show_name: revealData.firstName || revealData.lastName, show_email: revealData.email, show_phone: revealData.phone, show_linkedin: false });
     if (!re) {
       const { error: ue } = await supabase.from("intros").update({ status: "revealed" }).eq("id", selectedIntro.id);
       if (!ue) { setIntros(intros.map((i) => i.id === selectedIntro.id ? { ...i, status: "revealed" as const } : i)); setRevealOpen(false); }
@@ -154,10 +154,9 @@ export default function Dashboard() {
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {pending.map((intro) => (
               <div key={intro.id} style={{ padding: 16, borderRadius: 16, background: "#FFFFFF", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-                <div style={{ fontSize: "12px", color: "#AEAEB2", marginBottom: 8 }}>{formatDate(new Date(intro.created_at))}</div>
-                <div style={{ fontSize: "14px", color: "#1C1C1E", fontStyle: "italic", lineHeight: 1.5, marginBottom: 14 }}>
-                  &ldquo;{intro.message || `We're interested in your profile. Would love to chat!`}&rdquo;
-                </div>
+                <div style={{ fontSize: "12px", color: "#AEAEB2", marginBottom: 6 }}>{formatDate(new Date(intro.created_at))}</div>
+                <div style={{ fontSize: "15px", fontWeight: 700, color: "#1C1C1E", marginBottom: 4 }}>{intro.employer_company}</div>
+                <div style={{ fontSize: "13px", color: "#636366", marginBottom: 12 }}>is interested in your profile</div>
                 <div style={{ display: "flex", gap: 10 }}>
                   <button
                     onClick={() => handlePass(intro.id)}
@@ -268,18 +267,16 @@ export default function Dashboard() {
             {selectedIntro && (
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                 <div style={{ background: "#F5F5F5", padding: 16, borderRadius: 16 }}>
-                  <div style={{ fontSize: "12px", color: "#AEAEB2", marginBottom: 4 }}>They wrote:</div>
-                  <div style={{ fontSize: "14px", color: "#1C1C1E", fontStyle: "italic", lineHeight: 1.5 }}>
-                    &ldquo;{selectedIntro.message || `We're interested in your profile. Would love to chat!`}&rdquo;
-                  </div>
+                  <div style={{ fontWeight: 600, fontSize: "14px", color: "#1C1C1E" }}>{selectedIntro.employer_company}</div>
+                  <div style={{ fontSize: "12px", color: "#636366", marginTop: 4 }}>is interested in your profile</div>
                 </div>
 
                 <div style={{ fontSize: "12px", fontWeight: 700, color: "#1C1C1E" }}>
-                  Only share what you're comfortable with
+                  Only share what you&apos;re comfortable with
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  {(["name", "email", "phone", "linkedin"] as const).map((key) => (
+                  {(["firstName", "lastName", "email", "phone"] as const).map((key) => (
                     <div key={key} style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
                       <input
                         type="checkbox"
@@ -296,19 +293,19 @@ export default function Dashboard() {
                         style={{ fontSize: "14px", color: "#1C1C1E", fontWeight: 500, cursor: "pointer", flex: 1 }}
                         onClick={() => setRevealData({ ...revealData, [key]: !revealData[key] })}
                       >
-                        {key === "name" ? "My real name" : key === "email" ? "Email address" : key === "phone" ? "Phone number" : "LinkedIn"}
+                        {key === "firstName" ? "First name" : key === "lastName" ? "Last name" : key === "email" ? "Email address" : "Phone number"}
                       </span>
                     </div>
                   ))}
                 </div>
 
                 <div style={{ paddingTop: 8 }}>
-                  <div style={{ fontSize: "12px", color: "#636366", fontWeight: 600, marginBottom: 8 }}>They'll see:</div>
+                  <div style={{ fontSize: "12px", color: "#636366", fontWeight: 600, marginBottom: 8 }}>They&apos;ll see:</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                    {revealData.name && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>Name</span>}
+                    {revealData.firstName && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>First name</span>}
+                    {revealData.lastName && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>Last name</span>}
                     {revealData.email && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>Email</span>}
                     {revealData.phone && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>Phone</span>}
-                    {revealData.linkedin && <span style={{ padding: "4px 10px", borderRadius: 20, background: "#1C1C1E", color: "#FFFFFF", fontSize: "11px", fontWeight: 700 }}>LinkedIn</span>}
                     {!Object.values(revealData).some((v) => v) && (
                       <span style={{ fontSize: "12px", color: "#636366" }}>Nothing selected</span>
                     )}
