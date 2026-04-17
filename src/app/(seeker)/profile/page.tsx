@@ -2,6 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import {
+  EXPERIENCE_OPTIONS,
+  WORK_SETUP_OPTIONS,
+  LOCATION_OPTIONS,
+} from "@/lib/constants";
 
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -27,8 +32,7 @@ interface BlockedCompany { id: string; company_name: string; }
 
 const HEADLINE_OPTIONS = ["I lead teams and hit targets", "I build and ship software", "I keep operations running smooth", "I manage the money", "I take care of people", "I work with my hands"];
 const FIELD_OPTIONS = ["Sales & Marketing", "Technology", "Finance", "Operations", "Healthcare", "Skilled Trades"];
-const EXPERIENCE_OPTIONS = ["Just starting (0 yrs)", "A few years (3 yrs)", "Seasoned (8 yrs)", "Veteran (15 yrs)"];
-const WORK_SETUP_OPTIONS = ["Remote", "Hybrid", "On-site", "Flexible"];
+// EXPERIENCE_OPTIONS and WORK_SETUP_OPTIONS imported from constants
 const PAY_RANGE_OPTIONS = ["Under $40k", "$40–60k", "$60–80k", "$80–100k", "$100–120k", "$120k+"];
 const CITY_OPTIONS = ["Des Moines", "Cedar Rapids", "Davenport", "Iowa City", "Waterloo", "Ames", "West Des Moines", "Ankeny"];
 const AVAILABLE_COMPANIES = [

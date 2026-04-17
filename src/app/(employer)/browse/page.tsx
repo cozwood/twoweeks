@@ -25,13 +25,16 @@ const UTILITY_FILTERS = [
 
 function formatExperience(val: string | null): string {
   if (!val) return "—";
+  // If it already looks like a range string (e.g. "5–10 yrs"), display as-is
+  if (val.includes("yrs") || val.includes("years") || val.includes("+")) return val;
+  // If it's a raw number, bucket it
   const num = parseInt(val);
   if (isNaN(num)) return val;
-  if (num < 2) return "0–2 years";
-  if (num < 5) return "2–5 years";
-  if (num < 10) return "5–10 years";
-  if (num < 15) return "10–15 years";
-  return "15+ years";
+  if (num < 2) return "0–2 yrs";
+  if (num < 5) return "2–5 yrs";
+  if (num < 10) return "5–10 yrs";
+  if (num < 15) return "10–15 yrs";
+  return "15+ yrs";
 }
 
 export default function BrowsePage() {

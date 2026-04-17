@@ -3,7 +3,7 @@
 // Change these once, both marketplace and staffing update.
 // ============================================================
 
-export const EXPERIENCE_OPTIONS = ["0–2 yrs", "2–5 yrs", "5–10 yrs", "10–15 yrs", "15+ yrs"];
+export const EXPERIENCE_OPTIONS = ["0–2 yrs", "2–5 yrs", "5–10 yrs", "10–15 yrs", "15+ yrs"] as const;
 
 export const CATEGORIES = [
   "Healthcare",

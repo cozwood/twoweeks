@@ -7,20 +7,17 @@ import Link from "next/link";
 
 type Step = 1 | 2 | 3;
 
-const EXPERIENCE_OPTIONS = ["0–2 yrs", "3–5 yrs", "5–8 yrs", "8–12 yrs", "12+ yrs"];
-const JOB_TITLES = [
-  "Cashier", "Server", "Cook", "CNA", "Warehouse Worker",
-  "Forklift Operator", "Machine Operator", "Welder", "Electrician",
-  "HVAC Tech", "Admin Assistant", "Bookkeeper", "CDL Driver",
-  "Retail Associate", "Maintenance Tech",
-];
-const CERTIFICATION_OPTIONS = ["CNA", "CDL", "OSHA 10", "Forklift", "ServSafe", "CPR/First Aid", "CompTIA A+", "Phlebotomy"];
-const SKILL_OPTIONS = ["Customer Service", "Forklift", "Excel", "Heavy Lifting", "Inventory", "Cash Handling", "Welding", "Driving", "Data Entry", "Patient Care"];
-const SALARY_RANGE_OPTIONS = ["$20–30k", "$30–40k", "$40–50k", "$50–60k", "$60–70k"];
-const LOCATION_OPTIONS = ["Des Moines", "Cedar Rapids", "Davenport", "Sioux City", "Iowa City", "Waterloo", "Ames", "Ankeny"];
-const WORK_SETUP_OPTIONS = ["On-site", "Hybrid", "Remote", "Flexible"];
-const CAN_START_OPTIONS = ["Immediately", "2 weeks", "1 month", "Flexible"];
-const WHY_LOOKING_OPTIONS = ["Underpaid", "Bad culture", "No growth", "Bad mgmt", "Commute", "Hours"];
+import {
+  EXPERIENCE_OPTIONS,
+  JOB_TITLES,
+  CERTIFICATION_OPTIONS,
+  SKILL_OPTIONS,
+  SALARY_RANGE_OPTIONS,
+  LOCATION_OPTIONS,
+  WORK_SETUP_OPTIONS,
+  CAN_START_OPTIONS,
+  WHY_LOOKING_OPTIONS,
+} from "@/lib/constants";
 
 function parseSalaryRange(range: string | null): { min: number; max: number } | null {
   if (!range) return null;
