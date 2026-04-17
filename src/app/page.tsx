@@ -58,7 +58,7 @@ export default function HomePage() {
         No subscriptions. No nonsense.<br/><br/>
         <Link href="/login" style={{ color: '#636366', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', textDecorationLine: 'underline', textUnderlineOffset: '2px' }}>Already have an account? Sign in</Link>
         <br/><br/>
-        <Link href="/login" style={{ color: '#003768', fontSize: '11px', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
+        <Link href="/internal" style={{ color: '#003768', fontSize: '11px', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
           Staffing agency? Sign in →
         </Link>
       </div>
