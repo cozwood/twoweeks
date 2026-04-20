@@ -59,7 +59,7 @@ export default function HomePage() {
         <Link href="/login" style={{ color: '#636366', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', textDecorationLine: 'underline', textUnderlineOffset: '2px' }}>Already have an account? Sign in</Link>
         <br/><br/>
         <Link href="/internal" style={{ color: '#003768', fontSize: '11px', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
-          Staffing agency? Sign in →
+          Express Employment Login →
         </Link>
       </div>
     </div>

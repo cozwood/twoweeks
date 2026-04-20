@@ -91,6 +91,30 @@ async function seed() {
     await sleep(300);
   }
 
+  // Create recruiter (Express Employment staff account)
+  console.log("\n--- Creating recruiter ---");
+  {
+    const recEmail = "carter.oswood@expresspros.com";
+    const { data: authData, error: authErr } = await sb.auth.signUp({
+      email: recEmail,
+      password: PASSWORD,
+      options: { data: { role: "recruiter", name: "Carter Oswood", company: "Express Employment Professionals" } },
+    });
+    if (authErr) { console.log("  SKIP " + recEmail + ": " + authErr.message); }
+    else {
+      const uid = authData.user && authData.user.id;
+      if (uid) {
+        const { data: sessData } = await sb.auth.signInWithPassword({ email: recEmail, password: PASSWORD });
+        if (sessData && sessData.session) {
+          await sb.from("profiles").update({ name: "Carter Oswood", company: "Express Employment Professionals", title: "Staffing Manager", city: "Des Moines", state: "IA" }).eq("id", uid);
+          console.log("  + Carter Oswood @ Express Employment Professionals");
+          await sb.auth.signOut();
+        }
+      }
+    }
+    await sleep(300);
+  }
+
   // Create intros: employer shows interest in seekers
   if (employerIds.length >= 4 && seekerIds.length >= 10) {
     console.log("\n--- Creating intros ---");
