@@ -10,8 +10,8 @@ type Step = 1 | 2 | 3;
 import {
   EXPERIENCE_OPTIONS,
   JOB_SEGMENTS,
-  CERTIFICATION_OPTIONS,
-  SKILL_OPTIONS,
+  SEGMENT_CERTIFICATIONS,
+  SEGMENT_SKILLS,
   SALARY_RANGE_OPTIONS,
   LOCATION_OPTIONS,
   WORK_SETUP_OPTIONS,
@@ -194,32 +194,36 @@ export default function SeekerOnboarding() {
             </div>
           )}
 
-          <div style={{ padding: "0 20px", marginBottom: "20px" }}>
-            <div style={{ fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "8px" }}>Certifications <span style={{ fontWeight: 400, color: "#AEAEB2" }}>(optional)</span></div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "7px" }}>
-              {CERTIFICATION_OPTIONS.map((c) => (
-                <span key={c} style={{ padding: "9px 15px", borderRadius: "22px", border: certifications.includes(c) ? "1.5px solid #48BB78" : "1.5px solid #E5E5EA", background: certifications.includes(c) ? "#F0FFF4" : "#FFFFFF", fontSize: "13px", fontWeight: 500, color: certifications.includes(c) ? "#48BB78" : "#1C1C1E", cursor: "pointer", userSelect: "none", fontFamily: "inherit" }} onClick={() => toggleMulti(certifications, setCertifications, c)}>{c}</span>
-              ))}
+          {segment && SEGMENT_CERTIFICATIONS[segment] && (
+            <div style={{ padding: "0 20px", marginBottom: "20px" }}>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "8px" }}>Certifications <span style={{ fontWeight: 400, color: "#AEAEB2" }}>(optional)</span></div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "7px" }}>
+                {SEGMENT_CERTIFICATIONS[segment].map((c) => (
+                  <span key={c} style={{ padding: "9px 15px", borderRadius: "22px", border: certifications.includes(c) ? "1.5px solid #48BB78" : "1.5px solid #E5E5EA", background: certifications.includes(c) ? "#F0FFF4" : "#FFFFFF", fontSize: "13px", fontWeight: 500, color: certifications.includes(c) ? "#48BB78" : "#1C1C1E", cursor: "pointer", userSelect: "none", fontFamily: "inherit" }} onClick={() => toggleMulti(certifications, setCertifications, c)}>{c}</span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          <div style={{ padding: "0 20px", marginBottom: "20px" }}>
-            <div style={{ fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "8px" }}>Skills <span style={{ fontWeight: 400, color: "#AEAEB2" }}>(optional, max 6)</span></div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "7px" }}>
-              {SKILL_OPTIONS.map((s) => (
-                <span
-                  key={s}
-                  style={{ padding: "9px 15px", borderRadius: "22px", border: skills.includes(s) ? "1.5px solid #1C1C1E" : "1.5px solid #E5E5EA", background: skills.includes(s) ? "#1C1C1E" : "#FFFFFF", fontSize: "13px", fontWeight: 500, color: skills.includes(s) ? "#FFFFFF" : "#1C1C1E", cursor: "pointer", userSelect: "none", fontFamily: "inherit" }}
-                  onClick={() => {
-                    if (skills.includes(s)) setSkills(skills.filter((v) => v !== s));
-                    else if (skills.length < 6) setSkills([...skills, s]);
-                  }}
-                >
-                  {s}
-                </span>
-              ))}
+          {segment && SEGMENT_SKILLS[segment] && (
+            <div style={{ padding: "0 20px", marginBottom: "20px" }}>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "8px" }}>Skills <span style={{ fontWeight: 400, color: "#AEAEB2" }}>(optional, max 6)</span></div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "7px" }}>
+                {SEGMENT_SKILLS[segment].map((s) => (
+                  <span
+                    key={s}
+                    style={{ padding: "9px 15px", borderRadius: "22px", border: skills.includes(s) ? "1.5px solid #1C1C1E" : "1.5px solid #E5E5EA", background: skills.includes(s) ? "#1C1C1E" : "#FFFFFF", fontSize: "13px", fontWeight: 500, color: skills.includes(s) ? "#FFFFFF" : "#1C1C1E", cursor: "pointer", userSelect: "none", fontFamily: "inherit" }}
+                    onClick={() => {
+                      if (skills.includes(s)) setSkills(skills.filter((v) => v !== s));
+                      else if (skills.length < 6) setSkills([...skills, s]);
+                    }}
+                  >
+                    {s}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div style={{ padding: "8px 20px 20px" }}>
             <button style={{ display: "block", width: "100%", padding: "15px", borderRadius: "14px", fontSize: "15px", fontWeight: 600, textAlign: "center", cursor: "pointer", marginBottom: "10px", border: "1.5px solid transparent", fontFamily: "inherit", background: "#1C1C1E", color: "#FFFFFF" }} onClick={() => setStep(2)}>Continue</button>

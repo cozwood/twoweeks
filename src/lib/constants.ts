@@ -56,16 +56,37 @@ export const CATEGORIES = Object.keys(JOB_SEGMENTS) as string[];
 // Flat list of all job titles across segments
 export const JOB_TITLES = Object.values(JOB_SEGMENTS).flat() as string[];
 
-export const CERTIFICATION_OPTIONS = [
-  "CNA", "CDL", "OSHA 10", "Forklift", "ServSafe",
-  "CPR/First Aid", "CompTIA A+", "Phlebotomy",
-] as const;
+// ── Segment-specific certifications ──
+export const SEGMENT_CERTIFICATIONS: Record<string, string[]> = {
+  "Manufacturing & Production": ["OSHA 10", "OSHA 30", "Forklift", "Lean/Six Sigma", "Lockout/Tagout", "CPR/First Aid"],
+  "Skilled Trades": ["OSHA 10", "OSHA 30", "Journeyman License", "EPA 608", "AWS Welding Cert", "Electrical License", "Brazing Cert", "CPR/First Aid"],
+  "Office & Admin": ["Microsoft Office Specialist", "Notary Public", "QuickBooks Certified", "Google Workspace Cert"],
+  "Customer Service & Sales": ["ServSafe", "Food Handler", "CPR/First Aid", "Alcohol Compliance (TIPS)"],
+  "Healthcare Support": ["CNA", "BLS/CPR", "Phlebotomy", "Medical Assistant Cert", "HIPAA Training", "First Aid", "Pharmacy Tech (CPhT)"],
+  "Transportation & Logistics": ["CDL Class A", "CDL Class B", "Forklift", "Hazmat Endorsement", "TWIC Card", "DOT Medical Card"],
+  "IT & Technical": ["CompTIA A+", "CompTIA Network+", "CompTIA Security+", "AWS Cloud Practitioner", "Google IT Support"],
+  "Accounting & Finance": ["QuickBooks Certified", "Excel Expert", "Payroll Certification (CPP)", "Bookkeeper Certification"],
+  "Human Resources": ["SHRM-CP", "PHR", "CPR/First Aid", "OSHA 10"],
+  "Engineering & Design": ["AutoCAD Certified", "SolidWorks Cert", "PMP", "Lean/Six Sigma", "EIT/FE Exam"],
+};
 
-export const SKILL_OPTIONS = [
-  "Customer Service", "Forklift", "Excel", "Heavy Lifting",
-  "Inventory", "Cash Handling", "Welding", "Driving",
-  "Data Entry", "Patient Care",
-] as const;
+// ── Segment-specific skills ──
+export const SEGMENT_SKILLS: Record<string, string[]> = {
+  "Manufacturing & Production": ["Machine Operation", "Quality Control", "Heavy Lifting", "Inventory", "Forklift", "Assembly", "Packaging", "Blueprint Reading"],
+  "Skilled Trades": ["Welding", "Electrical Wiring", "HVAC Systems", "Plumbing", "Blueprint Reading", "Hand/Power Tools", "Troubleshooting", "Preventive Maintenance"],
+  "Office & Admin": ["Microsoft Office", "Data Entry", "Scheduling", "Filing/Organization", "Phone Systems", "Excel", "Typing 60+ WPM", "Customer Service"],
+  "Customer Service & Sales": ["Customer Service", "Cash Handling", "POS Systems", "Conflict Resolution", "Upselling", "Phone Skills", "CRM Software", "Bilingual"],
+  "Healthcare Support": ["Patient Care", "Vital Signs", "Medical Terminology", "EMR/EHR Systems", "Infection Control", "Medication Admin", "Wound Care", "CPR"],
+  "Transportation & Logistics": ["Driving", "Route Planning", "Forklift", "Loading/Unloading", "GPS Navigation", "DOT Compliance", "Inventory", "Dispatch Software"],
+  "IT & Technical": ["Help Desk", "Windows/Mac Support", "Networking", "Troubleshooting", "SQL", "Python", "Cloud Services", "Cybersecurity Basics"],
+  "Accounting & Finance": ["Excel", "QuickBooks", "Accounts Payable", "Accounts Receivable", "Payroll", "Reconciliation", "Financial Reporting", "Data Entry"],
+  "Human Resources": ["Recruiting", "Onboarding", "Benefits Admin", "HRIS Systems", "Conflict Resolution", "Training/Development", "Compliance", "Interviewing"],
+  "Engineering & Design": ["AutoCAD", "SolidWorks", "Blueprint Reading", "Process Improvement", "Project Management", "Technical Writing", "3D Modeling", "GD&T"],
+};
+
+// Flat lists (kept for backward compat / staff pages)
+export const CERTIFICATION_OPTIONS = [...new Set(Object.values(SEGMENT_CERTIFICATIONS).flat())] as string[];
+export const SKILL_OPTIONS = [...new Set(Object.values(SEGMENT_SKILLS).flat())] as string[];
 
 export const SALARY_RANGE_OPTIONS = [
   "$20–30k", "$30–40k", "$40–50k", "$50–60k", "$60–70k", "$70–80k", "$80–100k",

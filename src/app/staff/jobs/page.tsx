@@ -8,8 +8,8 @@ import {
   EXPERIENCE_OPTIONS,
   JOB_SEGMENTS,
   CATEGORIES,
-  CERTIFICATION_OPTIONS,
-  SKILL_OPTIONS,
+  SEGMENT_CERTIFICATIONS,
+  SEGMENT_SKILLS,
   SALARY_RANGE_OPTIONS,
   LOCATION_OPTIONS,
   WORK_SETUP_OPTIONS,
@@ -554,10 +554,11 @@ export default function JobsPage() {
               </div>
 
               {/* Required Skills */}
+              {category && SEGMENT_SKILLS[category] && (
               <div>
                 <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Required Skills (optional)</label>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {SKILL_OPTIONS.map((s) => (
+                  {SEGMENT_SKILLS[category].map((s) => (
                     <span
                       key={s}
                       onClick={() => toggleMulti(requiredSkills, setRequiredSkills, s)}
@@ -578,12 +579,14 @@ export default function JobsPage() {
                   ))}
                 </div>
               </div>
+              )}
 
               {/* Required Certs */}
+              {category && SEGMENT_CERTIFICATIONS[category] && (
               <div>
                 <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Required Certifications (optional)</label>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {CERTIFICATION_OPTIONS.map((c) => (
+                  {SEGMENT_CERTIFICATIONS[category].map((c) => (
                     <span
                       key={c}
                       onClick={() => toggleMulti(requiredCerts, setRequiredCerts, c)}
@@ -604,6 +607,7 @@ export default function JobsPage() {
                   ))}
                 </div>
               </div>
+              )}
 
               {formError && (
                 <div style={{ background: "#FFF5F5", border: "1px solid #E53E3E", color: "#E53E3E", fontSize: 12, padding: "12px", borderRadius: 16 }}>
