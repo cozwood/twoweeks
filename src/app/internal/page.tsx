@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { EXPRESS_BRANDING } from "@/lib/constants";
@@ -12,6 +12,28 @@ export default function StaffLoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const [userName, setUserName] = useState("");
+
+  // Check if already authenticated on load
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role, name")
+          .eq("id", user.id)
+          .single();
+        if (profile?.role === "recruiter") {
+          setUserName(profile.name || "");
+          setLoggedIn(true);
+        }
+      }
+      setChecking(false);
+    })();
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,12 +54,13 @@ export default function StaffLoginPage() {
     if (data.user) {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("role")
+        .select("role, name")
         .eq("id", data.user.id)
         .single();
 
       if (profile?.role === "recruiter") {
-        router.push("/staff/dashboard");
+        setUserName(profile.name || "");
+        setLoggedIn(true);
       } else {
         setError("This login is for internal staff only.");
         await supabase.auth.signOut();
@@ -49,6 +72,124 @@ export default function StaffLoginPage() {
     setLoading(false);
   };
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setLoggedIn(false);
+    setEmail("");
+    setPassword("");
+  };
+
+  // Loading state while checking auth
+  if (checking) {
+    return (
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", background: "#F2F4F7", minHeight: "100vh" }}>
+        <div style={{ fontSize: "15px", color: "#999" }}>Loading…</div>
+      </div>
+    );
+  }
+
+  // ── Choice screen (after login) ──
+  if (loggedIn) {
+    return (
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: "100vh", background: "#F2F4F7" }}>
+        {/* Header */}
+        <div style={{ padding: "50px 28px 30px", textAlign: "center", background: EXPRESS_BRANDING.primaryColor }}>
+          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", letterSpacing: "0.5px", marginBottom: "14px", fontWeight: 500 }}>
+            INTERNAL
+          </div>
+          <div style={{ fontSize: "36px", fontWeight: 900, color: "#FFFFFF", letterSpacing: "-1px", marginBottom: "6px" }}>
+            {EXPRESS_BRANDING.shortName}
+          </div>
+          <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)", marginBottom: "0", lineHeight: 1.4 }}>
+            {userName ? `Welcome back, ${userName.split(" ")[0]}` : EXPRESS_BRANDING.tagline}
+          </p>
+        </div>
+
+        {/* Choice buttons */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 28px", gap: "20px" }}>
+          <p style={{ fontSize: "16px", fontWeight: 600, color: "#333", marginBottom: "8px" }}>
+            What would you like to open?
+          </p>
+
+          {/* Kiosk button */}
+          <button
+            onClick={() => router.push("/kiosk")}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%",
+              maxWidth: "340px",
+              padding: "32px 24px",
+              borderRadius: "16px",
+              border: `2px solid ${EXPRESS_BRANDING.primaryColor}`,
+              background: "#FFFFFF",
+              cursor: "pointer",
+              fontFamily: "inherit",
+              transition: "transform 0.1s",
+            }}
+          >
+            <div style={{ fontSize: "40px", marginBottom: "12px" }}>📋</div>
+            <div style={{ fontSize: "20px", fontWeight: 700, color: EXPRESS_BRANDING.primaryColor, marginBottom: "6px" }}>
+              Kiosk
+            </div>
+            <div style={{ fontSize: "13px", color: "#666", lineHeight: 1.4 }}>
+              Walk-in intake for job seekers
+            </div>
+          </button>
+
+          {/* Dashboard button */}
+          <button
+            onClick={() => router.push("/staff/dashboard")}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%",
+              maxWidth: "340px",
+              padding: "32px 24px",
+              borderRadius: "16px",
+              border: `2px solid ${EXPRESS_BRANDING.accentColor}`,
+              background: "#FFFFFF",
+              cursor: "pointer",
+              fontFamily: "inherit",
+              transition: "transform 0.1s",
+            }}
+          >
+            <div style={{ fontSize: "40px", marginBottom: "12px" }}>📊</div>
+            <div style={{ fontSize: "20px", fontWeight: 700, color: EXPRESS_BRANDING.primaryColor, marginBottom: "6px" }}>
+              Dashboard
+            </div>
+            <div style={{ fontSize: "13px", color: "#666", lineHeight: 1.4 }}>
+              Recruiter tools &amp; candidate management
+            </div>
+          </button>
+        </div>
+
+        {/* Sign out */}
+        <div style={{ textAlign: "center", padding: "0 28px 40px" }}>
+          <button
+            onClick={handleSignOut}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#999",
+              fontSize: "13px",
+              cursor: "pointer",
+              fontFamily: "inherit",
+              textDecoration: "underline",
+            }}
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Login form ──
   return (
     <div style={{ flex: 1, overflowY: "auto", paddingBottom: "80px", background: "#F2F4F7" }}>
       <div style={{ padding: "50px 28px 30px", textAlign: "center", background: EXPRESS_BRANDING.primaryColor }}>
