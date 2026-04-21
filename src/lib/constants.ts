@@ -88,6 +88,10 @@ export const SEGMENT_SKILLS: Record<string, string[]> = {
 export const CERTIFICATION_OPTIONS = [...new Set(Object.values(SEGMENT_CERTIFICATIONS).flat())] as string[];
 export const SKILL_OPTIONS = [...new Set(Object.values(SEGMENT_SKILLS).flat())] as string[];
 
+export const HOURLY_RANGE_OPTIONS = [
+  "$12–15/hr", "$15–18/hr", "$18–22/hr", "$22–28/hr", "$28–35/hr", "$35–45/hr", "$45+/hr",
+] as const;
+
 export const SALARY_RANGE_OPTIONS = [
   "$20–30k", "$30–40k", "$40–50k", "$50–60k", "$60–70k", "$70–80k", "$80–100k",
 ] as const;
@@ -113,6 +117,7 @@ export const MATCH_STATUSES = ["pending", "reviewed", "interested", "declined", 
 export function parseSalaryRange(range: string | null): { min: number; max: number } | null {
   if (!range) return null;
   const map: Record<string, { min: number; max: number }> = {
+    // Annual
     "$20–30k": { min: 20000, max: 30000 },
     "$30–40k": { min: 30000, max: 40000 },
     "$40–50k": { min: 40000, max: 50000 },
@@ -120,6 +125,14 @@ export function parseSalaryRange(range: string | null): { min: number; max: numb
     "$60–70k": { min: 60000, max: 70000 },
     "$70–80k": { min: 70000, max: 80000 },
     "$80–100k": { min: 80000, max: 100000 },
+    // Hourly (converted to annual: rate × 2080)
+    "$12–15/hr": { min: 24960, max: 31200 },
+    "$15–18/hr": { min: 31200, max: 37440 },
+    "$18–22/hr": { min: 37440, max: 45760 },
+    "$22–28/hr": { min: 45760, max: 58240 },
+    "$28–35/hr": { min: 58240, max: 72800 },
+    "$35–45/hr": { min: 72800, max: 93600 },
+    "$45+/hr": { min: 93600, max: 150000 },
   };
   return map[range] || null;
 }

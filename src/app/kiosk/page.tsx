@@ -12,6 +12,7 @@ import {
   EXPRESS_BRANDING,
   parseSalaryRange,
   SALARY_RANGE_OPTIONS,
+  HOURLY_RANGE_OPTIONS,
 } from "@/lib/constants";
 
 type Step = 1 | 2 | 3 | 4 | 5;
@@ -111,7 +112,8 @@ export default function KioskIntake() {
   const [experience, setExperience] = useState<string | null>(null);
   const [availability, setAvailability] = useState<string | null>(null);
   const [workSetup, setWorkSetup] = useState<string | null>(null);
-  const [salaryRange, setSalaryRange] = useState<string | null>(null);
+  const [payType, setPayType] = useState<"hourly" | "salary">("hourly");
+  const [salaryRanges, setSalaryRanges] = useState<string[]>([]);
   const [certifications, setCertifications] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
 
@@ -168,7 +170,16 @@ export default function KioskIntake() {
         return;
       }
 
-      const salary = parseSalaryRange(salaryRange);
+      // Compute min/max across all selected ranges
+      let salaryMin: number | null = null;
+      let salaryMax: number | null = null;
+      for (const r of salaryRanges) {
+        const parsed = parseSalaryRange(r);
+        if (parsed) {
+          if (salaryMin === null || parsed.min < salaryMin) salaryMin = parsed.min;
+          if (salaryMax === null || parsed.max > salaryMax) salaryMax = parsed.max;
+        }
+      }
 
       // Walk-in seekers go into their own table — no auth account needed
       const { error: insertError } = await supabase.from("walk_in_seekers").insert({
@@ -184,8 +195,8 @@ export default function KioskIntake() {
         years_experience: experience,
         arrangement: workSetup?.toLowerCase() || null,
         availability: availability?.toLowerCase() || null,
-        salary_min: salary?.min || null,
-        salary_max: salary?.max || null,
+        salary_min: salaryMin,
+        salary_max: salaryMax,
         certifications,
         skills,
         city: branchName?.split(" / ")[0] || null,
@@ -217,7 +228,8 @@ export default function KioskIntake() {
     setExperience(null);
     setAvailability(null);
     setWorkSetup(null);
-    setSalaryRange(null);
+    setPayType("hourly");
+    setSalaryRanges([]);
     setCertifications([]);
     setSkills([]);
     setError("");
@@ -411,9 +423,27 @@ export default function KioskIntake() {
 
           <div style={{ marginBottom: "20px" }}>
             <div style={{ fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "8px" }}>Pay range</div>
+            <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+              <button
+                style={payType === "hourly" ? chipSelected : chipBase}
+                onClick={() => { setPayType("hourly"); setSalaryRanges([]); }}
+              >
+                Hourly
+              </button>
+              <button
+                style={payType === "salary" ? chipSelected : chipBase}
+                onClick={() => { setPayType("salary"); setSalaryRanges([]); }}
+              >
+                Salary
+              </button>
+            </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-              {SALARY_RANGE_OPTIONS.map((opt) => (
-                <button key={opt} style={salaryRange === opt ? chipSelected : chipBase} onClick={() => setSalaryRange(opt)}>
+              {(payType === "hourly" ? HOURLY_RANGE_OPTIONS : SALARY_RANGE_OPTIONS).map((opt) => (
+                <button
+                  key={opt}
+                  style={salaryRanges.includes(opt) ? chipSelected : chipBase}
+                  onClick={() => toggleMulti(salaryRanges, setSalaryRanges, opt)}
+                >
                   {opt}
                 </button>
               ))}
@@ -504,7 +534,7 @@ export default function KioskIntake() {
                 { label: "Experience", value: experience || "—" },
                 { label: "Available", value: availability || "—" },
                 { label: "Setup", value: workSetup || "—" },
-                { label: "Pay range", value: salaryRange || "—" },
+                { label: "Pay range", value: salaryRanges.length > 0 ? salaryRanges.join(", ") : "—" },
               ].map((row, i, arr) => (
                 <div key={row.label} style={{
                   display: "flex", justifyContent: "space-between", alignItems: "center",
