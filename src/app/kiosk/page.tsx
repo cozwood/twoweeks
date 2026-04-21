@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import {
   EXPERIENCE_OPTIONS,
@@ -224,6 +224,15 @@ export default function KioskIntake() {
     setDone(false);
   };
 
+  // Auto-reset after submission
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (done) {
+      resetTimer.current = setTimeout(() => resetForm(), 4000);
+    }
+    return () => { if (resetTimer.current) clearTimeout(resetTimer.current); };
+  }, [done]);
+
   // ── Success screen ──
   if (done) {
     return (
@@ -235,9 +244,6 @@ export default function KioskIntake() {
         <p style={{ fontSize: "16px", color: "#636366", lineHeight: 1.5, marginBottom: "40px" }}>
           Your information has been saved. A recruiter will follow up with you about matching opportunities.
         </p>
-        <button style={buttonPrimary} onClick={resetForm}>
-          Next Person
-        </button>
       </div>
     );
   }
