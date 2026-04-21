@@ -104,8 +104,8 @@ export default function RecruiterOnboarding() {
         <>
           {/* Express-branded header */}
           <div style={{ background: "#0060A9", padding: "24px 20px 24px" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#F7941D", fontWeight: 700, letterSpacing: "0.5px", marginBottom: "8px", textTransform: "uppercase" }}>
-              <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#F7941D" }} />
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#4DA8DA", fontWeight: 700, letterSpacing: "0.5px", marginBottom: "8px", textTransform: "uppercase" }}>
+              <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#4DA8DA" }} />
               Internal Staffing Tool
             </div>
             <h1 style={{ fontSize: "22px", lineHeight: "1.2", color: "#FFFFFF", marginTop: "0", fontWeight: 800 }}>Set up your office</h1>

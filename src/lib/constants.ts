@@ -161,7 +161,7 @@ export const EXPRESS_BRANDING = {
   shortName: "Express",
   primaryColor: "#0060A9",   // Express corporate blue
   secondaryColor: "#004B87", // Express dark blue (hover states)
-  accentColor: "#F7941D",    // Express orange
+  accentColor: "#4DA8DA",    // Express light blue (buttons, accents)
   lightBlue: "#E8F1FA",      // Express blue tint (tag backgrounds)
   tagline: "Helping People Succeed",
 } as const;

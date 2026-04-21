@@ -556,17 +556,17 @@ html, body { height: 100%; }
 :root {
   --express-blue: #0060A9;
   --express-blue-dark: #004B87;
-  --express-orange: #F7941D;
-  --express-orange-light: #FFA940;
-  --express-orange-bg: #FFF7ED;
+  --express-accent: #4DA8DA;
+  --express-accent-light: #7BC4E8;
+  --express-accent-bg: #E8F1FA;
 }
 
 @theme inline {
   --color-express-blue: var(--express-blue);
   --color-express-blue-dark: var(--express-blue-dark);
-  --color-express-orange: var(--express-orange);
-  --color-express-orange-light: var(--express-orange-light);
-  --color-express-orange-bg: var(--express-orange-bg);
+  --color-express-accent: var(--express-accent);
+  --color-express-accent-light: var(--express-accent-light);
+  --color-express-accent-bg: var(--express-accent-bg);
 }
 
 /* Staffing mode overrides */
@@ -576,10 +576,10 @@ html, body { height: 100%; }
 .staffing-header .subtitle { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 2px; }
 .staffing-header .express-badge {
   display: inline-flex; align-items: center; gap: 6px;
-  font-size: 11px; color: var(--express-orange); font-weight: 700;
+  font-size: 11px; color: var(--express-accent); font-weight: 700;
   letter-spacing: 0.5px; margin-bottom: 8px; text-transform: uppercase;
 }
-.express-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--express-orange); }
+.express-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--express-accent); }
 
 /* Job card header — Express navy instead of charcoal */
 .staffing-mode .job-card-header {

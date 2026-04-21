@@ -93,8 +93,8 @@ export default function StaffingDashboard() {
       {/* Header */}
       <div style={{ background: "#0060A9", padding: "20px 16px", color: "#FFFFFF" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F7941D", display: "inline-block" }} />
-          <span style={{ fontSize: 11, fontWeight: 700, color: "#F7941D", textTransform: "uppercase" }}>
+          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#4DA8DA", display: "inline-block" }} />
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#4DA8DA", textTransform: "uppercase" }}>
             {EXPRESS_BRANDING.shortName} Staffing
           </span>
         </div>
@@ -142,7 +142,7 @@ export default function StaffingDashboard() {
           onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)")}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: "#F7941D", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: "#4DA8DA", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Briefcase size={18} color="#FFFFFF" />
             </div>
             <div>

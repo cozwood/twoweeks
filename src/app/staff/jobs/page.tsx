@@ -138,8 +138,8 @@ export default function JobsPage() {
       {/* Header */}
       <div style={{ background: "#0060A9", padding: "20px 16px", color: "#FFFFFF" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F7941D", display: "inline-block" }} />
-          <span style={{ fontSize: 11, fontWeight: 700, color: "#F7941D", textTransform: "uppercase" }}>
+          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#4DA8DA", display: "inline-block" }} />
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#4DA8DA", textTransform: "uppercase" }}>
             {EXPRESS_BRANDING.shortName} Staffing
           </span>
         </div>
@@ -198,7 +198,7 @@ export default function JobsPage() {
                       {job.city || "Iowa"}, {job.state} · {job.arrangement || "Flexible"}
                     </div>
                   </div>
-                  <span style={{ background: "#F7941D", color: "#FFFFFF", fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 20, whiteSpace: "nowrap" }}>
+                  <span style={{ background: "#4DA8DA", color: "#FFFFFF", fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 20, whiteSpace: "nowrap" }}>
                     Active
                   </span>
                 </div>

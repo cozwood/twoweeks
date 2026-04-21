@@ -14,7 +14,7 @@ interface MatchWithDetails extends JobMatch {
 type StatusFilter = "all" | "pending" | "reviewed" | "interested" | "hired" | "declined";
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  pending: { bg: "#FFF7ED", text: "#F7941D" },
+  pending: { bg: "#FFF7ED", text: "#4DA8DA" },
   reviewed: { bg: "#F5F5F5", text: "#3A3A3C" },
   interested: { bg: "#F0FFF4", text: "#22863A" },
   hired: { bg: "#0060A9", text: "#FFFFFF" },
@@ -125,8 +125,8 @@ export default function MatchesPage() {
       {/* Header */}
       <div style={{ background: "#0060A9", padding: "20px 16px", color: "#FFFFFF" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F7941D", display: "inline-block" }} />
-          <span style={{ fontSize: 11, fontWeight: 700, color: "#F7941D", textTransform: "uppercase" }}>
+          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#4DA8DA", display: "inline-block" }} />
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#4DA8DA", textTransform: "uppercase" }}>
             {EXPRESS_BRANDING.shortName} Staffing
           </span>
         </div>
