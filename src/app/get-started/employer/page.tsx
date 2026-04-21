@@ -260,6 +260,13 @@ export default function EmployerOnboarding() {
               >
                 Back
               </Link>
+              <span style={{ color: "#AEAEB2", margin: "0 6px" }}>·</span>
+              <Link
+                href="/login"
+                style={{ color: "#636366", fontWeight: 600, cursor: "pointer", textDecoration: "underline", textDecorationLine: "underline", textUnderlineOffset: "2px" }}
+              >
+                Already have an account? Sign in
+              </Link>
             </div>
           </div>
         </>
