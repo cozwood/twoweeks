@@ -14,6 +14,7 @@ export interface Profile {
   state: string
   branch_id: string | null
   organization_id: string | null
+  is_admin: boolean
   created_at: string
   updated_at: string
 }

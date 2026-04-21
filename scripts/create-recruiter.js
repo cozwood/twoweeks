@@ -46,15 +46,30 @@ async function main() {
 
   // Step 3: If signed in, update profile
   if (signInData?.session && signInData?.user) {
-    console.log("\n3. Updating profile...");
+    // Find Cedar Rapids / Iowa City branch
+    console.log("\n3. Looking up Cedar Rapids branch...");
+    const { data: branch } = await sb.from("branches")
+      .select("id")
+      .eq("slug", "cedar-rapids-iowa-city")
+      .single();
+
+    if (branch) {
+      console.log("   BRANCH ID:", branch.id);
+    } else {
+      console.log("   WARNING: Branch not found — profile will have no branch_id");
+    }
+
+    console.log("\n4. Updating profile (admin)...");
     const { error: profileErr } = await sb.from("profiles")
       .update({
         name: "Carter Oswood",
         company: "Express Employment Professionals",
         title: "Staffing Manager",
-        city: "Des Moines",
+        city: "Cedar Rapids",
         state: "IA",
         role: "recruiter",
+        branch_id: branch?.id || null,
+        is_admin: true,
       })
       .eq("id", signInData.user.id);
 

@@ -32,6 +32,7 @@ create table if not exists public.profiles (
   state text not null default 'IA',
   branch_id uuid references public.branches(id),
   organization_id uuid,
+  is_admin boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -277,6 +278,16 @@ as $$
   select role from public.profiles where id = auth.uid();
 $$;
 
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select coalesce((select is_admin from public.profiles where id = auth.uid()), false);
+$$;
+
 -- ============================================
 -- ROW LEVEL SECURITY
 -- ============================================
@@ -296,13 +307,20 @@ alter table public.audit_log enable row level security;
 
 create policy "branches_select_own"
   on public.branches for select
-  using (id in (select branch_id from public.profiles where id = auth.uid()));
+  using (
+    public.is_admin()
+    or id in (select branch_id from public.profiles where id = auth.uid())
+  );
 
 -- ── PROFILES ──
 
 create policy "profiles_select_own"
   on public.profiles for select
   using (auth.uid() = id);
+
+create policy "profiles_select_admin"
+  on public.profiles for select
+  using (public.is_admin());
 
 create policy "profiles_select_revealed"
   on public.profiles for select
@@ -336,6 +354,10 @@ create policy "seeker_cards_manage_own"
   on public.seeker_cards for all
   using (profile_id = auth.uid());
 
+create policy "seeker_cards_select_admin"
+  on public.seeker_cards for select
+  using (public.is_admin());
+
 create policy "seeker_cards_browse_employers"
   on public.seeker_cards for select
   using (
@@ -361,14 +383,14 @@ create policy "seeker_cards_insert_recruiters"
   on public.seeker_cards for insert
   with check (
     public.my_role() = 'recruiter'
-    and branch_id = public.my_branch_id()
+    and (branch_id = public.my_branch_id() or public.is_admin())
   );
 
 create policy "seeker_cards_update_recruiters"
   on public.seeker_cards for update
   using (
     public.my_role() = 'recruiter'
-    and branch_id = public.my_branch_id()
+    and (branch_id = public.my_branch_id() or public.is_admin())
   );
 
 -- ── BLOCK LIST ──
@@ -386,6 +408,10 @@ create policy "intros_insert_employers"
 create policy "intros_select_parties"
   on public.intros for select
   using (employer_id = auth.uid() or seeker_id = auth.uid());
+
+create policy "intros_select_admin"
+  on public.intros for select
+  using (public.is_admin());
 
 create policy "intros_select_branch_recruiters"
   on public.intros for select
@@ -424,6 +450,10 @@ create policy "reveals_select_parties"
     )
   );
 
+create policy "reveals_select_admin"
+  on public.reveals for select
+  using (public.is_admin());
+
 create policy "reveals_select_branch_recruiters"
   on public.reveals for select
   using (
@@ -440,23 +470,23 @@ create policy "reveals_select_branch_recruiters"
 create policy "job_listings_select_branch"
   on public.job_listings for select
   using (
-    public.my_role() = 'recruiter'
-    and branch_id = public.my_branch_id()
+    public.is_admin()
+    or (public.my_role() = 'recruiter' and branch_id = public.my_branch_id())
   );
 
 create policy "job_listings_insert_branch"
   on public.job_listings for insert
   with check (
     public.my_role() = 'recruiter'
-    and branch_id = public.my_branch_id()
+    and (branch_id = public.my_branch_id() or public.is_admin())
     and created_by = auth.uid()
   );
 
 create policy "job_listings_update_branch"
   on public.job_listings for update
   using (
-    public.my_role() = 'recruiter'
-    and branch_id = public.my_branch_id()
+    public.is_admin()
+    or (public.my_role() = 'recruiter' and branch_id = public.my_branch_id())
   );
 
 -- ── JOB MATCHES ──
@@ -464,8 +494,8 @@ create policy "job_listings_update_branch"
 create policy "job_matches_select_branch"
   on public.job_matches for select
   using (
-    public.my_role() = 'recruiter'
-    and branch_id = public.my_branch_id()
+    public.is_admin()
+    or (public.my_role() = 'recruiter' and branch_id = public.my_branch_id())
   );
 
 create policy "job_matches_select_seekers"
@@ -476,14 +506,14 @@ create policy "job_matches_insert_branch"
   on public.job_matches for insert
   with check (
     public.my_role() = 'recruiter'
-    and branch_id = public.my_branch_id()
+    and (branch_id = public.my_branch_id() or public.is_admin())
   );
 
 create policy "job_matches_update_branch"
   on public.job_matches for update
   using (
-    public.my_role() = 'recruiter'
-    and branch_id = public.my_branch_id()
+    public.is_admin()
+    or (public.my_role() = 'recruiter' and branch_id = public.my_branch_id())
   );
 
 -- ── WALK-IN SEEKERS ──
@@ -492,21 +522,21 @@ create policy "walk_in_seekers_insert_branch"
   on public.walk_in_seekers for insert
   with check (
     public.my_role() = 'recruiter'
-    and branch_id = public.my_branch_id()
+    and (branch_id = public.my_branch_id() or public.is_admin())
   );
 
 create policy "walk_in_seekers_select_branch"
   on public.walk_in_seekers for select
   using (
-    public.my_role() = 'recruiter'
-    and branch_id = public.my_branch_id()
+    public.is_admin()
+    or (public.my_role() = 'recruiter' and branch_id = public.my_branch_id())
   );
 
 create policy "walk_in_seekers_update_branch"
   on public.walk_in_seekers for update
   using (
-    public.my_role() = 'recruiter'
-    and branch_id = public.my_branch_id()
+    public.is_admin()
+    or (public.my_role() = 'recruiter' and branch_id = public.my_branch_id())
   );
 
 -- ============================================
