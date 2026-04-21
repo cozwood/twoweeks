@@ -12,25 +12,15 @@ import {
   JOB_SEGMENTS,
   SEGMENT_CERTIFICATIONS,
   SEGMENT_SKILLS,
+  HOURLY_RANGE_OPTIONS,
   SALARY_RANGE_OPTIONS,
   LOCATION_OPTIONS,
   WORK_SETUP_OPTIONS,
   CAN_START_OPTIONS,
   WHY_LOOKING_OPTIONS,
   getCategoryFromTitle,
+  parseSalaryRange,
 } from "@/lib/constants";
-
-function parseSalaryRange(range: string | null): { min: number; max: number } | null {
-  if (!range) return null;
-  const map: Record<string, { min: number; max: number }> = {
-    "$20–30k": { min: 20000, max: 30000 },
-    "$30–40k": { min: 30000, max: 40000 },
-    "$40–50k": { min: 40000, max: 50000 },
-    "$50–60k": { min: 50000, max: 60000 },
-    "$60–70k": { min: 60000, max: 70000 },
-  };
-  return map[range] || null;
-}
 
 function arrangementValue(setup: string | null): string | null {
   if (!setup) return null;
@@ -57,7 +47,8 @@ export default function SeekerOnboarding() {
   const [jobTitle, setJobTitle] = useState<string | null>(null);
   const [certifications, setCertifications] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
-  const [salaryRange, setSalaryRange] = useState<string | null>(null);
+  const [payType, setPayType] = useState<"hourly" | "salary">("hourly");
+  const [salaryRanges, setSalaryRanges] = useState<string[]>([]);
   const [location, setLocation] = useState<string | null>(null);
   const [workSetup, setWorkSetup] = useState<string | null>(null);
   const [canStart, setCanStart] = useState<string | null>(null);
@@ -101,7 +92,15 @@ export default function SeekerOnboarding() {
     }
 
     // 2. Create seeker card
-    const salary = parseSalaryRange(salaryRange);
+    let salaryMin: number | null = null;
+    let salaryMax: number | null = null;
+    for (const r of salaryRanges) {
+      const parsed = parseSalaryRange(r);
+      if (parsed) {
+        if (salaryMin === null || parsed.min < salaryMin) salaryMin = parsed.min;
+        if (salaryMax === null || parsed.max > salaryMax) salaryMax = parsed.max;
+      }
+    }
     const { error: cardError } = await supabase.from("seeker_cards").insert({
       profile_id: user.id,
       job_title: jobTitle,
@@ -110,8 +109,8 @@ export default function SeekerOnboarding() {
       years_experience: experience,
       arrangement: arrangementValue(workSetup),
       availability: availabilityValue(canStart),
-      salary_min: salary?.min || null,
-      salary_max: salary?.max || null,
+      salary_min: salaryMin,
+      salary_max: salaryMax,
       city: location,
       state: "IA",
       certifications,
@@ -242,10 +241,35 @@ export default function SeekerOnboarding() {
           </div>
 
           <div style={{ padding: "0 20px", marginBottom: "20px" }}>
-            <div style={{ fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "8px" }}>Salary range</div>
+            <div style={{ fontSize: "13px", fontWeight: 700, color: "#1C1C1E", marginBottom: "8px" }}>Pay range</div>
+            {/* Hourly / Salary toggle */}
+            <div style={{ display: "flex", gap: 0, marginBottom: "10px", borderRadius: "10px", overflow: "hidden", border: "1.5px solid #E5E5EA", width: "fit-content" }}>
+              <button
+                type="button"
+                onClick={() => { setPayType("hourly"); setSalaryRanges([]); }}
+                style={{
+                  padding: "8px 20px", border: "none", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                  background: payType === "hourly" ? "#1C1C1E" : "#FFFFFF",
+                  color: payType === "hourly" ? "#FFFFFF" : "#636366",
+                }}
+              >
+                Hourly
+              </button>
+              <button
+                type="button"
+                onClick={() => { setPayType("salary"); setSalaryRanges([]); }}
+                style={{
+                  padding: "8px 20px", border: "none", borderLeft: "1.5px solid #E5E5EA", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                  background: payType === "salary" ? "#1C1C1E" : "#FFFFFF",
+                  color: payType === "salary" ? "#FFFFFF" : "#636366",
+                }}
+              >
+                Salary
+              </button>
+            </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "7px" }}>
-              {SALARY_RANGE_OPTIONS.map((opt) => (
-                <span key={opt} style={{ padding: "9px 15px", borderRadius: "22px", border: salaryRange === opt ? "1.5px solid #1C1C1E" : "1.5px solid #E5E5EA", background: salaryRange === opt ? "#1C1C1E" : "#FFFFFF", fontSize: "13px", fontWeight: 500, color: salaryRange === opt ? "#FFFFFF" : "#1C1C1E", cursor: "pointer", userSelect: "none", fontFamily: "inherit" }} onClick={() => setSalaryRange(opt)}>{opt}</span>
+              {(payType === "hourly" ? HOURLY_RANGE_OPTIONS : SALARY_RANGE_OPTIONS).map((opt) => (
+                <span key={opt} style={{ padding: "9px 15px", borderRadius: "22px", border: salaryRanges.includes(opt) ? "1.5px solid #1C1C1E" : "1.5px solid #E5E5EA", background: salaryRanges.includes(opt) ? "#1C1C1E" : "#FFFFFF", fontSize: "13px", fontWeight: 500, color: salaryRanges.includes(opt) ? "#FFFFFF" : "#1C1C1E", cursor: "pointer", userSelect: "none", fontFamily: "inherit" }} onClick={() => setSalaryRanges(salaryRanges.includes(opt) ? salaryRanges.filter((v) => v !== opt) : [...salaryRanges, opt])}>{opt}</span>
               ))}
             </div>
           </div>
@@ -314,7 +338,7 @@ export default function SeekerOnboarding() {
               <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #F5F5F5", fontSize: "13px" }}><span style={{ color: "#636366" }}>Experience</span><span style={{ color: "#1C1C1E", fontWeight: 600 }}>{experience || "—"}</span></div>
               <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #F5F5F5", fontSize: "13px" }}><span style={{ color: "#636366" }}>Setup</span><span style={{ color: "#1C1C1E", fontWeight: 600 }}>{workSetup || "—"}</span></div>
               <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #F5F5F5", fontSize: "13px" }}><span style={{ color: "#636366" }}>Available</span><span style={{ color: "#1C1C1E", fontWeight: 600 }}>{canStart || "—"}</span></div>
-              <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #F5F5F5", fontSize: "13px" }}><span style={{ color: "#636366" }}>Pay range</span><span style={{ color: "#1C1C1E", fontWeight: 600 }}>{salaryRange || "—"}</span></div>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #F5F5F5", fontSize: "13px" }}><span style={{ color: "#636366" }}>Pay range</span><span style={{ color: "#1C1C1E", fontWeight: 600 }}>{salaryRanges.length > 0 ? salaryRanges.join(", ") : "—"}</span></div>
             </div>
             {(certifications.length > 0 || skills.length > 0) && (
               <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", padding: "12px 18px 16px" }}>

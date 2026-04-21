@@ -10,19 +10,22 @@ import {
   CATEGORIES,
   SEGMENT_CERTIFICATIONS,
   SEGMENT_SKILLS,
+  HOURLY_RANGE_OPTIONS,
   SALARY_RANGE_OPTIONS,
-  LOCATION_OPTIONS,
   WORK_SETUP_OPTIONS,
   parseSalaryRange,
   formatSalary,
   EXPRESS_BRANDING,
 } from "@/lib/constants";
+import type { Branch } from "@/lib/types";
 
 export default function JobsPage() {
   const [supabase] = useState(() => createClient());
   const [jobs, setJobs] = useState<JobListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
+  const [branch, setBranch] = useState<Branch | null>(null);
+  const [branchId, setBranchId] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -31,8 +34,8 @@ export default function JobsPage() {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<string | null>(null);
   const [experience, setExperience] = useState<string | null>(null);
-  const [salaryRange, setSalaryRange] = useState<string | null>(null);
-  const [city, setCity] = useState<string | null>(null);
+  const [payType, setPayType] = useState<"hourly" | "salary">("hourly");
+  const [salaryRanges, setSalaryRanges] = useState<string[]>([]);
   const [arrangement, setArrangement] = useState<string | null>(null);
   const [requiredSkills, setRequiredSkills] = useState<string[]>([]);
   const [requiredCerts, setRequiredCerts] = useState<string[]>([]);
@@ -48,14 +51,26 @@ export default function JobsPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { setLoading(false); return; }
 
-      const { data: profile } = await supabase.from("profiles").select("organization_id").eq("id", user.id).single();
-      const orgId = profile?.organization_id;
+      const { data: profile } = await supabase.from("profiles").select("branch_id, is_admin").eq("id", user.id).single();
+      const bid = profile?.branch_id;
+      setBranchId(bid || null);
 
-      if (orgId) {
+      // Load branch info for city display
+      if (bid) {
+        const { data: branchData } = await supabase.from("branches").select("*").eq("id", bid).single();
+        if (branchData) setBranch(branchData as Branch);
+
         const { data } = await supabase
           .from("job_listings")
           .select("*")
-          .eq("organization_id", orgId)
+          .eq("branch_id", bid)
+          .order("created_at", { ascending: false });
+        if (data) setJobs(data as JobListing[]);
+      } else if (profile?.is_admin) {
+        // Admin with no branch — show all jobs
+        const { data } = await supabase
+          .from("job_listings")
+          .select("*")
           .order("created_at", { ascending: false });
         if (data) setJobs(data as JobListing[]);
       }
@@ -76,21 +91,28 @@ export default function JobsPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setFormError("Not authenticated."); setSaving(false); return; }
 
-    const { data: profile } = await supabase.from("profiles").select("organization_id").eq("id", user.id).single();
-    if (!profile?.organization_id) { setFormError("No organization found. Complete recruiter setup first."); setSaving(false); return; }
+    if (!branchId) { setFormError("No branch assigned. Contact an admin."); setSaving(false); return; }
 
-    const salary = parseSalaryRange(salaryRange);
+    let salaryMin: number | null = null;
+    let salaryMax: number | null = null;
+    for (const r of salaryRanges) {
+      const parsed = parseSalaryRange(r);
+      if (parsed) {
+        if (salaryMin === null || parsed.min < salaryMin) salaryMin = parsed.min;
+        if (salaryMax === null || parsed.max > salaryMax) salaryMax = parsed.max;
+      }
+    }
     const { data, error } = await supabase.from("job_listings").insert({
-      organization_id: profile.organization_id,
+      branch_id: branchId,
       created_by: user.id,
       title: title.trim(),
       description: description.trim() || null,
       category,
       years_experience: experience,
-      salary_min: salary?.min || null,
-      salary_max: salary?.max || null,
+      salary_min: salaryMin,
+      salary_max: salaryMax,
       arrangement: arrangement?.toLowerCase() || null,
-      city,
+      city: branch?.cities?.[0] || null,
       state: "IA",
       required_skills: requiredSkills,
       required_certifications: requiredCerts,
@@ -108,7 +130,7 @@ export default function JobsPage() {
 
   const resetForm = () => {
     setTitle(""); setDescription(""); setCategory(null); setExperience(null);
-    setSalaryRange(null); setCity(null); setArrangement(null);
+    setPayType("hourly"); setSalaryRanges([]); setArrangement(null);
     setRequiredSkills([]); setRequiredCerts([]); setFormError("");
   };
 
@@ -475,20 +497,45 @@ export default function JobsPage() {
                 </div>
               </div>
 
-              {/* Salary */}
+              {/* Pay Range */}
               <div>
-                <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Salary Range</label>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Pay Range</label>
+                {/* Hourly / Salary toggle */}
+                <div style={{ display: "flex", gap: 0, marginBottom: 10, borderRadius: 10, overflow: "hidden", border: "1.5px solid #E5E5EA", width: "fit-content" }}>
+                  <button
+                    type="button"
+                    onClick={() => { setPayType("hourly"); setSalaryRanges([]); }}
+                    style={{
+                      padding: "8px 20px", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                      background: payType === "hourly" ? "#0060A9" : "#FFFFFF",
+                      color: payType === "hourly" ? "#FFFFFF" : "#636366",
+                    }}
+                  >
+                    Hourly
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setPayType("salary"); setSalaryRanges([]); }}
+                    style={{
+                      padding: "8px 20px", border: "none", borderLeft: "1.5px solid #E5E5EA", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                      background: payType === "salary" ? "#0060A9" : "#FFFFFF",
+                      color: payType === "salary" ? "#FFFFFF" : "#636366",
+                    }}
+                  >
+                    Salary
+                  </button>
+                </div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {SALARY_RANGE_OPTIONS.map((s) => (
+                  {(payType === "hourly" ? HOURLY_RANGE_OPTIONS : SALARY_RANGE_OPTIONS).map((s) => (
                     <span
                       key={s}
-                      onClick={() => setSalaryRange(s)}
+                      onClick={() => setSalaryRanges(salaryRanges.includes(s) ? salaryRanges.filter((v) => v !== s) : [...salaryRanges, s])}
                       style={{
                         padding: "8px 14px",
                         borderRadius: 20,
                         border: "1.5px solid #E5E5EA",
-                        background: salaryRange === s ? "#0060A9" : "#FFFFFF",
-                        color: salaryRange === s ? "#FFFFFF" : "#636366",
+                        background: salaryRanges.includes(s) ? "#0060A9" : "#FFFFFF",
+                        color: salaryRanges.includes(s) ? "#FFFFFF" : "#636366",
                         fontSize: 12,
                         fontWeight: 500,
                         cursor: "pointer",
@@ -501,29 +548,18 @@ export default function JobsPage() {
                 </div>
               </div>
 
-              {/* Location */}
+              {/* Branch / Location (auto from branch) */}
               <div>
                 <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", display: "block", marginBottom: 8 }}>Location</label>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {LOCATION_OPTIONS.map((loc) => (
-                    <span
-                      key={loc}
-                      onClick={() => setCity(loc)}
-                      style={{
-                        padding: "8px 14px",
-                        borderRadius: 20,
-                        border: "1.5px solid #E5E5EA",
-                        background: city === loc ? "#0060A9" : "#FFFFFF",
-                        color: city === loc ? "#FFFFFF" : "#636366",
-                        fontSize: 12,
-                        fontWeight: 500,
-                        cursor: "pointer",
-                        transition: "all 0.2s ease"
-                      }}
-                    >
-                      {loc}
-                    </span>
-                  ))}
+                <div style={{
+                  padding: "10px 14px",
+                  borderRadius: 10,
+                  background: "#E8F1FA",
+                  fontSize: 13,
+                  color: "#0060A9",
+                  fontWeight: 600,
+                }}>
+                  {branch ? `${branch.name} — ${branch.cities.join(", ")}` : "Loading branch…"}
                 </div>
               </div>
 

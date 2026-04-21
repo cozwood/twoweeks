@@ -6,36 +6,42 @@ import {
   EXPERIENCE_OPTIONS,
   WORK_SETUP_OPTIONS,
   LOCATION_OPTIONS,
+  HOURLY_RANGE_OPTIONS,
+  SALARY_RANGE_OPTIONS,
   JOB_SEGMENTS,
+  parseSalaryRange,
 } from "@/lib/constants";
 
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function salaryToRange(min: number | null, max: number | null): string {
-  if (!min || !max) return "";
-  const ranges: Record<string, string> = { "40000-60000": "$40–60k", "60000-80000": "$60–80k", "80000-100000": "$80–100k", "100000-120000": "$100–120k" };
-  return ranges[`${min}-${max}`] || (min < 40000 ? "Under $40k" : "$120k+");
+/** Convert stored salary_min/max back to the closest matching range chips */
+function salaryToRanges(min: number | null, max: number | null): { payType: "hourly" | "salary"; ranges: string[] } {
+  if (!min && !max) return { payType: "hourly", ranges: [] };
+  // Try hourly ranges first
+  const hourlyMatches: string[] = [];
+  for (const r of HOURLY_RANGE_OPTIONS) {
+    const parsed = parseSalaryRange(r);
+    if (parsed && min !== null && max !== null && parsed.min >= min && parsed.max <= max) hourlyMatches.push(r);
+  }
+  if (hourlyMatches.length > 0) return { payType: "hourly", ranges: hourlyMatches };
+  // Try salary ranges
+  const salaryMatches: string[] = [];
+  for (const r of SALARY_RANGE_OPTIONS) {
+    const parsed = parseSalaryRange(r);
+    if (parsed && min !== null && max !== null && parsed.min >= min && parsed.max <= max) salaryMatches.push(r);
+  }
+  if (salaryMatches.length > 0) return { payType: "salary", ranges: salaryMatches };
+  // Fallback: return empty
+  return { payType: "hourly", ranges: [] };
 }
 
-function rangeToSalary(range: string): { min: number; max: number } | null {
-  const m: Record<string, { min: number; max: number }> = {
-    "Under $40k": { min: 0, max: 40000 }, "$40–60k": { min: 40000, max: 60000 },
-    "$60–80k": { min: 60000, max: 80000 }, "$80–100k": { min: 80000, max: 100000 },
-    "$100–120k": { min: 100000, max: 120000 }, "$120k+": { min: 120000, max: 200000 },
-  };
-  return m[range] || null;
-}
-
-interface ProfileData { headline: string; field: string; jobTitle: string; experience: string; workSetup: string; payRange: string; city: string; }
+interface ProfileData { headline: string; field: string; jobTitle: string; experience: string; workSetup: string; city: string; }
 interface BlockedCompany { id: string; company_name: string; }
 
 const HEADLINE_OPTIONS = ["I lead teams and hit targets", "I build and ship software", "I keep operations running smooth", "I manage the money", "I take care of people", "I work with my hands"];
 const SEGMENT_NAMES = Object.keys(JOB_SEGMENTS);
-// EXPERIENCE_OPTIONS and WORK_SETUP_OPTIONS imported from constants
-const PAY_RANGE_OPTIONS = ["Under $40k", "$40–60k", "$60–80k", "$80–100k", "$100–120k", "$120k+"];
-const CITY_OPTIONS = ["Des Moines", "Cedar Rapids", "Davenport", "Iowa City", "Waterloo", "Ames", "West Des Moines", "Ankeny"];
 
 const chipBaseStyle = {
   padding: "8px 16px",
@@ -61,7 +67,9 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [profile, setProfile] = useState<ProfileData>({ headline: "", field: "", jobTitle: "", experience: "", workSetup: "", payRange: "", city: "" });
+  const [profile, setProfile] = useState<ProfileData>({ headline: "", field: "", jobTitle: "", experience: "", workSetup: "", city: "" });
+  const [payType, setPayType] = useState<"hourly" | "salary">("hourly");
+  const [salaryRanges, setSalaryRanges] = useState<string[]>([]);
   const [blocked, setBlocked] = useState<BlockedCompany[]>([]);
   const [blockInput, setBlockInput] = useState("");
 
@@ -73,13 +81,15 @@ export default function Profile() {
 
         const { data: card } = await supabase.from("seeker_cards").select("headline, category, job_title, years_experience, arrangement, salary_min, salary_max, city").eq("profile_id", user.id).single();
         if (card) {
+          const { payType: pt, ranges: sr } = salaryToRanges(card.salary_min, card.salary_max);
+          setPayType(pt);
+          setSalaryRanges(sr);
           setProfile({
             headline: card.headline || "",
             field: card.category || "",
             jobTitle: card.job_title || "",
             experience: card.years_experience || "",
             workSetup: card.arrangement ? capitalize(card.arrangement) : "",
-            payRange: salaryToRange(card.salary_min, card.salary_max),
             city: card.city || "",
           });
         }
@@ -95,11 +105,19 @@ export default function Profile() {
     setSaving(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSaving(false); return; }
-    const salary = rangeToSalary(profile.payRange);
+    let salaryMin: number | null = null;
+    let salaryMax: number | null = null;
+    for (const r of salaryRanges) {
+      const parsed = parseSalaryRange(r);
+      if (parsed) {
+        if (salaryMin === null || parsed.min < salaryMin) salaryMin = parsed.min;
+        if (salaryMax === null || parsed.max > salaryMax) salaryMax = parsed.max;
+      }
+    }
     const { error } = await supabase.from("seeker_cards").update({
       headline: profile.headline, category: profile.field, job_title: profile.jobTitle,
       years_experience: profile.experience,
-      arrangement: profile.workSetup.toLowerCase() || null, salary_min: salary?.min || null, salary_max: salary?.max || null, city: profile.city,
+      arrangement: profile.workSetup.toLowerCase() || null, salary_min: salaryMin, salary_max: salaryMax, city: profile.city,
     }).eq("profile_id", user.id);
     setSaving(false);
     if (!error) { setSaved(true); setTimeout(() => setSaved(false), 2000); }
@@ -233,12 +251,35 @@ export default function Profile() {
       {/* Pay range */}
       <div style={{ padding: "16px 20px" }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", marginBottom: 8 }}>Pay range</div>
+        {/* Hourly / Salary toggle */}
+        <div style={{ display: "flex", gap: 0, marginBottom: 10, borderRadius: 10, overflow: "hidden", border: "1.5px solid #E5E5EA", width: "fit-content" }}>
+          <button
+            onClick={() => { setPayType("hourly"); setSalaryRanges([]); }}
+            style={{
+              padding: "8px 20px", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+              background: payType === "hourly" ? "#1C1C1E" : "#FFFFFF",
+              color: payType === "hourly" ? "#FFFFFF" : "#636366",
+            }}
+          >
+            Hourly
+          </button>
+          <button
+            onClick={() => { setPayType("salary"); setSalaryRanges([]); }}
+            style={{
+              padding: "8px 20px", border: "none", borderLeft: "1.5px solid #E5E5EA", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+              background: payType === "salary" ? "#1C1C1E" : "#FFFFFF",
+              color: payType === "salary" ? "#FFFFFF" : "#636366",
+            }}
+          >
+            Salary
+          </button>
+        </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {PAY_RANGE_OPTIONS.map((o) => (
+          {(payType === "hourly" ? HOURLY_RANGE_OPTIONS : SALARY_RANGE_OPTIONS).map((o) => (
             <button
               key={o}
-              onClick={() => setProfile({ ...profile, payRange: o })}
-              style={profile.payRange === o ? chipSelectedStyle : chipBaseStyle}
+              onClick={() => setSalaryRanges(salaryRanges.includes(o) ? salaryRanges.filter((v) => v !== o) : [...salaryRanges, o])}
+              style={salaryRanges.includes(o) ? chipSelectedStyle : chipBaseStyle}
             >
               {o}
             </button>
@@ -250,7 +291,7 @@ export default function Profile() {
       <div style={{ padding: "16px 20px" }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1E", marginBottom: 8 }}>City</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {CITY_OPTIONS.map((o) => (
+          {LOCATION_OPTIONS.map((o) => (
             <button
               key={o}
               onClick={() => setProfile({ ...profile, city: o })}

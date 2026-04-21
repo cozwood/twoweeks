@@ -4,14 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import { LOCATION_OPTIONS } from "@/lib/constants";
 
 type Step = 1 | 2;
-
-const CITY_OPTIONS = [
-  "Des Moines", "Cedar Rapids", "Davenport", "Sioux City", "Iowa City",
-  "Waterloo", "Ames", "West Des Moines", "Ankeny", "Urbandale",
-  "Council Bluffs", "Dubuque",
-];
 
 export default function EmployerOnboarding() {
   const router = useRouter();
@@ -288,7 +283,7 @@ export default function EmployerOnboarding() {
               City
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "7px" }}>
-              {CITY_OPTIONS.map((c) => (
+              {LOCATION_OPTIONS.map((c) => (
                 <span
                   key={c}
                   style={{
