@@ -153,7 +153,7 @@ export default function LoginPage() {
             I&apos;m hiring
           </Link>
           <br /><br />
-          <Link href="/internal" style={{ color: "#003768", fontWeight: 600, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: "2px", fontSize: "11px" }}>
+          <Link href="/internal" style={{ color: "#0060A9", fontWeight: 600, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: "2px", fontSize: "11px" }}>
             Express Employment Login →
           </Link>
         </div>

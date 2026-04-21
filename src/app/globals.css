@@ -554,16 +554,16 @@ html, body { height: 100%; }
 
 /* ── Express Employment Staffing Mode ── */
 :root {
-  --express-navy: #003768;
-  --express-navy-light: #0a4a80;
+  --express-blue: #0060A9;
+  --express-blue-dark: #004B87;
   --express-orange: #F7941D;
   --express-orange-light: #FFA940;
   --express-orange-bg: #FFF7ED;
 }
 
 @theme inline {
-  --color-express-navy: var(--express-navy);
-  --color-express-navy-light: var(--express-navy-light);
+  --color-express-blue: var(--express-blue);
+  --color-express-blue-dark: var(--express-blue-dark);
   --color-express-orange: var(--express-orange);
   --color-express-orange-light: var(--express-orange-light);
   --color-express-orange-bg: var(--express-orange-bg);
@@ -571,7 +571,7 @@ html, body { height: 100%; }
 
 /* Staffing mode overrides */
 .staffing-mode .screen-body { background: #F8FAFC; }
-.staffing-header { background: var(--express-navy); padding: 24px 20px 16px; }
+.staffing-header { background: var(--express-blue); padding: 24px 20px 16px; }
 .staffing-header h1 { font-size: 24px; font-weight: 800; color: var(--white); letter-spacing: -0.5px; }
 .staffing-header .subtitle { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 2px; }
 .staffing-header .express-badge {
@@ -583,7 +583,7 @@ html, body { height: 100%; }
 
 /* Job card header — Express navy instead of charcoal */
 .staffing-mode .job-card-header {
-  background: var(--express-navy); padding: 16px 18px;
+  background: var(--express-blue); padding: 16px 18px;
   display: flex; align-items: center; gap: 12px;
 }
 .staffing-mode .job-card-header .title { font-size: 16px; font-weight: 600; color: var(--white); }

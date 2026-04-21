@@ -41,8 +41,8 @@ export function BottomNav({ role }: BottomNavProps) {
   const items = role === "recruiter" ? recruiterItems : role === "seeker" ? seekerItems : employerItems;
 
   // Express navy for recruiter mode
-  const activeColor = role === "recruiter" ? "text-express-navy" : "text-charcoal";
-  const activeFontClass = role === "recruiter" ? "text-express-navy font-semibold" : "text-charcoal font-semibold";
+  const activeColor = role === "recruiter" ? "text-express-blue" : "text-charcoal";
+  const activeFontClass = role === "recruiter" ? "text-express-blue font-semibold" : "text-charcoal font-semibold";
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 mx-auto max-w-[430px] h-16 bg-white border-t border-border flex items-center justify-around z-50">

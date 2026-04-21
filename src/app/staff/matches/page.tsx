@@ -17,7 +17,7 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   pending: { bg: "#FFF7ED", text: "#F7941D" },
   reviewed: { bg: "#F5F5F5", text: "#3A3A3C" },
   interested: { bg: "#F0FFF4", text: "#22863A" },
-  hired: { bg: "#003768", text: "#FFFFFF" },
+  hired: { bg: "#0060A9", text: "#FFFFFF" },
   declined: { bg: "#FFF5F5", text: "#E53E3E" },
 };
 
@@ -123,7 +123,7 @@ export default function MatchesPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#F8FAFC", paddingBottom: 80 }}>
       {/* Header */}
-      <div style={{ background: "#003768", padding: "20px 16px", color: "#FFFFFF" }}>
+      <div style={{ background: "#0060A9", padding: "20px 16px", color: "#FFFFFF" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
           <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F7941D", display: "inline-block" }} />
           <span style={{ fontSize: 11, fontWeight: 700, color: "#F7941D", textTransform: "uppercase" }}>
@@ -149,8 +149,8 @@ export default function MatchesPage() {
               fontWeight: 600,
               whiteSpace: "nowrap",
               transition: "all 0.2s ease",
-              border: statusFilter === s ? "1px solid #003768" : "1px solid #E5E5EA",
-              background: statusFilter === s ? "#003768" : "#FFFFFF",
+              border: statusFilter === s ? "1px solid #0060A9" : "1px solid #E5E5EA",
+              background: statusFilter === s ? "#0060A9" : "#FFFFFF",
               color: statusFilter === s ? "#FFFFFF" : "#636366",
               cursor: "pointer"
             }}
@@ -201,8 +201,8 @@ export default function MatchesPage() {
                   fontWeight: 600,
                   padding: "4px 10px",
                   borderRadius: 20,
-                  background: STATUS_COLORS[match.status]?.bg || "#E8EBF5",
-                  color: STATUS_COLORS[match.status]?.text || "#003768"
+                  background: STATUS_COLORS[match.status]?.bg || "#E8F1FA",
+                  color: STATUS_COLORS[match.status]?.text || "#0060A9"
                 }}>
                   {STATUS_LABELS[match.status] || match.status}
                 </span>
@@ -243,7 +243,7 @@ export default function MatchesPage() {
                       style={{
                         flex: 1,
                         border: "1.5px solid #E5E5EA",
-                        color: "#003768",
+                        color: "#0060A9",
                         fontWeight: 600,
                         padding: "10px 16px",
                         background: "#FFFFFF",
@@ -280,7 +280,7 @@ export default function MatchesPage() {
                     onClick={() => updateStatus(match.id, "hired")}
                     style={{
                       flex: 1,
-                      background: "#003768",
+                      background: "#0060A9",
                       color: "#FFFFFF",
                       fontWeight: 600,
                       padding: "10px 16px",
@@ -290,8 +290,8 @@ export default function MatchesPage() {
                       cursor: "pointer",
                       transition: "background 0.2s ease"
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "#0a4a80")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "#003768")}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#004B87")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "#0060A9")}
                   >
                     Mark Hired
                   </button>
@@ -300,7 +300,7 @@ export default function MatchesPage() {
                   onClick={() => { setSelectedMatch(match); setNotes(match.notes || ""); setNotesOpen(true); }}
                   style={{
                     border: "1.5px solid #E5E5EA",
-                    color: "#003768",
+                    color: "#0060A9",
                     fontWeight: 600,
                     padding: "10px 14px",
                     background: "#FFFFFF",
@@ -373,7 +373,7 @@ export default function MatchesPage() {
                   style={{
                     flex: 1,
                     border: "1.5px solid #E5E5EA",
-                    color: "#003768",
+                    color: "#0060A9",
                     fontWeight: 600,
                     padding: "12px 16px",
                     background: "#FFFFFF",
@@ -389,7 +389,7 @@ export default function MatchesPage() {
                   disabled={savingNotes}
                   style={{
                     flex: 2,
-                    background: "#003768",
+                    background: "#0060A9",
                     color: "#FFFFFF",
                     fontWeight: 600,
                     padding: "12px 16px",
@@ -401,10 +401,10 @@ export default function MatchesPage() {
                     transition: "background 0.2s ease"
                   }}
                   onMouseEnter={(e) => {
-                    if (!savingNotes) e.currentTarget.style.background = "#0a4a80";
+                    if (!savingNotes) e.currentTarget.style.background = "#004B87";
                   }}
                   onMouseLeave={(e) => {
-                    if (!savingNotes) e.currentTarget.style.background = "#003768";
+                    if (!savingNotes) e.currentTarget.style.background = "#0060A9";
                   }}
                 >
                   {savingNotes ? "Saving…" : "Save Notes"}

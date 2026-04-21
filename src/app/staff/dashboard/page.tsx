@@ -91,7 +91,7 @@ export default function StaffingDashboard() {
   return (
     <div style={{ minHeight: "100vh", background: "#F8FAFC", paddingBottom: 80 }}>
       {/* Header */}
-      <div style={{ background: "#003768", padding: "20px 16px", color: "#FFFFFF" }}>
+      <div style={{ background: "#0060A9", padding: "20px 16px", color: "#FFFFFF" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
           <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F7941D", display: "inline-block" }} />
           <span style={{ fontSize: 11, fontWeight: 700, color: "#F7941D", textTransform: "uppercase" }}>
@@ -118,7 +118,7 @@ export default function StaffingDashboard() {
           onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)")}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: "#003768", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: "#0060A9", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Users size={18} color="#FFFFFF" />
             </div>
             <div>
@@ -202,7 +202,7 @@ export default function StaffingDashboard() {
           onClick={() => router.push("/staff/jobs?new=1")}
           style={{
             flex: 1,
-            background: "#003768",
+            background: "#0060A9",
             color: "#FFFFFF",
             fontWeight: 600,
             fontSize: 14,
@@ -212,8 +212,8 @@ export default function StaffingDashboard() {
             cursor: "pointer",
             transition: "background 0.2s ease"
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = "#0a4a80")}
-          onMouseLeave={(e) => (e.currentTarget.style.background = "#003768")}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#004B87")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "#0060A9")}
         >
           + New Job
         </button>
@@ -221,8 +221,8 @@ export default function StaffingDashboard() {
           onClick={() => router.push("/staff/candidates")}
           style={{
             flex: 1,
-            border: "1.5px solid #003768",
-            color: "#003768",
+            border: "1.5px solid #0060A9",
+            color: "#0060A9",
             fontWeight: 600,
             fontSize: 14,
             padding: "14px 16px",

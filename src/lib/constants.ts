@@ -159,7 +159,9 @@ export function getCategoryInitials(cat: string | null): string {
 export const EXPRESS_BRANDING = {
   name: "Express Employment Professionals",
   shortName: "Express",
-  primaryColor: "#003768",   // Express navy blue
+  primaryColor: "#0060A9",   // Express corporate blue
+  secondaryColor: "#004B87", // Express dark blue (hover states)
   accentColor: "#F7941D",    // Express orange
-  tagline: "Staffing made simple.",
+  lightBlue: "#E8F1FA",      // Express blue tint (tag backgrounds)
+  tagline: "Helping People Succeed",
 } as const;

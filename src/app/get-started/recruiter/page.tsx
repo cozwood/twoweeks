@@ -90,7 +90,7 @@ export default function RecruiterOnboarding() {
             style={{
               flex: 1,
               height: "3px",
-              background: s <= step ? "#003768" : "#E5E5EA",
+              background: s <= step ? "#0060A9" : "#E5E5EA",
               borderRadius: "2px",
             }}
           />
@@ -103,7 +103,7 @@ export default function RecruiterOnboarding() {
       {step === 1 && (
         <>
           {/* Express-branded header */}
-          <div style={{ background: "#003768", padding: "24px 20px 24px" }}>
+          <div style={{ background: "#0060A9", padding: "24px 20px 24px" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#F7941D", fontWeight: 700, letterSpacing: "0.5px", marginBottom: "8px", textTransform: "uppercase" }}>
               <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#F7941D" }} />
               Internal Staffing Tool
@@ -136,8 +136,8 @@ export default function RecruiterOnboarding() {
                     style={{
                       padding: "9px 15px",
                       borderRadius: "22px",
-                      border: city === loc ? "1.5px solid #003768" : "1.5px solid #E5E5EA",
-                      background: city === loc ? "#003768" : "#FFFFFF",
+                      border: city === loc ? "1.5px solid #0060A9" : "1.5px solid #E5E5EA",
+                      background: city === loc ? "#0060A9" : "#FFFFFF",
                       fontSize: "13px",
                       fontWeight: 500,
                       color: city === loc ? "#FFFFFF" : "#1C1C1E",
@@ -157,7 +157,7 @@ export default function RecruiterOnboarding() {
           <div style={{ padding: "8px 20px 20px" }}>
             <button
               type="button"
-              style={{ display: "block", width: "100%", padding: "15px", borderRadius: "14px", fontSize: "15px", fontWeight: 600, textAlign: "center", cursor: "pointer", marginBottom: "10px", border: "1.5px solid transparent", fontFamily: "inherit", background: "#003768", color: "#FFFFFF" }}
+              style={{ display: "block", width: "100%", padding: "15px", borderRadius: "14px", fontSize: "15px", fontWeight: 600, textAlign: "center", cursor: "pointer", marginBottom: "10px", border: "1.5px solid transparent", fontFamily: "inherit", background: "#0060A9", color: "#FFFFFF" }}
               onClick={() => setStep(2)}
             >
               Continue
@@ -241,7 +241,7 @@ export default function RecruiterOnboarding() {
           <div style={{ padding: "8px 20px 20px" }}>
             <button
               type="button"
-              style={{ display: "block", width: "100%", padding: "15px", borderRadius: "14px", fontSize: "15px", fontWeight: 600, textAlign: "center", cursor: "pointer", marginBottom: "10px", border: "1.5px solid transparent", fontFamily: "inherit", background: "#003768", color: "#FFFFFF", opacity: loading ? 0.6 : 1 }}
+              style={{ display: "block", width: "100%", padding: "15px", borderRadius: "14px", fontSize: "15px", fontWeight: 600, textAlign: "center", cursor: "pointer", marginBottom: "10px", border: "1.5px solid transparent", fontFamily: "inherit", background: "#0060A9", color: "#FFFFFF", opacity: loading ? 0.6 : 1 }}
               onClick={handleSignUp}
               disabled={loading}
             >

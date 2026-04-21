@@ -136,7 +136,7 @@ export default function JobsPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#F8FAFC", paddingBottom: 80 }}>
       {/* Header */}
-      <div style={{ background: "#003768", padding: "20px 16px", color: "#FFFFFF" }}>
+      <div style={{ background: "#0060A9", padding: "20px 16px", color: "#FFFFFF" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
           <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F7941D", display: "inline-block" }} />
           <span style={{ fontSize: 11, fontWeight: 700, color: "#F7941D", textTransform: "uppercase" }}>
@@ -155,7 +155,7 @@ export default function JobsPage() {
           onClick={() => setShowCreate(true)}
           style={{
             width: "100%",
-            background: "#003768",
+            background: "#0060A9",
             color: "#FFFFFF",
             fontWeight: 600,
             padding: "14px 16px",
@@ -165,8 +165,8 @@ export default function JobsPage() {
             cursor: "pointer",
             transition: "background 0.2s ease"
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = "#0a4a80")}
-          onMouseLeave={(e) => (e.currentTarget.style.background = "#003768")}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#004B87")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "#0060A9")}
         >
           + Create New Job
         </button>
@@ -189,7 +189,7 @@ export default function JobsPage() {
                   overflow: "hidden"
                 }}
               >
-                <div style={{ background: "#0a4a80", padding: "12px 16px", display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ background: "#004B87", padding: "12px 16px", display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ color: "#FFFFFF", fontWeight: 600, fontSize: 14, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                       {job.title}
@@ -225,7 +225,7 @@ export default function JobsPage() {
                       </span>
                     ))}
                     {job.required_skills?.map((s) => (
-                      <span key={s} style={{ background: "#E8EBF5", color: "#003768", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
+                      <span key={s} style={{ background: "#E8F1FA", color: "#0060A9", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
                         {s}
                       </span>
                     ))}
@@ -237,7 +237,7 @@ export default function JobsPage() {
                     style={{
                       flex: 1,
                       border: "1.5px solid #E5E5EA",
-                      color: "#003768",
+                      color: "#0060A9",
                       fontWeight: 600,
                       padding: "10px 16px",
                       background: "#FFFFFF",
@@ -252,7 +252,7 @@ export default function JobsPage() {
                     onClick={() => router.push(`/staff/matches?job=${job.id}`)}
                     style={{
                       flex: 1,
-                      background: "#003768",
+                      background: "#0060A9",
                       color: "#FFFFFF",
                       fontWeight: 600,
                       padding: "10px 16px",
@@ -262,8 +262,8 @@ export default function JobsPage() {
                       cursor: "pointer",
                       transition: "background 0.2s ease"
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "#0a4a80")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "#003768")}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#004B87")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "#0060A9")}
                   >
                     View Matches
                   </button>
@@ -303,7 +303,7 @@ export default function JobsPage() {
                   onClick={() => toggleActive(job)}
                   style={{
                     border: "1.5px solid #E5E5EA",
-                    color: "#003768",
+                    color: "#0060A9",
                     fontWeight: 600,
                     padding: "8px 14px",
                     background: "#FFFFFF",
@@ -371,7 +371,7 @@ export default function JobsPage() {
                         padding: "8px 14px",
                         borderRadius: 20,
                         border: "1.5px solid #E5E5EA",
-                        background: category === c ? "#003768" : "#FFFFFF",
+                        background: category === c ? "#0060A9" : "#FFFFFF",
                         color: category === c ? "#FFFFFF" : "#636366",
                         fontSize: 12,
                         fontWeight: 500,
@@ -398,7 +398,7 @@ export default function JobsPage() {
                           padding: "8px 14px",
                           borderRadius: 20,
                           border: "1.5px solid #E5E5EA",
-                          background: title === t ? "#003768" : "#FFFFFF",
+                          background: title === t ? "#0060A9" : "#FFFFFF",
                           color: title === t ? "#FFFFFF" : "#636366",
                           fontSize: 12,
                           fontWeight: 500,
@@ -461,7 +461,7 @@ export default function JobsPage() {
                         padding: "8px 14px",
                         borderRadius: 20,
                         border: "1.5px solid #E5E5EA",
-                        background: experience === e ? "#003768" : "#FFFFFF",
+                        background: experience === e ? "#0060A9" : "#FFFFFF",
                         color: experience === e ? "#FFFFFF" : "#636366",
                         fontSize: 12,
                         fontWeight: 500,
@@ -487,7 +487,7 @@ export default function JobsPage() {
                         padding: "8px 14px",
                         borderRadius: 20,
                         border: "1.5px solid #E5E5EA",
-                        background: salaryRange === s ? "#003768" : "#FFFFFF",
+                        background: salaryRange === s ? "#0060A9" : "#FFFFFF",
                         color: salaryRange === s ? "#FFFFFF" : "#636366",
                         fontSize: 12,
                         fontWeight: 500,
@@ -513,7 +513,7 @@ export default function JobsPage() {
                         padding: "8px 14px",
                         borderRadius: 20,
                         border: "1.5px solid #E5E5EA",
-                        background: city === loc ? "#003768" : "#FFFFFF",
+                        background: city === loc ? "#0060A9" : "#FFFFFF",
                         color: city === loc ? "#FFFFFF" : "#636366",
                         fontSize: 12,
                         fontWeight: 500,
@@ -539,7 +539,7 @@ export default function JobsPage() {
                         padding: "8px 14px",
                         borderRadius: 20,
                         border: "1.5px solid #E5E5EA",
-                        background: arrangement === w ? "#003768" : "#FFFFFF",
+                        background: arrangement === w ? "#0060A9" : "#FFFFFF",
                         color: arrangement === w ? "#FFFFFF" : "#636366",
                         fontSize: 12,
                         fontWeight: 500,
@@ -566,7 +566,7 @@ export default function JobsPage() {
                         padding: "8px 14px",
                         borderRadius: 20,
                         border: "1.5px solid #E5E5EA",
-                        background: requiredSkills.includes(s) ? "#003768" : "#FFFFFF",
+                        background: requiredSkills.includes(s) ? "#0060A9" : "#FFFFFF",
                         color: requiredSkills.includes(s) ? "#FFFFFF" : "#636366",
                         fontSize: 12,
                         fontWeight: 500,
@@ -594,7 +594,7 @@ export default function JobsPage() {
                         padding: "8px 14px",
                         borderRadius: 20,
                         border: "1.5px solid #E5E5EA",
-                        background: requiredCerts.includes(c) ? "#003768" : "#FFFFFF",
+                        background: requiredCerts.includes(c) ? "#0060A9" : "#FFFFFF",
                         color: requiredCerts.includes(c) ? "#FFFFFF" : "#636366",
                         fontSize: 12,
                         fontWeight: 500,
@@ -621,7 +621,7 @@ export default function JobsPage() {
                   style={{
                     flex: 1,
                     border: "1.5px solid #E5E5EA",
-                    color: "#003768",
+                    color: "#0060A9",
                     fontWeight: 600,
                     padding: "12px 16px",
                     background: "#FFFFFF",
@@ -637,7 +637,7 @@ export default function JobsPage() {
                   disabled={saving || !title.trim()}
                   style={{
                     flex: 2,
-                    background: "#003768",
+                    background: "#0060A9",
                     color: "#FFFFFF",
                     fontWeight: 600,
                     padding: "12px 16px",
@@ -649,10 +649,10 @@ export default function JobsPage() {
                     transition: "background 0.2s ease"
                   }}
                   onMouseEnter={(e) => {
-                    if (!saving && title.trim()) e.currentTarget.style.background = "#0a4a80";
+                    if (!saving && title.trim()) e.currentTarget.style.background = "#004B87";
                   }}
                   onMouseLeave={(e) => {
-                    if (!saving && title.trim()) e.currentTarget.style.background = "#003768";
+                    if (!saving && title.trim()) e.currentTarget.style.background = "#0060A9";
                   }}
                 >
                   {saving ? "Creating…" : "Create Job"}

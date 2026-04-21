@@ -113,7 +113,7 @@ export default function CandidatesPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#F8FAFC", paddingBottom: 80 }}>
       {/* Header */}
-      <div style={{ background: "#003768", padding: "20px 16px", color: "#FFFFFF" }}>
+      <div style={{ background: "#0060A9", padding: "20px 16px", color: "#FFFFFF" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
           <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F7941D", display: "inline-block" }} />
           <span style={{ fontSize: 11, fontWeight: 700, color: "#F7941D", textTransform: "uppercase" }}>
@@ -139,8 +139,8 @@ export default function CandidatesPage() {
               fontWeight: 600,
               whiteSpace: "nowrap",
               transition: "all 0.2s ease",
-              border: filters.has(key) ? "1px solid #003768" : "1px solid #E5E5EA",
-              background: filters.has(key) ? "#003768" : "#FFFFFF",
+              border: filters.has(key) ? "1px solid #0060A9" : "1px solid #E5E5EA",
+              background: filters.has(key) ? "#0060A9" : "#FFFFFF",
               color: filters.has(key) ? "#FFFFFF" : "#636366",
               cursor: "pointer"
             }}
@@ -170,13 +170,13 @@ export default function CandidatesPage() {
               }}
             >
               {/* Header — Express navy */}
-              <div style={{ background: "#0a4a80", padding: "12px 16px", display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ background: "#004B87", padding: "12px 16px", display: "flex", alignItems: "center", gap: 12 }}>
                 <div
                   style={{
                     width: 44,
                     height: 44,
                     borderRadius: 8,
-                    background: "#0a4a80",
+                    background: "#004B87",
                     color: "#FFFFFF",
                     display: "flex",
                     alignItems: "center",
@@ -236,7 +236,7 @@ export default function CandidatesPage() {
               {/* Tags */}
               <div style={{ padding: "12px 16px", background: "#FFFFFF", borderTop: "1px solid #F5F5F5", display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {c.category && (
-                  <span style={{ background: "#E8EBF5", color: "#003768", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
+                  <span style={{ background: "#E8F1FA", color: "#0060A9", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
                     {c.category}
                   </span>
                 )}
@@ -246,7 +246,7 @@ export default function CandidatesPage() {
                   </span>
                 ))}
                 {c.skills?.slice(0, 3).map((s) => (
-                  <span key={s} style={{ background: "#E8EBF5", color: "#003768", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
+                  <span key={s} style={{ background: "#E8F1FA", color: "#0060A9", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
                     {s}
                   </span>
                 ))}
@@ -258,8 +258,8 @@ export default function CandidatesPage() {
                   onClick={() => handleViewCandidate(c)}
                   style={{
                     flex: 1,
-                    border: "1.5px solid #003768",
-                    color: "#003768",
+                    border: "1.5px solid #0060A9",
+                    color: "#0060A9",
                     fontWeight: 600,
                     padding: "12px 16px",
                     background: "#FFFFFF",
@@ -281,7 +281,7 @@ export default function CandidatesPage() {
                   onClick={() => handleViewCandidate(c)}
                   style={{
                     flex: 1,
-                    background: "#003768",
+                    background: "#0060A9",
                     color: "#FFFFFF",
                     fontWeight: 600,
                     padding: "12px 16px",
@@ -291,8 +291,8 @@ export default function CandidatesPage() {
                     cursor: "pointer",
                     transition: "background 0.2s ease"
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "#0a4a80")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "#003768")}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "#004B87")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "#0060A9")}
                 >
                   Match to job
                 </button>
@@ -386,7 +386,7 @@ export default function CandidatesPage() {
                       </span>
                     ))}
                     {selectedCandidate.skills?.map((s) => (
-                      <span key={s} style={{ background: "#E8EBF5", color: "#003768", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
+                      <span key={s} style={{ background: "#E8F1FA", color: "#0060A9", fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 20 }}>
                         {s}
                       </span>
                     ))}
@@ -413,7 +413,7 @@ export default function CandidatesPage() {
                     style={{
                       flex: 1,
                       border: "1.5px solid #E5E5EA",
-                      color: "#003768",
+                      color: "#0060A9",
                       fontWeight: 600,
                       padding: "12px 16px",
                       background: "#FFFFFF",
@@ -427,7 +427,7 @@ export default function CandidatesPage() {
                   <button
                     style={{
                       flex: 2,
-                      background: "#003768",
+                      background: "#0060A9",
                       color: "#FFFFFF",
                       fontWeight: 600,
                       padding: "12px 16px",
@@ -437,8 +437,8 @@ export default function CandidatesPage() {
                       cursor: "pointer",
                       transition: "background 0.2s ease"
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "#0a4a80")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "#003768")}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#004B87")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "#0060A9")}
                   >
                     Match to job
                   </button>
