@@ -1,14 +1,18 @@
+// ============================================================
+// Database types — mirrors supabase/schema.sql
+// ============================================================
+
 export interface Profile {
   id: string
   role: 'seeker' | 'employer' | 'recruiter'
   email: string
   name: string | null
   phone: string | null
-  linkedin: string | null
   company: string | null
   title: string | null
   city: string | null
   state: string
+  branch_id: string | null
   organization_id: string | null
   created_at: string
   updated_at: string
@@ -31,7 +35,34 @@ export interface SeekerCard {
   skills: string[]
   reasons: string[]
   is_active: boolean
+  branch_id: string | null
   organization_id: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface WalkInSeeker {
+  id: string
+  branch_id: string
+  entered_by: string
+  first_name: string
+  last_name: string
+  phone: string | null
+  email: string | null
+  headline: string | null
+  job_title: string | null
+  category: string | null
+  years_experience: string | null
+  arrangement: 'on-site' | 'hybrid' | 'remote' | 'flexible' | null
+  availability: 'immediately' | '2 weeks' | '1 month' | 'flexible' | null
+  salary_min: number | null
+  salary_max: number | null
+  certifications: string[]
+  skills: string[]
+  city: string | null
+  state: string
+  status: 'new' | 'contacted' | 'matched' | 'placed' | 'inactive'
+  notes: string | null
   created_at: string
   updated_at: string
 }
@@ -47,10 +78,11 @@ export interface Intro {
   id: string
   employer_id: string
   seeker_id: string
+  job_id: string | null
+  branch_id: string | null
+  organization_id: string | null
   message: string | null
   status: 'pending' | 'revealed' | 'passed' | 'revoked' | 'hired'
-  job_id: string | null
-  organization_id: string | null
   created_at: string
   updated_at: string
 }
@@ -61,37 +93,14 @@ export interface Reveal {
   show_name: boolean
   show_email: boolean
   show_phone: boolean
-  show_linkedin: boolean  // kept for DB compat, always false for new reveals
+  show_linkedin: boolean
   revealed_at: string
-}
-
-// ── New types for multi-mode support ──
-
-export interface Organization {
-  id: string
-  name: string
-  slug: string
-  mode: 'marketplace' | 'staffing'
-  owner_id: string
-  config: OrganizationConfig
-  created_at: string
-  updated_at: string
-}
-
-export interface OrganizationConfig {
-  show_company_names?: boolean
-  show_seeker_names?: boolean
-  allow_self_serve?: boolean
-  require_recruiter_approval?: boolean
-  branding?: {
-    primary_color?: string
-    logo_url?: string
-  }
 }
 
 export interface JobListing {
   id: string
-  organization_id: string
+  branch_id: string | null
+  organization_id: string | null
   created_by: string
   title: string
   description: string | null
@@ -115,8 +124,30 @@ export interface JobMatch {
   job_id: string
   seeker_id: string
   recruiter_id: string | null
+  branch_id: string | null
   status: 'pending' | 'reviewed' | 'interested' | 'declined' | 'hired'
   notes: string | null
   created_at: string
   updated_at: string
+}
+
+export interface Branch {
+  id: string
+  name: string
+  slug: string
+  cities: string[]
+  is_active: boolean
+  created_at: string
+}
+
+export interface AuditLogEntry {
+  id: string
+  user_id: string | null
+  branch_id: string | null
+  action: string
+  table_name: string
+  record_id: string | null
+  details: Record<string, unknown>
+  ip_address: string | null
+  created_at: string
 }

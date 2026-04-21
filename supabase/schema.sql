@@ -131,6 +131,33 @@ create table if not exists public.job_matches (
   unique(job_id, seeker_id)
 );
 
+-- Walk-in seekers: kiosk tablet intake (no auth account)
+create table if not exists public.walk_in_seekers (
+  id uuid primary key default gen_random_uuid(),
+  branch_id uuid not null references public.branches(id),
+  entered_by uuid not null references auth.users(id),
+  first_name text not null,
+  last_name text not null,
+  phone text,
+  email text,
+  headline text,
+  job_title text,
+  category text,
+  years_experience text,
+  arrangement text check (arrangement in ('on-site', 'hybrid', 'remote', 'flexible')),
+  availability text check (availability in ('immediately', '2 weeks', '1 month', 'flexible')),
+  salary_min integer,
+  salary_max integer,
+  certifications text[] default '{}',
+  skills text[] default '{}',
+  city text,
+  state text not null default 'IA',
+  status text not null default 'new' check (status in ('new', 'contacted', 'matched', 'placed', 'inactive')),
+  notes text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 -- Audit log: tracks all sensitive data access
 create table if not exists public.audit_log (
   id uuid primary key default gen_random_uuid(),
@@ -164,6 +191,9 @@ create index if not exists idx_job_matches_job on public.job_matches(job_id);
 create index if not exists idx_job_matches_seeker on public.job_matches(seeker_id);
 create index if not exists idx_job_matches_recruiter on public.job_matches(recruiter_id);
 create index if not exists idx_job_matches_branch on public.job_matches(branch_id);
+create index if not exists idx_walk_in_seekers_branch on public.walk_in_seekers(branch_id);
+create index if not exists idx_walk_in_seekers_status on public.walk_in_seekers(status);
+create index if not exists idx_walk_in_seekers_created on public.walk_in_seekers(created_at);
 create index if not exists idx_audit_log_user on public.audit_log(user_id);
 create index if not exists idx_audit_log_branch on public.audit_log(branch_id);
 create index if not exists idx_audit_log_created on public.audit_log(created_at);
@@ -190,6 +220,10 @@ create trigger on_seeker_cards_updated
 
 create trigger on_intros_updated
   before update on public.intros
+  for each row execute function public.handle_updated_at();
+
+create trigger on_walk_in_seekers_updated
+  before update on public.walk_in_seekers
   for each row execute function public.handle_updated_at();
 
 -- ============================================
@@ -255,6 +289,7 @@ alter table public.intros enable row level security;
 alter table public.reveals enable row level security;
 alter table public.job_listings enable row level security;
 alter table public.job_matches enable row level security;
+alter table public.walk_in_seekers enable row level security;
 alter table public.audit_log enable row level security;
 
 -- ── BRANCHES ──
@@ -446,6 +481,29 @@ create policy "job_matches_insert_branch"
 
 create policy "job_matches_update_branch"
   on public.job_matches for update
+  using (
+    public.my_role() = 'recruiter'
+    and branch_id = public.my_branch_id()
+  );
+
+-- ── WALK-IN SEEKERS ──
+
+create policy "walk_in_seekers_insert_branch"
+  on public.walk_in_seekers for insert
+  with check (
+    public.my_role() = 'recruiter'
+    and branch_id = public.my_branch_id()
+  );
+
+create policy "walk_in_seekers_select_branch"
+  on public.walk_in_seekers for select
+  using (
+    public.my_role() = 'recruiter'
+    and branch_id = public.my_branch_id()
+  );
+
+create policy "walk_in_seekers_update_branch"
+  on public.walk_in_seekers for update
   using (
     public.my_role() = 'recruiter'
     and branch_id = public.my_branch_id()

@@ -344,8 +344,8 @@ export default function CandidatesPage() {
                   {candidateProfile?.phone && (
                     <div style={{ fontSize: 12, color: "#636366" }}>{candidateProfile.phone}</div>
                   )}
-                  {candidateProfile?.linkedin && (
-                    <div style={{ fontSize: 12, color: "#636366" }}>{candidateProfile.linkedin}</div>
+                  {candidateProfile?.company && (
+                    <div style={{ fontSize: 12, color: "#636366" }}>{candidateProfile.company}</div>
                   )}
                 </div>
 

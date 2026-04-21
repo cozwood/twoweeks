@@ -32,9 +32,14 @@ export async function updateSession(request: NextRequest) {
   const isPublic = publicRoutes.some(route => path === route || path.startsWith(route + '/'))
 
   if (!user && !isPublic) {
-    // Redirect unauthenticated users to login
+    // Redirect unauthenticated users to the right login page
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
+    // Express-branded pages (kiosk, staff) go to /internal login
+    if (path.startsWith('/kiosk') || path.startsWith('/staff')) {
+      url.pathname = '/internal'
+    } else {
+      url.pathname = '/login'
+    }
     return NextResponse.redirect(url)
   }
 
