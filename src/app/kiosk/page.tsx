@@ -1,98 +1,10 @@
-import { headers } from "next/headers";
-import { EXPRESS_BRANDING, SITE_URLS, KIOSK_HOST } from "@/lib/constants";
+import { EXPRESS_BRANDING } from "@/lib/constants";
 
-export default async function KioskPage() {
-  // Host detection: both ozvaag.com and kiosk.ozvaag.com point at this app.
-  //   - main domain → short gateway with two CTAs (links out to kiosk subdomain)
-  //   - kiosk subdomain → full explainer / "tour"
-  const headersList = await headers();
-  const host = (headersList.get("host") || "").toLowerCase();
-  const isKioskHost = host === KIOSK_HOST || host.startsWith("kiosk.");
-
-  if (isKioskHost) {
-    return <FullExplainer />;
-  }
-  return <Gateway />;
-}
-
-// ── Gateway (shown on ozvaag.com/kiosk) ──
-// Short landing page with two CTAs that send visitors to the kiosk subdomain.
-function Gateway() {
-  return (
-    <div style={{ flex: 1, overflowY: "auto", paddingBottom: "80px", background: "#F5F5F5", minHeight: "100vh" }}>
-      {/* Hero */}
-      <div style={{ background: EXPRESS_BRANDING.primaryColor, padding: "50px 28px 40px", textAlign: "center" }}>
-        <span style={{ display: "inline-block", fontSize: "11px", color: "rgba(255,255,255,0.6)", letterSpacing: "0.5px", marginBottom: "14px", fontWeight: 500 }}>
-          {EXPRESS_BRANDING.shortName.toUpperCase()} STAFFING
-        </span>
-        <div style={{ fontSize: "40px", fontWeight: 900, color: "#FFFFFF", lineHeight: 1.1, letterSpacing: "-1.2px", marginBottom: "14px" }}>
-          The Express Staffing Kiosk
-        </div>
-        <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.8)", lineHeight: 1.5, maxWidth: "340px", margin: "0 auto" }}>
-          A tablet intake system for walk-in candidates at Express Employment branches.
-        </p>
-      </div>
-
-      {/* Two CTAs */}
-      <div style={{ padding: "28px 20px 20px", display: "flex", flexDirection: "column", gap: "12px" }}>
-        <a
-          href={`${SITE_URLS.kiosk}/kiosk`}
-          style={{
-            display: "block",
-            width: "100%",
-            padding: "18px 20px",
-            borderRadius: "14px",
-            background: "#FFFFFF",
-            border: `2px solid ${EXPRESS_BRANDING.primaryColor}`,
-            color: EXPRESS_BRANDING.primaryColor,
-            textDecoration: "none",
-            fontFamily: "inherit",
-            boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-          }}
-        >
-          <div style={{ fontSize: "16px", fontWeight: 700, marginBottom: "2px" }}>
-            Curious? Click here →
-          </div>
-          <div style={{ fontSize: "13px", color: "#636366", fontWeight: 500 }}>
-            Take a tour of the Express Staffing Kiosk
-          </div>
-        </a>
-
-        <a
-          href={`${SITE_URLS.kiosk}/internal`}
-          style={{
-            display: "block",
-            width: "100%",
-            padding: "18px 20px",
-            borderRadius: "14px",
-            background: EXPRESS_BRANDING.primaryColor,
-            border: `2px solid ${EXPRESS_BRANDING.primaryColor}`,
-            color: "#FFFFFF",
-            textDecoration: "none",
-            fontFamily: "inherit",
-            boxShadow: "0 1px 2px rgba(0,0,0,0.06)",
-          }}
-        >
-          <div style={{ fontSize: "16px", fontWeight: 700, marginBottom: "2px" }}>
-            Already a user? Log in →
-          </div>
-          <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.75)", fontWeight: 500 }}>
-            Staff sign-in for Express recruiters
-          </div>
-        </a>
-      </div>
-
-      <div style={{ textAlign: "center", fontSize: "12px", color: "#AEAEB2", padding: "8px 28px 20px", lineHeight: 1.5 }}>
-        {EXPRESS_BRANDING.tagline}
-      </div>
-    </div>
-  );
-}
-
-// ── Full Explainer (shown on kiosk.ozvaag.com/kiosk) ──
-// The "tour" — headline, how-it-works steps, who it's for, and a CTA
-// that goes to /internal on the same (kiosk) domain.
-function FullExplainer() {
+// Public explainer / "tour" for the Express Staffing Kiosk.
+// Served at kiosk.ozvaag.com/kiosk (and twoweeks-iota.vercel.app/kiosk).
+// The outer ozvaag.com marketing site is a separate Cloudflare Pages project
+// and is NOT served by this app.
+export default function KioskInfoPage() {
   return (
     <div style={{ flex: 1, overflowY: "auto", paddingBottom: "80px", background: "#F5F5F5", minHeight: "100vh" }}>
       {/* Hero */}
@@ -163,7 +75,7 @@ function FullExplainer() {
         </div>
       </div>
 
-      {/* CTA — stays on the kiosk subdomain */}
+      {/* CTA */}
       <div style={{ padding: "24px 20px 20px" }}>
         <a
           href="/internal"
