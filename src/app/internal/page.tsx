@@ -113,7 +113,7 @@ export default function StaffLoginPage() {
 
           {/* Kiosk button */}
           <button
-            onClick={() => router.push("/kiosk")}
+            onClick={() => router.push("/kiosk/intake")}
             style={{
               display: "flex",
               flexDirection: "column",

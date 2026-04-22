@@ -61,6 +61,10 @@ export default function HomePage() {
         <Link href="/internal" style={{ color: '#0060A9', fontSize: '11px', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
           Express Employment Login →
         </Link>
+        <span style={{ color: '#C7C7CC', fontSize: '11px', margin: '0 8px' }}>·</span>
+        <Link href="/kiosk" style={{ color: '#0060A9', fontSize: '11px', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
+          See the Kiosk →
+        </Link>
       </div>
     </div>
   );

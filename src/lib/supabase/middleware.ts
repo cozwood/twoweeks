@@ -28,8 +28,13 @@ export async function updateSession(request: NextRequest) {
   const path = request.nextUrl.pathname
 
   // Public routes — no auth required
-  const publicRoutes = ['/', '/login', '/internal', '/get-started']
-  const isPublic = publicRoutes.some(route => path === route || path.startsWith(route + '/'))
+  // publicPrefix: match route OR any nested child (e.g. /get-started/seeker)
+  // publicExact:  match route ONLY (e.g. /kiosk is public, but /kiosk/intake is gated)
+  const publicPrefix = ['/', '/login', '/internal', '/get-started']
+  const publicExact = ['/kiosk']
+  const isPublic =
+    publicExact.includes(path) ||
+    publicPrefix.some(route => path === route || path.startsWith(route + '/'))
 
   if (!user && !isPublic) {
     // Redirect unauthenticated users to the right login page

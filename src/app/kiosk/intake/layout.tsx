@@ -2,7 +2,7 @@ import { EXPRESS_BRANDING } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
-export default function KioskLayout({
+export default function KioskIntakeLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
