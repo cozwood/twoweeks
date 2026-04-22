@@ -178,3 +178,13 @@ export const EXPRESS_BRANDING = {
   lightBlue: "#E8F1FA",      // Express blue tint (tag backgrounds)
   tagline: "Helping People Succeed",
 } as const;
+
+// Canonical site URLs — both domains point at the same Vercel project.
+// Host detection in server components decides which page to render.
+export const SITE_URLS = {
+  main: "https://ozvaag.com",         // Two Weeks marketplace
+  kiosk: "https://kiosk.ozvaag.com",  // Express kiosk subdomain
+} as const;
+
+// Convenience: hostname of the kiosk subdomain (used for host detection)
+export const KIOSK_HOST = "kiosk.ozvaag.com";
